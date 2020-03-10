@@ -5,8 +5,8 @@ const app = require("./app/app");
 const cronJobs = require("./app/cron/cronJobsController");
 
 require('dotenv').config({path: 'environment.env'});
-const db = process.env.DB_PROD || process.env.DB_DEV || process.env.DB_LOCAL;
-const host = process.env.HOST || '0.0.0.0';
+const db = process.env.DB_PROD || process.env.DB_DEV || "mongodb://localhost:27017/distritoPyme";
+const host = process.env.HOST || 'localhost';
 const port = process.env.PORT || 3900;
 
 mongoose.set('useFindAndModify', false);
