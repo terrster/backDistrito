@@ -18,19 +18,27 @@ route.get("/", (request, response) => {
     response.status(200).sendFile('index.html', { root: path.join(__dirname, '../public') });
 });
 
+//////////////login url
 route.post('/signin', async (req, res, next) => {
 
     const { email, password } = req.body;
     
+    ////////////////existing mail verification
     const user = await User.findOne({ email: email })
     if (!user) {
         res.status(404).json({ status: "Correo electronico incorrecto"})
     }
     
+    //////////////////password verification
     const validPassword = await user.validatePassword(password);
     if (!validPassword) {
         return res.status(404).json({status: "Contrasena Incorrecta"})
     }
+    /////////////////token generation pending
+    ///////////////
+    ///////////////////
+
+
     res.json({ auth: true, user })
 });
 
