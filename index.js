@@ -3,22 +3,16 @@
 const mongoose = require("mongoose")
 const app = require("./app/app");
 const cronJobs = require("./app/cron/cronJobsController");
+require('dotenv').config({
+    path: `.env.${process.env.NODE_ENV}`
+  })
+require('./config/database')
 
-require('dotenv').config({path: 'environment.env'});
-const db = process.env.DB_PROD || process.env.DB_DEV || "mongodb://localhost:27017/distritoPyme";
-const host = process.env.HOST || 'localhost';
-const port = process.env.PORT || 3900;
+async function init() {
+    await app.listen(3900);
+    console.log('server on port 3900')
+}
 
-mongoose.set('useFindAndModify', false);
-mongoose.Promise = global.Promise;
-mongoose.connect(db, { useUnifiedTopology: true, useNewUrlParser: true }).then(() => {
-    console.log('La conexión a la base de datos se ha realizado correctamente!');
-    
-    app.listen(port, host, () => {
-        console.log(`Servidor corriendo en http://${host}:` + port);
-    });
-});
+init()
 
-
-
-//cronJobs.test();
+cronJobs.test();
