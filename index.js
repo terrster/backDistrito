@@ -5,7 +5,7 @@ const app = require("./app/app");
 const cronJobs = require("./app/cron/cronJobsController");
 
 require('dotenv').config({path: 'environment.env'});
-const db = process.env.DB_PROD || process.env.DB_DEV || "mongodb://localhost:27017/distritoPyme";
+const db = process.env.DB_PROD || process.env.DB_DEV;
 const host = process.env.HOST || 'localhost';
 const port = process.env.PORT || 3900;
 

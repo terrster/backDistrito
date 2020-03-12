@@ -19,5 +19,7 @@ route.get("/", (request, response) => {
 
 route.post('/sign_in', dealController.store);
 
+route.post('/get_all_deals', dealController.getAllDeals);
+
 
 module.exports = route;

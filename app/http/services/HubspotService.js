@@ -1,54 +1,115 @@
 'use strict'
 
 const axios = require("axios").default;
+const globalUrl = "https://api.hubapi.com/deals/v1/deal";
+const hapiKey = "?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3";
 
 class HubspotService {
 
-    globalUrl = "https://api.hubapi.com/deals/v1/deal";
-    hapiKey = "?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3";
+    static getAllDeals(request) {
 
-    storeDeal(request){
+        try {
 
-        axios.post(this.globalUrl + this.hapiKey, request.body)
-        .then((response) => {
+            const deals = async() => {
+                const {data} = await axios.get("https://api.hubapi.com/deals/v1/deal/paged?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3&includeAssociations=true&limit=2&properties=dealname")
+                .then((response) => {
+                    return response;
+                })
+                .catch((error) => {
+    
+                });
 
-        })
-        .catch((error) => {
+                return data;
+            }
 
-        });
+            return deals();
+
+        }
+        catch (error) {
+            console.log(error);
+        }
+
+    }
+
+    async storeDeal(request){
+
+        try{
+
+            const newDeal = async() => {
+                const {data} = await axios.post(globalUrl + hapiKey, request.body)
+                .then((response) => {
+    
+                })
+                .catch((error) => {
+    
+                });
+            }
+
+        }
+        catch(error){
+
+        }
+        
+
+    }
+
+    async getDeal(request){
+        
+        try{
+
+            axios.get(globalUrl + "/" + request.dealId + hapiKey)
+            .then((response) => {
+
+            })
+            .catch((error) => {
+
+            });
+
+        }
+        catch(error){
+
+        }
         
     }
 
-    getDeal(request){
-        axios.get(this.globalUrl + "/" + request.dealId + this.hapiKey)
-        .then((response) => {
+    async updateDeal(request){
+        
+        try{
 
-        })
-        .catch((error) => {
+            axios.put(globalUrl + "/" + request.params.dealId + hapiKey, request.body)
+            .then((response) => {
 
-        });
+            })
+            .catch((error) => {
+
+            });
+
+        }
+        catch(error){
+
+        }
+        
     }
 
-    updateDeal(request){
-        axios.put(this.globalUrl + "/" + request.params.dealId + this.hapiKey, request.body)
-        .then((response) => {
+    async deleteDeal(request, response){
+        
+        try{
 
-        })
-        .catch((error) => {
+            axios.delete(globalUrl + "/" + request.params.dealId + hapiKey)
+            .then((response) => {
 
-        });
-    }
+            })
+            .catch((error) => {
 
-    deleteDeal(request, response){
-        axios.delete(this.globalUrl + "/" + request.params.dealId + this.hapiKey)
-        .then((response) => {
+            });
 
-        })
-        .catch((error) => {
+        }
+        catch(error){
 
-        });
+        }
+        
     }
 
 }
 
-module.exports = HubspotService;
+module.exports = { HubspotService };
