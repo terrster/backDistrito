@@ -6,106 +6,111 @@ const hapiKey = "?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3";
 
 class HubspotService {
 
-    static getAllDeals(request) {
-
-        try {
-
-            const deals = async() => {
-                const {data} = await axios.get("https://api.hubapi.com/deals/v1/deal/paged?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3&includeAssociations=true&limit=2&properties=dealname")
-                .then((response) => {
-                    return response;
-                })
-                .catch((error) => {
-    
-                });
-
-                return data;
-            }
-
-            return deals();
-
-        }
-        catch (error) {
-            console.log(error);
-        }
-
-    }
-
-    async storeDeal(request){
+    static storeDeal(request){
 
         try{
 
             const newDeal = async() => {
                 const {data} = await axios.post(globalUrl + hapiKey, request.body)
                 .then((response) => {
-    
+                    return response;
                 })
                 .catch((error) => {
-    
+                    return error;
                 });
+
+                return data;
             }
 
+            return newDeal();
+
         }
         catch(error){
-
+            return {
+                message : "Ha ocurrido un error al obtener la información"
+            };
         }
         
 
     }
 
-    async getDeal(request){
+    static getDeal(request){
         
         try{
 
-            axios.get(globalUrl + "/" + request.dealId + hapiKey)
-            .then((response) => {
+            const deal = async() => {
+                const {data} = await axios.get(globalUrl + "/" + request.id + hapiKey)
+                .then((response) => {
+                    return response;
+                })
+                .catch((error) => {
+                    return error;
+                });
 
-            })
-            .catch((error) => {
+                return data;
+            }
 
-            });
+            return deal();
 
         }
         catch(error){
-
+            return {
+                message : "Ha ocurrido un error al obtener la información"
+            };
         }
         
     }
 
-    async updateDeal(request){
+    static updateDeal(request){
         
         try{
 
-            axios.put(globalUrl + "/" + request.params.dealId + hapiKey, request.body)
-            .then((response) => {
+            const editDeal = async() => {
+                const {data} = await axios.put(globalUrl + "/" + request.params.id + hapiKey, request.body)
+                .then((response) => {
+                    return response;
+                })
+                .catch((error) => {
+                    return error;
+                });
 
-            })
-            .catch((error) => {
+                return data;
+            }
 
-            });
+            return editDeal();      
 
         }
         catch(error){
-
+            return {
+                message : "Ha ocurrido un error al obetner la información"
+            };
         }
         
     }
 
-    async deleteDeal(request, response){
+    static deleteDeal(request){
         
         try{
 
-            axios.delete(globalUrl + "/" + request.params.dealId + hapiKey)
-            .then((response) => {
+            const delDeal = async() => {
+                const {data} = await axios.delete(globalUrl + "/" + request.id + hapiKey)
+                .then((response) => {
+                    return response;
+                })
+                .catch((error) => {
+                    return error;
+                });
 
-            })
-            .catch((error) => {
+                return data;
+            }
 
-            });
+            return delDeal();
 
         }
         catch(error){
-
+            return {
+                message : "Ha ocurrido un error al obtener la información"
+            };
         }
         
     }
