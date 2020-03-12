@@ -24,5 +24,6 @@ route.group("/deal", (deal) => {
     deal.put('/:id', dealController.update);
     //deal.delete('/:id', dealController.destroy);
 });
+
     
 module.exports = route;
