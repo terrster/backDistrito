@@ -16,4 +16,4 @@ async function init() {
 
 init()
 
-cronJobs.test();
+//cronJobs.test();

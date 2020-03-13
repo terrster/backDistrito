@@ -3,6 +3,7 @@
 const validator = require("validator");
 const { HubspotService } = require("../services/HubspotService");
 const { MongoUserService } = require("../services/MongoUserService");
+const bcrypt = require('bcrypt');
 //const newDeal = require("../models/newDeal");
 
 //const hubspotService = new HubspotService();
@@ -12,33 +13,36 @@ var dealController = {
     store: async (request, response) => { 
 
         if(request.body && Object.keys(request.body).length){
-            var newDeal = request.body;
-            //conexión con HB
-            var storeDeal = await HubspotService.storeDeal(newDeal);
-            //conexión con MongoDB
-            if(storeDeal){
-                newDeal.hubspotDealId = storeDeal.dealId;
-                var newUser = await MongoUserService.storeUser(newDeal);
+            const passwordHash = await bcrypt.hash(request.body.password, 12);
 
-                if(newUser){
-                    response.status(200).send({
-                        message: "Registro exitoso"
-                    });
-                }
-                else{
-                    response.status(200).send({
-                        message: "Ha ocurrido un error al guardar un nuevo usuario"
-                    });
-                }
+            // var newDeal = request.body;
+            // //conexión con HB
+            // var storeDeal = await HubspotService.storeDeal(newDeal);
+            // //conexión con MongoDB
+            // if(storeDeal){
+            //     newDeal.hubspotDealId = storeDeal.dealId;
+            //     var newUser = await MongoUserService.storeUser(newDeal);
 
-            }
-            else{
-                response.status(200).send({
-                    message: "Ha ocurrido un error al guardar un nuevo deal"
-                });
-            }
+            //     if(newUser){
+            //         response.status(200).send({
+            //             message: "Registro exitoso"
+            //         });
+            //     }
+            //     else{
+            //         response.status(200).send({
+            //             message: "Ha ocurrido un error al guardar un nuevo usuario"
+            //         });
+            //     }
+
+            // }
+            // else{
+            //     response.status(200).send({
+            //         message: "Ha ocurrido un error al guardar un nuevo deal"
+            //     });
+            // }
             response.status(200).send({
-                message: "Con datos para guardar"
+                message: "Con datos para guardar",
+                pass : passwordHash
             });
         }
         else{
