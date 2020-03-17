@@ -1,7 +1,8 @@
-const { Schema, model }= require('mongoose');
+const { Schema, model } = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new Schema({
+    idClient: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
     name: { type: String, default: ''},
     lastName: { type: String, default: '' },
     access: { type:  String, default: '' },
@@ -9,13 +10,12 @@ const userSchema = new Schema({
     password: { type: String, default: ''},
     phone: { type: String, default: ''},
     registerDate: { type: Date, default: '' },
-    address: {},
+    address: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
     hubspotContactId: { type: String, default: ''},
     hubspotDealId: { type: String, default: ''},
     recoverPassHash: { type: String, default: ''},
     idDistrito: { type: Number },
     createdAt: { type: Date },
-    idClient: { type: String, default: '' },
 }, { collection: 'User' });
 
 userSchema.methods.encryptPassword = async (password) => {

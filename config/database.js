@@ -6,9 +6,9 @@ const PASSWORD_DB =process.env.PASSWORD_DB
 const CLUSTER_MONGO = process.env.CLUSTER_MONGO
 
 ////////////generate connection url
-const url = (process.env.NODE_ENV === 'local') ? process.env.CLUSTER_MONGO: `mongodb+srv://${USER_DB}:${PASSWORD_DB}${CLUSTER_MONGO}`;
-
-
+const url = (process.env.NODE_ENV === 'local')
+                ? process.env.CLUSTER_MONGO 
+                : `mongodb+srv://${USER_DB}:${PASSWORD_DB}${CLUSTER_MONGO}`;
 
 mongoose.connect(url, {
     useNewUrlParser: true,

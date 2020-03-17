@@ -1,11 +1,11 @@
 'use strict'
 
-const mongoose = require("mongoose")
 const app = require("./app/app");
 const cronJobs = require("./app/cron/cronJobsController");
 require('dotenv').config({
     path: `.env.${process.env.NODE_ENV}`
-})
+}) 
+
 //////database access configuration with environment variables
 require('./config/database')
 
