@@ -9,7 +9,7 @@ const userSchema = new Schema({
     email: { type: String, default: ''},
     password: { type: String, default: ''},
     phone: { type: String, default: ''},
-    registerDate: { type: Date, default: '' },
+    registerDate: { type: Date, default: Date.now },
     address: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
     hubspotContactId: { type: String, default: ''},
     hubspotDealId: { type: String, default: ''},

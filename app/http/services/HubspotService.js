@@ -3,6 +3,9 @@
 const axios = require("axios").default;
 const globalUrl = "https://api.hubapi.com/deals/v1/deal";
 const hapiKey = "?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3";
+require('dotenv').config({
+    path: `.env.${process.env.NODE_ENV}`
+});
 
 class HubspotService {
 
@@ -10,12 +13,55 @@ class HubspotService {
 
         try{
 
+            var userData = {
+                "associations": {
+                    "associatedCompanyIds": [],
+                    "associatedVids": [
+                        284701
+                    ]
+                  },
+                "properties": [
+                    {
+                        "value": request.name + " " + request.lastname,
+                        "name": "dealname"
+                    },
+                    {
+                        "value": request.email,
+                        "name": "email"
+                    },
+                    {
+                        "value": request.phone,
+                        "name": "celular"
+                    },
+                    {
+                        "value" : process.env.DATE_HUB,
+                        "name": "dealstage" 
+                    }
+                ]
+            };
+
+            //console.log(userData);
+            
+
+           // axios.post(globalUrl + hapiKey, userData);
+            // .then(function (response) {
+            //     //console.log(response);
+            //   })
+            //   .catch(function (error) {
+            //     //console.log(error);
+            //   });
+            
             const newDeal = async() => {
-                const {data} = await axios.post(globalUrl + hapiKey, request.body)
-                .then((response) => {
+                const {data} = await axios.post(globalUrl + hapiKey, userData, 
+                {
+                    headers: {
+                        'content-type': 'application/json',
+                    }
+                })
+                .then((response) => {console.log(response);
                     return response;
                 })
-                .catch((error) => {
+                .catch((error) => {console.log(error);
                     return error;
                 });
 

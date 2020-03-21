@@ -15,38 +15,39 @@ var dealController = {
         if(request.body && Object.keys(request.body).length){
             const passwordHash = await bcrypt.hash(request.body.password, 12);
 
-            // var newDeal = request.body;
-            // //conexión con HB
-            // var storeDeal = await HubspotService.storeDeal(newDeal);
-            // //conexión con MongoDB
-            // if(storeDeal){
-            //     newDeal.hubspotDealId = storeDeal.dealId;
-            //     var newUser = await MongoUserService.storeUser(newDeal);
+            var newDeal = request.body;
+            //console.log(newDeal);
+            //conexión con HB
+            var storeDeal = await HubspotService.storeDeal(newDeal);
+            
+            //conexión con MongoDB
+            if(storeDeal){
+                newDeal.hubspotDealId = storeDeal.dealId;
+                var newUser = await MongoUserService.storeUser(newDeal);
 
-            //     if(newUser){
-            //         response.status(200).send({
-            //             message: "Registro exitoso"
-            //         });
-            //     }
-            //     else{
-            //         response.status(200).send({
-            //             message: "Ha ocurrido un error al guardar un nuevo usuario"
-            //         });
-            //     }
+                if(newUser){
+                    return response.status(200).send({
+                        message: "Registro exitoso"
+                    });
+                }
+                else{
+                    return response.status(200).send({
+                        message: "Ha ocurrido un error al guardar un nuevo usuario"
+                    });
+                }
 
-            // }
-            // else{
-            //     response.status(200).send({
-            //         message: "Ha ocurrido un error al guardar un nuevo deal"
-            //     });
-            // }
-            response.status(200).send({
-                message: "Con datos para guardar",
-                pass : passwordHash
-            });
+            }
+            else{
+                return response.status(200).send({
+                    message: "Ha ocurrido un error al guardar un nuevo deal"
+                });
+            }
+            // response.status(200).send({
+            //     message: "Con datos para guardar"
+            // });
         }
         else{
-            response.status(200).send({
+            return response.status(200).send({
                 message: "Sin datos para guardar"
             });
         }
