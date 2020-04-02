@@ -35,13 +35,13 @@ route.get("/", (request, response) => {
 |--------------------------------------------------------------------------
 */
 route.post('/signin', async (req, res, next) => {
-
     const { email, password } = req.body;
 /*
 |--------------------------------------------------------------------------
 | existing mail verification
 |--------------------------------------------------------------------------
 */
+
     const user = await User.findOne({ email: email })
                             .populate({ 
                                 path: "idClient address",
