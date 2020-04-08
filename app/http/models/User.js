@@ -15,7 +15,7 @@ const userSchema = new Schema({
     hubspotDealId: { type: String, default: ''},
     recoverPassHash: { type: String, default: ''},
     idDistrito: { type: Number },
-    createdAt: { type: Date },
+    createdAt: { type: Date, default: Date.now },
 }, { collection: 'User' });
 
 userSchema.methods.encryptPassword = async (password) => {

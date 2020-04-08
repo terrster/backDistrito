@@ -22,7 +22,7 @@ class HubspotService {
                   },
                 "properties": [
                     {
-                        "value": request.name + " " + request.lastname,
+                        "value": request.idDP + " "+ request.name + " " + request.lastname,
                         "name": "dealname"
                     },
                     {
@@ -39,17 +39,6 @@ class HubspotService {
                     }
                 ]
             };
-
-            //console.log(userData);
-            
-
-           // axios.post(globalUrl + hapiKey, userData);
-            // .then(function (response) {
-            //     //console.log(response);
-            //   })
-            //   .catch(function (error) {
-            //     //console.log(error);
-            //   });
             
             const newDeal = async() => {
                 const {data} = await axios.post(globalUrl + hapiKey, userData, 
@@ -58,10 +47,10 @@ class HubspotService {
                         'content-type': 'application/json',
                     }
                 })
-                .then((response) => {console.log(response);
+                .then((response) => {//console.log(response);
                     return response;
                 })
-                .catch((error) => {console.log(error);
+                .catch((error) => {//console.log(error);
                     return error;
                 });
 

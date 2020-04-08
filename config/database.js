@@ -10,6 +10,7 @@ const url = (process.env.NODE_ENV === 'local')
                 ? process.env.CLUSTER_MONGO 
                 : `mongodb+srv://${USER_DB}:${PASSWORD_DB}${CLUSTER_MONGO}`;
 
+mongoose.set('useFindAndModify', false);
 mongoose.connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
