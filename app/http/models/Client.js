@@ -7,7 +7,7 @@ const clientSchema = new Schema({
     subType: String,
     appliance: [{ type: Schema.Types.ObjectId, ref: 'Appliance' }],
     sign: String,
-    registerDate: Date,
+    registerDate: { type: Date, default: Date.now },
     idDocuments: [{ type: Schema.Types.ObjectId, ref: 'Documents' }],
     idGeneralInfo: [{ type: Schema.Types.ObjectId, ref: 'GeneralInfo' }],
     idComercialInfo: [{ type: Schema.Types.ObjectId, ref: 'ComercialInfo' }],

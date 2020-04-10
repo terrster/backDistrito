@@ -13,17 +13,8 @@ class MongoClientService {
                 const client = new Client();
                 client.idUser = idUser;                
 
-                // client.save((error, clientStored) => {
-                //     if(error){
-                //         console.log(error);
-                        
-                //         return null;
-                //     }
-                //     console.log(clientStored);
-                //     return {clientStored};
-                // });
                 let clientStored = await client.save();
-                return {clientStored};
+                return clientStored;
             }
 
             return newClient();

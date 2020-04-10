@@ -6,7 +6,7 @@ const applianceSchema = new Schema({
   idAmount: [{ type: Schema.Types.ObjectId, ref: 'Amount' }],
   idGeneralInfo:  [{ type: Schema.Types.ObjectId, ref: 'GeneralInfo' }],
   idComercialInfo:  [{ type: Schema.Types.ObjectId, ref: 'ComercialInfo' }],
-  registerDate: Date,
+  registerDate: { type: Date, default: Date.now },
   proposals: [{ type: Schema.Types.ObjectId, ref: 'Proposal' }],
   reason: String,
   tips: String,

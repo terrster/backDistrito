@@ -14,7 +14,7 @@ const generalInfoSchema = new Schema({
     mortgageCredit: Boolean,
     carCredit: String,
     creditCard: Boolean,
-    registerDate: Date,
+    registerDate: { type: Date, default: Date.now },
     contactWith: [{ type: Schema.Types.ObjectId, ref: 'Reference' }],
     last4: String,
     status: Boolean,

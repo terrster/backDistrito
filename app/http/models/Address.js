@@ -6,7 +6,7 @@ const addressSchema = new Schema({
     intNumber: String,
     town:String,
     zipCode:String,
-    registerDate: Date,
+    registerDate: { type: Date, default: Date.now },
 }, { collection: 'Address' });
 
 var collectionName = 'Address'

@@ -20,19 +20,9 @@ class MongoUserService {
                 user.hubspotDealId = request.hubspotDealId;
                 user.idDistrito = request.idDP;
 
-                // user.save((error, userStored) => {
-                //     // if(error){
-                //     //     console.log(error);
-                        
-                //     //     return null;
-                //     // }
-                //     //console.log(userStored);
-                //     return {userStored};
-                // });
-
                 let userStored = await user.save();
                 //console.log(userStored);
-                return {userStored};
+                return userStored;
             }
 
             return newUser();
@@ -52,20 +42,33 @@ class MongoUserService {
 
             const showUser = async() => {
 
-                User.findById(request.id, (error, user) => {
-
-                    if(error || !user){
-                      return null;
-                    }
-              
-                    console.log(user);
-                    return {user};
-              
-                  });
-
+                let user = await User.findById(request.id);
+                return user;
             }
 
             return showUser();
+        }
+        catch(error){
+            return {
+                message : "Ha ocurrido un error al obtener la información"
+            };
+        }
+
+    }
+
+    static getLastUser(){
+
+        try{
+
+            const lastUser = async() => {
+
+               let user = await User.findOne({}, {}, { sort: { 'createdAt' : -1 } });
+               return user;
+
+            }
+
+            return lastUser();
+
         }
         catch(error){
             return {
@@ -79,16 +82,10 @@ class MongoUserService {
         try{
 
             const updateUser = async() => {
-                User.findOneAndUpdate({_id : request._id}, {"idClient": request.idClient}, {new : true}, (error, updatedUser) => {
-                    if(error){
-                        console.log(error);
-        
-                        return null;
-                    }
-                    
-                    console.log(updatedUser);
-                    return {updatedUser};
-                });
+
+                let updatedUser = await User.findOneAndUpdate({_id : request._id}, {"idClient": request.idClient}, {new : true});
+                return updatedUser;
+                
             }
 
             return updateUser();

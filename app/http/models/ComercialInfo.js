@@ -8,7 +8,7 @@ const comercialInfoSchema = new Schema({
   specific:String,
   phone: String ,
   address: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
-  registerDate: Date,
+  registerDate: { type: Date, default: Date.now },
   webSite: String ,
   facebook: String ,
   terminal: Boolean ,

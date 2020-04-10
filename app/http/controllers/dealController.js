@@ -20,9 +20,12 @@ var dealController = {
             const passwordHash = await bcrypt.hash(request.body.password, 12);
 
             var newDeal = request.body;
-            //console.log(newDeal);
+
+            //Se obtiene el último usuario de mongo
+            var lastUser = await MongoUserService.getLastUser();            
+            newDeal.idDP = lastUser.idDistrito + 1;
+
             //conexión con HB
-            newDeal.idDP = process.env.COUNT_DP + 1;
             var storeDeal = await HubspotService.storeDeal(newDeal);
             //var TOTAL_DP = await HubspotService.getCountDeals(); //Para obtener total de deals ¿?
             
@@ -33,14 +36,16 @@ var dealController = {
                 
                 if(newUser){
                     
-                    var newClient = await MongoClientService.storeClient(newUser.userStored._id);
+                    var newClient = await MongoClientService.storeClient(newUser._id);
                     
                     if(newClient){
-                        newUser.userStored.idClient = {
-                            _id : newClient.clientStored._id
+                        newUser.idClient = {
+                            _id : newClient._id
                         }
 
-                        var updatedUser = await MongoUserService.updateUser_Client(newUser.userStored);
+                        var updatedUser = await MongoUserService.updateUser_Client(newUser);
+                        console.log(updatedUser);
+                        
                     }
                     return response.status(200).send({
                         message: "Registro exitoso"

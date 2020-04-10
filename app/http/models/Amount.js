@@ -8,7 +8,7 @@ const amountSchema = new Schema({
   term: Number,
   yearSales: Number,
   old: Number,
-  registerDate: Date,
+  registerDate: { type: Date, default: Date.now },
   status: Boolean,
 }, { collection: 'Amount' });
 
