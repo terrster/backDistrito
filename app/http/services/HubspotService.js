@@ -2,10 +2,10 @@
 
 const axios = require("axios").default;
 const globalUrl = "https://api.hubapi.com/deals/v1/deal";
-const hapiKey = "?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3";
 require('dotenv').config({
     path: `.env.${process.env.NODE_ENV}`
 });
+const hapiKey = "?hapikey="+`${process.env.HAPIKEY}`;
 
 class HubspotService {
 

@@ -12,6 +12,7 @@ const path = require("path");
 
 //Controllers
 const dealController = require("../app/http/controllers/dealController");
+const documentsController = require("../app/http/controllers/documentsController");
 const User = require('../app/http/models/User')
 const Address = require('../app/http/models/Address')
 const Appliance = require('../app/http/models/Appliance')
@@ -23,7 +24,6 @@ const Documents = require('../app/http/models/Documents')
 const GeneralInfo = require('../app/http/models/GeneralInfo')
 const Proposal = require('../app/http/models/Proposal')
 const Reference = require('../app/http/models/Reference')
-
 
 route.get("/", (request, response) => {
     response.status(200).sendFile(path.resolve("public/index.html"));
@@ -191,5 +191,8 @@ route.put('/update/reference/:id', async (req, res, next) => {
 })
 
 route.post('/sign_in', dealController.store);
+
+route.post('/upload', documentsController.store);
+route.put('/upload/:id', documentsController.update);
 
 module.exports = route;

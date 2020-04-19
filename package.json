@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@hubspot/api-client": "^0.4.0",
+    "aws-sdk": "^2.658.0",
     "axios": "^0.19.2",
     "bcrypt": "^4.0.1",
     "bcryptjs": "^2.4.3",
@@ -23,6 +24,7 @@
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-fileupload": "^1.1.7-alpha.3",
     "express-group-routes": "^1.1.0",
     "fs": "0.0.1-security",
     "hubspot": "^2.3.9",
