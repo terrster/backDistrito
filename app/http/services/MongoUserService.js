@@ -56,6 +56,38 @@ class MongoUserService {
 
     }
 
+    static getFullUser(request){
+
+        try{
+
+            const showUser = async() => {
+
+                let user = await User.findById(request.id)
+                                    .populate({ 
+                                        path: "idClient address",
+                                        populate: {
+                                            path: 'appliance',
+                                            populate: {
+                                                path: "idDocuments idAmount idGeneralInfo idComercialInfo",
+                                                populate: {
+                                                    path: "address contactWith",
+                                                }
+                                            }
+                                        }
+                                    });
+                return user;
+            }
+
+            return showUser();
+
+        }
+        catch(error){
+            return {
+                message : "Ha ocurrido un error al obtener la información"
+            }
+        }
+    }
+
     static getLastUser(){
 
         try{

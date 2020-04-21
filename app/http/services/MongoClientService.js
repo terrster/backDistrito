@@ -36,6 +36,26 @@ class MongoClientService {
 
     }
 
+    static updateClient_Documents(idClient, idDocuments){
+        try{
+
+            const updateClient = async() => {
+
+                let updatedClient = await Client.findOneAndUpdate({_id : idClient}, {"idDocuments": idDocuments}, {new : true});
+                return updatedClient;
+                
+            }
+
+            return updateClient();
+
+        }
+        catch(error){
+            return {
+                message : "Ha ocurrido un error al obtener la información"
+            };
+        }
+    }
+
     static deleteClient(request){
 
     }
