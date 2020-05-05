@@ -15,4 +15,4 @@ mongoose.connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-    .then(db => console.log('database is connect'))
+    .then(db => console.log('Database is connected'))

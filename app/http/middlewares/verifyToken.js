@@ -16,7 +16,7 @@ const publicKey = fs.readFileSync(path.resolve("config/public.key"));
 const options = require("../../../config/jwt_options");
 
 router.use((request, response, next) => {
-    const token = request.headers['_token'];
+    const token = request.headers['token'];
  
     if(token){
       jwt.verify(token, publicKey, options, (error, decoded) => {      

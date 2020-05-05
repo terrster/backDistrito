@@ -48,24 +48,22 @@ var dealController = {
                         
                     }
                     return response.status(200).send({
-                        message: "Registro exitoso"
+                        code: 200,
+                        user: updatedUser
                     });
                 }
                 else{
-                    return response.status(200).send({
+                    return response.status(400).send({
                         message: "Ha ocurrido un error al guardar un nuevo usuario"
                     });
                 }
 
             }
             else{
-                return response.status(200).send({
+                return response.status(400).send({
                     message: "Ha ocurrido un error al guardar un nuevo deal"
                 });
             }
-            // response.status(200).send({
-            //     message: "Con datos para guardar"
-            // });
         }
         else{
             return response.status(200).send({
@@ -75,7 +73,8 @@ var dealController = {
 
     },
     show: async (request, response) => {
-        response.status(200).send("DEAL SHOW : " + request.params);
+        console.log(request.headers.tokenDecoded.data.id); //Este dato se crea a través de un middleware en cada petición hacía api con el token proveído desde el front
+        return response.status(200).send("DEAL SHOW : " + request.params);
     },
     update: async (request, response) => {
 

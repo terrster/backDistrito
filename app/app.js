@@ -7,7 +7,6 @@ const fileUpload = require('express-fileupload');
 const app = express();
 
 //Routing
-const authRoutes = require("../routes/auth");
 const webRoutes = require("../routes/web");
 const apiRoutes = require("../routes/api");
 
@@ -28,7 +27,6 @@ app.use((request, response, next) => {
 });
 
 //Prefix or routes
-app.use(authRoutes);
 app.use(webRoutes);
 app.use('/api', apiRoutes);
 
