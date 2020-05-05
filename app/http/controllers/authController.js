@@ -33,6 +33,7 @@ const authController = {
             };
             const token = jwt.sign(payload, privateKey, options);
             return response.json({
+                user: user,
                 token: token
             });
         } 
