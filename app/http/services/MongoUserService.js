@@ -1,6 +1,9 @@
 'use strict'
 
 const User = require("../models/User");
+const Client = require('../models/Client');
+const Address = require('../models/Address');
+const Appliance = require('../models/Appliance');
 
 class MongoUserService {
 
@@ -36,13 +39,13 @@ class MongoUserService {
 
     }
 
-    static getUser(request){
+    static getUser(id){
 
         try{
 
             const showUser = async() => {
 
-                let user = await User.findById(request.id);
+                let user = await User.findById(id);
                 return user;
             }
 
@@ -56,13 +59,13 @@ class MongoUserService {
 
     }
 
-    static getFullUser(request){
+    static getFullUser(id){
 
         try{
 
             const showUser = async() => {
 
-                let user = await User.findById(request.id)
+                let user = await User.findById(id)
                                     .populate({ 
                                         path: "idClient address",
                                         populate: {

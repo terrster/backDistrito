@@ -16,6 +16,8 @@ const tokenManager = require("../app/http/services/tokenManager");
 
 //Controllers
 const dealController = require("../app/http/controllers/dealController");
+const infoController = require("../app/http/controllers/infoController");
+const amountController = require("../app/http/controllers/amountController");
 const documentsController = require("../app/http/controllers/documentsController");
 
 route.use(verifyToken);
@@ -29,6 +31,24 @@ route.group("/deal", (deal) => {
     deal.get('/:id', dealController.show);
     deal.put('/:id', dealController.update);
     //deal.delete('/:id', dealController.destroy);
+});
+
+//Info
+route.group("/info", (info) => {
+    info.get('/general', infoController.getGeneralInfo);
+    info.post('/general/store', infoController.storeOrUpdateGeneralInfo);
+    info.put('/general/update', infoController.storeOrUpdateGeneralInfo);
+
+    info.get('/comercial', infoController.getComercialInfo);
+    info.post('/comercial/store', infoController.storeOrUpdateComercialInfo);
+    info.put('/comercial/update', infoController.storeOrUpdateComercialInfo);
+});
+
+//Amount
+route.group("/amount", (amount) => {
+    amount.get('', amountController.getAmount);
+    amount.post('/store', amountController.storeOrUpdateAmount);
+    amount.put('/update', amountController.storeOrUpdateAmount);
 });
 
 //Documents routes
