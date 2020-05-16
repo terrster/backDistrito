@@ -119,6 +119,7 @@ class MongoUserService {
             const updateUser = async() => {
 
                 let updatedUser = await User.findOneAndUpdate({_id : request._id}, {"idClient": request.idClient}, {new : true});
+                await updatedUser.save();
                 return updatedUser;
                 
             }

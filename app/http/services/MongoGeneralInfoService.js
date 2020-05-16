@@ -14,7 +14,6 @@ class MongoGeneralInfoService {
             const generalInfo = async() => {
 
                 let info = await GeneralInfo.findById(id);
-                //console.log(info);
                 return info;
             }
 
@@ -30,88 +29,91 @@ class MongoGeneralInfoService {
 
     static storeGeneralInfo(idClient, request){
 
-        try{
+		async function storeInfo (){
 
-            const createAddress = async() => {
+			try{
+	
+				const createAddress = async() => {
 
-                let address = await MongoAddressService.storeAddress(request);
-                return address;
+					let address = await MongoAddressService.storeAddress(request);
+					return address;
+	
+				}
+				
+				const createReference1 = async() => {	
 
-            }
+					let reference = {
+						name : request.name1,
+						phone : request.phone1,
+						relative : request.relative1
+					}
 
-            let newAddress = createAddress();
+					let refernceCreated = await MongoReferenceService.storeReference(reference);
+					return refernceCreated;
+				}
+				
+				const createReference2 = async() => {
 
-            const createReference1 = async() => {
+					let reference = {
+						name : request.name2,
+						phone : request.phone2,
+						relative : request.relative2
+					}
 
-                let reference = {
-                    name : request.name1,
-                    phone : request.phone1,
-                    relative : request.relative1
-                }
+					let refernceCreated = await MongoReferenceService.storeReference(reference);
+					return refernceCreated;
+				}
+				
+				let newAddress = await createAddress();
+				let reference1 = await createReference1();
+				let reference2 = await createReference2();
 
-                let refernceCreated = await MongoReferenceService.storeReference(reference);
-                return refernceCreated;
-            }
-
-            let reference1 = createReference1();
-
-            const createReference2 = async() => {
-
-                let reference = {
-                    name : request.name2,
-                    phone : request.phone2,
-                    relative : request.relative2
-                }
-
-                let refernceCreated = await MongoReferenceService.storeReference(reference);
-                return refernceCreated;
-            }
-
-            let reference2 = createReference2();
-
-            const createInfo = async() => {
-
-                const infoGral = new GeneralInfo();
-                infoGral.name = request.name;
-                infoGral.lastname = request.lastname;
-                infoGral.secondLastname = request.secondLastname;
-                infoGral.civilStatus = request.civilStatus;
-                infoGral.birthDate = request.birthDate;
-                infoGral.rfcPerson = request.rfcPerson;
-                infoGral.ciec = request.ciec;
-                infoGral.phone = request.phone;
-                infoGral.address = {//id from Addres model
-                    _id : newAddress._id
-                }
-                infoGral.mortgageCredit = request.mortgageCredit;
-                infoGral.carCredit = request.carCredit;
-                infoGral.creditCard = request.creditCard;
-                infoGral.contactWith = [//Array of id's from Reference model
-                    {
-                        _id : reference1._id
-                    },
-                    {
-                        _id : reference2._id
-                    }
-                ];
-                infoGral.last4 = request.last4;
-                infoGral.idClient = {
-                    _id : idClient
-                }
-                infoGral.status = true;
-
-                let infoGeneralCreated = await infoGral.save();
-                return infoGeneralCreated;
-                
-            }
-
-            return createInfo();
+				const createInfo = async() => {
+					
+					const infoGral = new GeneralInfo();
+					infoGral.name = request.name;
+					infoGral.lastname = request.lastname;
+					infoGral.secondLastname = request.secondLastname;
+					infoGral.civilStatus = request.civilStatus;
+					infoGral.birthDate = request.birthDate;
+					infoGral.rfcPerson = request.rfcPerson;
+					infoGral.ciec = request.ciec;
+					infoGral.phone = request.phone;
+					infoGral.address = {//id from Addres model
+						_id : newAddress._id
+					}
+					infoGral.mortgageCredit = request.mortgageCredit;
+					infoGral.carCredit = request.carCredit;
+					infoGral.creditCard = request.creditCard;
+					infoGral.contactWith = [//Array of id's from Reference model
+						{
+							_id : reference1._id
+						},
+						{
+							_id : reference2._id
+						}
+					];
+					infoGral.last4 = request.last4;
+					infoGral.idClient = {
+						_id : idClient
+					}
+					infoGral.status = true;
+					let infoGeneralCreated = await infoGral.save();
+					return infoGeneralCreated;
+				}
+				const info = await createInfo();
+				return info;
 
         }
         catch(error){
             console.log(error);
             return null;
         }
+
+
+			
+		}
+		return storeInfo();
 
     }
 

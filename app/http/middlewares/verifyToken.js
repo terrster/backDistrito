@@ -19,6 +19,7 @@ router.use((request, response, next) => {
     const token = request.headers['token'];
  
     if(token){
+		console.log("Token" + token);
       jwt.verify(token, publicKey, options, (error, decoded) => {      
         if(error){
             response.json({ 
