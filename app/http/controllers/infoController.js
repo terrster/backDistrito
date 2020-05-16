@@ -59,7 +59,7 @@ var infoController = {
         if(user.idClient[0].idComercialInfo != ""){//Get comercial info
             let info = await MongoComercialInfoService.getComercialInfo(user.idClient[0].idGeneralInfo[0]);
             //console.log(info);
-            return response.status(200).send(info);
+            return responsejson({info});
         }
     },
     storeOrUpdateComercialInfo: async(request, response) => {
@@ -74,13 +74,23 @@ var infoController = {
                     _id : infoStored._id
                 }
             });
-            return infoStored;
+            let params = {
+                appliance :{
+                    _id : applianceStored._id
+                },
+                idComercialInfo : {
+                    _id : infoStored._id
+                }
+            }
+            let clientUpdated = await MongoClientService.updateClient(user.idClient[0]._id, params);
+            console.log("Client Upd: ",clientUpdated);
+            return response.json({ message: clientUpdated });
         }
         else{//Edit
             let infoUpdated = await MongoComercialInfoService.updateComercialInfo(user.idClient[0].idComercialInfo[0], request);
             let applianceUpdated = await MongoApplianceService.updateAppliance(user.idClient[0].appliance[0], {
-                idComercialInfo : {
-                    _id : infoUpdated._id
+               idComercialInfo : {
+                   _id : infoUpdated._id
                 }
             });
             return infoUpdated;
