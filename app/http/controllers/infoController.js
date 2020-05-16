@@ -50,6 +50,16 @@ var infoController = {
 			}
             const test = await User.findOneAndUpdate({ _id : id}, {"idClient": updateUserData }, {new : true});
             * */
+            let params = {
+                appliance :{
+                    _id : applianceStored._id
+                },
+                idGeneralInfo : {
+                    _id : infoStored._id
+                }
+            }
+            let clientUpdated = await MongoClientService.updateClient(user.idClient[0]._id, params);
+            console.log(clientUpdated);
             return response.json({ message: 'Datos creatos correctamente' });
         }
         else{//Edit

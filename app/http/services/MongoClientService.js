@@ -32,8 +32,22 @@ class MongoClientService {
 
     }
 
-    static updateClient(request){
+    static updateClient(id, request){
+        try{
 
+            const editClient = async() => {
+                let clientUpdated = await Client.findByIdAndUpdate(id, request);
+                return clientUpdated;
+            }
+
+            return editClient();
+
+        }
+        catch(error){
+            return {
+                message : "Ha ocurrido un error al obtener la información"
+            };
+        }
     }
 
     static updateClient_Documents(idClient, idDocuments){
