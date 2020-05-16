@@ -48,7 +48,7 @@ var infoController = {
 				_id: id,
 				idClient: [newIdClient]
 			}
-            const test = await User.findOneAndUpdate({ _id : id}, {"idClient": new }, {new : true});
+            const test = await User.findOneAndUpdate({ _id : id}, {"idClient": updateUserData }, {new : true});
             * */
             return response.json({ message: 'Datos creatos correctamente' });
         }
