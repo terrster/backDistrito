@@ -10,14 +10,13 @@ class MongoComercialInfoService {
 
         try{
 
-            const ComercialInfo = async() => {
+            const comercialInfo = async() => {
 
                 let info = await ComercialInfo.findById(id);
-                //console.log(info);
                 return info;
             }
 
-            return ComercialInfo();
+            return comercialInfo();
 
         }
         catch(error){
@@ -27,16 +26,17 @@ class MongoComercialInfoService {
 
     }
 
-    static storeComercialInfo(request){
-	
-		async function storeInfo (){
-			try{
+    static storeComercialInfo(idClient, request){
 
+		async function storeInfo (){
+
+			try{
+	
 				const createAddress = async() => {
 
 					let address = await MongoAddressService.storeAddress(request);
 					return address;
-
+	
 				}
 
 				let newAddress = await createAddress();
@@ -66,17 +66,20 @@ class MongoComercialInfoService {
 				const info = await createInfo();
 				return info;
 
-			}
-			catch(error){
-				console.log(error);
-				return null;
-			}
+        }
+        catch(error){
+            console.log(error);
+            return null;
+        }
+
+
+			
 		}
-        return storeInfo();
+		return storeInfo();
 
     }
 
-    static updateComercialInfo(id, request){
+    static updateComercialInfo(idClient, request){
         
         try{
 

@@ -6,7 +6,7 @@ const { MongoClientService } = require("../services/MongoClientService");
 const { MongoApplianceService } = require("../services/MongoApplianceService");
 const { MongoGeneralInfoService } = require("../services/MongoGeneralInfoService");
 const { MongoComercialInfoService } = require("../services/MongoComercialInfoService");
-
+const User = require("../models/User");
 require('dotenv').config({
     path: `.env.${process.env.NODE_ENV}`
 });
@@ -53,27 +53,30 @@ var infoController = {
     },
     getComercialInfo: async(request, response) => {
         let id = request.headers.tokenDecoded.data.id;
-
+        
         let user = await MongoUserService.getFullUser(id);
+        console.log(user);
 
-        if(user.idClient[0].idComercialInfo != ""){//Get comercial info
-            let info = await MongoComercialInfoService.getComercialInfo(user.idClient[0].idGeneralInfo[0]);
-            //console.log(info);
-            return responsejson({info});
+        if(user.idClient[0].idComercialInfo !== []){//Get comercial info
+           let info = await MongoComercialInfoService.getComercialInfo(user.idClient[0].idComercialInfo[0]);
+           return response.send(info);
         }
+		console.log("Responder null");
+        return response.send(null);
     },
     storeOrUpdateComercialInfo: async(request, response) => {
         let id = request.headers.tokenDecoded.data.id;
-
+        
         let user = await MongoUserService.getFullUser(id);
 
         if(user.idClient[0].idComercialInfo == ""){//Create
-            let infoStored = await MongoComercialInfoService.storeComercialInfo(request);
+            let infoStored = await MongoComercialInfoService.storeComercialInfo(user.idClient[0]._id, request.body);
             let applianceStored = await MongoApplianceService.storeAppliance({
-                idComercialInfo : {
+                idComercialInfo: {
                     _id : infoStored._id
                 }
             });
+            
             let params = {
                 appliance :{
                     _id : applianceStored._id
@@ -83,20 +86,20 @@ var infoController = {
                 }
             }
             let clientUpdated = await MongoClientService.updateClient(user.idClient[0]._id, params);
-            console.log("Client Upd: ",clientUpdated);
-            return response.json({ message: clientUpdated });
+            console.log(clientUpdated);
+            return response.json({ message: 'Datos creatos correctamente' });
         }
         else{//Edit
-            let infoUpdated = await MongoComercialInfoService.updateComercialInfo(user.idClient[0].idComercialInfo[0], request);
+			console.log(user.idClient[0].idComercialInfo[0]);
+            /*let infoUpdated = await MongoGeneralInfoService.updateGeneralInfo(user.idClient[0].idGeneralInfo[0], request);
             let applianceUpdated = await MongoApplianceService.updateAppliance(user.idClient[0].appliance[0], {
-               idComercialInfo : {
-                   _id : infoUpdated._id
+                idGeneralInfo : {
+                    _id : infoUpdated._id
                 }
-            });
-            return infoUpdated;
+            });*/
+            return response.json({ message });
         }
     }
-
 }
 
 module.exports = infoController;
