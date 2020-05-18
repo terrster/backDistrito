@@ -1,7 +1,7 @@
  const { Schema, model }= require('mongoose');
 
 const amountSchema = new Schema({
-  idClient:  [{ type: Schema.Types.ObjectId, ref: 'Client' }],
+  /*idClient: [{ type: Schema.Types.ObjectId, ref: 'Client' }],*/
   howMuch: Number,
   whyNeed: String,
   whenNeed: String,

@@ -44,13 +44,15 @@ var amountController = {
             let amountStored = await MongoAmountService.storeAmount(user.idClient[0], amountParams);
 
             if(user.idClient[0].appliance == ""){//Este appliance está en duda, está confuso
+		let infoStored = await MongoAmountService.storeAmount(user.idClient[0]._id, request.body);
                 let applianceStored = await MongoApplianceService.storeAppliance({
                     idGeneralInfo : {
                         _id : infoStored._id
                     }
                 });
+		console.log(infoStored)
             }
-            return amountStored;
+		return response.json({msg:"datos creados"});
         }
         else{//Edit
             const { howMuch, whyNeed, whenNeed, term, yearSales, status} = request;
