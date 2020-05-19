@@ -15,6 +15,7 @@ const verifyToken = require("../app/http/middlewares/verifyToken");
 const tokenManager = require("../app/http/services/tokenManager");
 
 //Controllers
+const userController = require("../app/http/controllers/userController");
 const dealController = require("../app/http/controllers/dealController");
 const infoController = require("../app/http/controllers/infoController");
 const amountController = require("../app/http/controllers/amountController");
@@ -24,6 +25,11 @@ route.use(verifyToken);
 route.use(async(request, response, next) => {
     request.headers.tokenDecoded = await tokenManager.decode(request.headers.token);
     next();
+});
+
+//User routes
+route.group('/user', (user) => {
+	user.get('/info', userController.getUserInfo)
 });
 
 //Deal routes

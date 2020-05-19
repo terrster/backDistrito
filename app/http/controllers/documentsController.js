@@ -10,14 +10,19 @@ require('dotenv').config({
 
 var documentsController = {
 
-    store: async(request, response) => {console.log(request.body);
-        var User = await MongoUserService.getFullUser(request.body);
+    store: async(request, response) => {
+		let id = request.headers.tokenDecoded.data.id;
+		console.log(request.body);
+        var User = await MongoUserService.getFullUser(id);
+        console.log(User);
         var idDocument = "";
 
         if(User.idClient[0].idDocuments == ""){
+			console.log("No hay documentos antiguos");
             var newDocument = await MongoDocumentService.store(User.idClient[0]);
             var updatedClient = await MongoClientService.updateClient_Documents(User.idClient[0]._id, newDocument._id);
             idDocument = newDocument._id;
+            response.json({ status: 'OK', code: 200, user: updatedClient });
         }
         else{
             idDocument = User.idClient[0].idDocuments[0];
