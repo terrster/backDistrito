@@ -39,17 +39,7 @@ var infoController = {
                     _id : infoStored._id
                 }
             });
-            /*
-             * INTENTE CREAR UN IDCLIENT CON LOS DATOS QUE SE GUARDAN Y ACTUALIZAR ESA PROPIEDAD DEL USUARIO PERO NO LA ACTUALIZA
-            const newIdClient = user.idClient[user.idClient.length - 1];
-            newIdClient.idGeneralInfo = [...newIdClient.idGeneralInfo, infoStored._id]
-            newIdClient.appliance = [...newIdClient.appliance, applianceStored._id]
-            const updateUserData = {
-				_id: id,
-				idClient: [newIdClient]
-			}
-            const test = await User.findOneAndUpdate({ _id : id}, {"idClient": updateUserData }, {new : true});
-            * */
+            
             let params = {
                 appliance :{
                     _id : applianceStored._id
@@ -63,13 +53,14 @@ var infoController = {
             return response.json({ message: 'Datos creatos correctamente' });
         }
         else{//Edit
-            let infoUpdated = await MongoGeneralInfoService.updateGeneralInfo(user.idClient[0].idGeneralInfo[0], request);
+			console.log(user.idClient[0].idGeneralInfo[0]);
+            /*let infoUpdated = await MongoGeneralInfoService.updateGeneralInfo(user.idClient[0].idGeneralInfo[0], request);
             let applianceUpdated = await MongoApplianceService.updateAppliance(user.idClient[0].appliance[0], {
                 idGeneralInfo : {
                     _id : infoUpdated._id
                 }
-            });
-            return response.json({infoUpdated});
+            });*/
+            return response.json({ message });
         }
     },
     getComercialInfo: async(request, response) => {
