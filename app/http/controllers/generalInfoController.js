@@ -1,7 +1,6 @@
 'use strict'
 
 const GeneralInfo = require("../models/GeneralInfo");
-
 const User = require("../models/User");
 const Address = require("../models/Address");
 const Reference = require("../models/Reference");
@@ -130,11 +129,11 @@ var generalInfoController = {
             });
         }
     },
-    show: async(request) => {        
+    show: async(request, response) => {        
         let id = request.params.id || request.headers.tokenDecoded.data.id;
 
         try{
-            let user = await User.findById(id).select('-idClient');
+            let user = await User.findById(id);
 
             let general = await GeneralInfo.findById(user.idClient[0].idGeneralInfo[0]);
 

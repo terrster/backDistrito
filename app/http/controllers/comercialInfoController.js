@@ -1,15 +1,14 @@
 'use strict'
 
 const ComercialInfo = require("../models/ComercialInfo");
-
-const userController = require("../controllers/userController");
-const addressController = require("../controllers/addressController");
-const applianceController = require("../controllers/applianceController");
-const clientController = require("../controllers/clientController");
+const User = require("../models/User");
+const Address = require("../models/Address");
+const Appliance = require("../models/Appliance");
+const Client = require("../models/Client");
 
 var comercialInfoController = {
 
-    store: async(request) => {
+    store: async(request, response) => {
         try{
             let user = await userController.show(request);
 
@@ -27,7 +26,7 @@ var comercialInfoController = {
                 town, 
                 zipCode
             };
-            let addressStored = await addressController.store(addressParams);
+            let addressStored = await Address.create(addressParams);
 
             let {
                 comercialName,
@@ -64,7 +63,7 @@ var comercialInfoController = {
 
             let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
 
-            let applianceStored = await applianceController.store({
+            let applianceStored = await Appliance.create({
                 idClient: {
                     _id: user.idClient[0]._id
                 },
@@ -73,7 +72,7 @@ var comercialInfoController = {
                 }
             });
 
-            await clientController.update(user.idClient[0]._id,{
+            await Client.findByIdAndUpdate(user.idClient[0]._id,{
                 appliance: {
                     _id: applianceStored._id
                 },
@@ -82,19 +81,39 @@ var comercialInfoController = {
                 }
             });
 
-            return comercialInfoStored;
+            return response.json({ 
+                code: 200,
+                msg: "Información comercial guardada exitosamente",
+                comercial: comercialInfoStored 
+            });
         } 
         catch(error){
-            console.log(error);
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de guardar la información comercial",
+                error: error
+            });
         }
     },
-    show: async(id) => {
+    show: async(request, response) => {
+        let id = request.params.id || request.headers.tokenDecoded.data.id;
+
         try{
-            let info = await ComercialInfo.findById(id);
-            return info;
+            let user = await User.findById(id);
+
+            let comercial = await ComercialInfo.findById(user.idClient[0].idComerciallInfo[0]);
+
+            return response.json({ 
+                code: 200,
+                comercial: comercial 
+            });
         } 
         catch(error){
-            console.log(error);
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de obtener la información comercial",
+                error: error
+            });
         }
     },
     update: async(id, request) => {//Pendiente
