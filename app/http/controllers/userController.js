@@ -1,32 +1,59 @@
 'user strict'
 
-const { MongoUserService } = require("../services/MongoUserService");
 const User = require("../models/User");
 
-require('dotenv').config({
-    path: `.env.${process.env.NODE_ENV}`
-});
+const userController = {
 
-var userController = {
+	lastUser: async(request) => {
 
-    getUserInfo: async(request, response) => {
-		try {
-			
-			let id = request.headers.tokenDecoded.data.id;
-			console.log(id);
-			
-			let user = await MongoUserService.getFullUser(id);
-        
-			console.log(user);
-        
-			response.json({ user });
-		
-		} catch (e) {
-			console.log(e);
-			response.json({ error: e});
+		try{
+			let user = await User.findOne({}, {}, { sort: { 'createdAt' : -1 } });
+			return user;
 		}
+		catch(error){
+			console.error(error);
+		}
+
+	},
+	show: async(request, response) => {
+		let id = request.params.id || request.headers.tokenDecoded.data.id;
+
+        try{
+            let user = await User.findById(id).select('-idClient');
+
+            return response.json({ 
+                code: 200,
+                user: user 
+            });
+        } 
+        catch(error){
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de obtener un usuario",
+                error: error
+            });
+        }
+	},
+	update: async(request, response) => {
+        let id = request.params.id;
+
+        try{
+            let userUpdated = await User.findByIdAndUpdate(id, request.body);
+
+            return response.json({ 
+                code: 200,
+                msg: "Usuario actualizado exitosamente",
+                userUpdated: userUpdated 
+            });
+        } 
+        catch(error){
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de actualizar un usuario",
+                error: error
+            });
+        }
     },
-   
 
 }
 

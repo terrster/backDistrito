@@ -15,11 +15,9 @@ const documentsSchema = new Schema({
     facturacion: Array,
     others: Array,
     cventerprise:Array,
-    proofAddressMainFounders: Array,
+    proofAddressMainFounders: Array
 }, { collection: 'Documents' });
 
+var collectionName = 'Documents';
 
-
-var collectionName = 'Documents'
-
-module.exports = model('Documents', documentsSchema, collectionName)
+module.exports = model('Documents', documentsSchema, collectionName);

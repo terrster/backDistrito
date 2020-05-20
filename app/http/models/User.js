@@ -1,31 +1,45 @@
 const { Schema, model } = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+var now = new Date();
+var utc = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+
 const userSchema = new Schema({
-    idClient: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
-    name: { type: String, default: ''},
-    lastName: { type: String, default: '' },
-    access: { type:  String, default: '' },
-    email: { type: String, default: ''},
-    password: { type: String, default: ''},
-    phone: { type: String, default: ''},
-    registerDate: { type: Date, default: Date.now },
-    address: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
-    hubspotContactId: { type: String, default: ''},
-    hubspotDealId: { type: String, default: ''},
-    recoverPassHash: { type: String, default: ''},
-    idDistrito: { type: Number },
-    createdAt: { type: Date, default: Date.now },
+    idClient: [{ type: Schema.Types.ObjectId, ref: 'Client', autopopulate: true }],
+    name: String,
+    lastName: String,
+    access: { type:  String, default: 'USER' },
+    email: { type: String, index: true, unique: true, required: true, uniqueCaseInsensitive: true },
+    password: String,
+    phone: String,
+    registerDate: { type: Date, default: utc },
+    address: [{ type: Schema.Types.ObjectId, ref: 'Address', autopopulate: true }],
+    hubspotContactId: String,
+    hubspotDealId: String,
+    recoverPassHash: String,
+    idDistrito: Number,
+    createdAt: { type: Date, default: utc }
 }, { collection: 'User' });
 
-userSchema.methods.encryptPassword = async (password) => {
-    return bcrypt.hash(password, 12);
-};
+userSchema.plugin(require('mongoose-unique-validator'));
+userSchema.plugin(require('mongoose-autopopulate'));
 
 userSchema.methods.validatePassword = function (password) {
     return bcrypt.compare(password, this.password);
 }
 
-var collectionName = 'User'
+userSchema.pre('save', async function (next) {
+    this.password = await bcrypt.hash(this.password, 12);
+    next();
+});
 
-module.exports = model('User', userSchema, collectionName)
+userSchema.pre('findOneAndUpdate', async function (next) {
+    if(this._update.password){
+        this._update.password = await bcrypt.hash(this._update.password, 12);
+    }
+    next();
+});
+
+var collectionName = 'User';
+
+module.exports = model('User', userSchema, collectionName);

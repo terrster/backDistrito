@@ -7,10 +7,9 @@ const creditSchema = new Schema({
     reason: String,
     whenNeed: String,
     expiresDate: Date,
-    date: Date,
-
+    date: Date
 }, { collection: 'Credit' });
 
-var collectionName = 'Credit'
+var collectionName = 'Credit';
 
-module.exports = model('Credit', creditSchema, collectionName)
+module.exports = model('Credit', creditSchema, collectionName);

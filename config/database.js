@@ -12,7 +12,7 @@ const url = (process.env.NODE_ENV === 'local')
 
 mongoose.set('useFindAndModify', false);
 mongoose.connect(url, {
+    useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
-})
-    .then(db => console.log('Database is connected'))
+}).then(db => console.log('Database is connected'))

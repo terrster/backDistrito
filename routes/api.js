@@ -15,9 +15,11 @@ const verifyToken = require("../app/http/middlewares/verifyToken");
 const tokenManager = require("../app/http/services/tokenManager");
 
 //Controllers
-const userController = require("../app/http/controllers/userController");
 const dealController = require("../app/http/controllers/dealController");
-const infoController = require("../app/http/controllers/infoController");
+const userController = require("../app/http/controllers/userController");
+const clientController = require("../app/http/controllers/clientController");
+const generalInfoController = require("../app/http/controllers/generalInfoController");
+const comercialInfoController = require("../app/http/controllers/comercialInfoController");
 const amountController = require("../app/http/controllers/amountController");
 const documentsController = require("../app/http/controllers/documentsController");
 
@@ -27,35 +29,45 @@ route.use(async(request, response, next) => {
     next();
 });
 
-//User routes
-route.group('/user', (user) => {
-	user.get('/info', userController.getUserInfo)
-});
-
 //Deal routes
 route.group("/deal", (deal) => {
+    deal.post('', dealController.store);
     deal.get('/:id', dealController.show);
     deal.put('/:id', dealController.update);
-    //deal.delete('/:id', dealController.destroy);
 });
 
-//Info
-route.group("/info", (info) => {
-    info.get('/general', infoController.getGeneralInfo);
-    info.post('/general/store', infoController.storeOrUpdateGeneralInfo);
-    info.put('/general/update', infoController.storeOrUpdateGeneralInfo);
-
-    info.get('/comercial', infoController.getComercialInfo);
-    info.post('/comercial/store', infoController.storeOrUpdateComercialInfo);
-    info.put('/comercial/update', infoController.storeOrUpdateComercialInfo);
+//User routes
+route.group('/user', (user) => {
+    user.get('/:id?', userController.show);
+    user.put('/:id', userController.update);
 });
 
-//Amount
-route.group("/amount", (amount) => {
-    amount.get('', amountController.getAmount);
-    amount.post('/store', amountController.storeOrUpdateAmount);
-    amount.put('/update', amountController.storeOrUpdateAmount);
+//Client routes
+route.group('/user', (client) => {
+    client.get('/:id?', clientController.show);
+    client.put('/:id', clientController.update);
 });
+
+//Info general routes
+route.group("/info-general", (general) => {
+    general.post('', generalInfoController.store);
+    general.get('/:id', generalInfoController.show);
+    general.put('/:id', generalInfoController.update);
+});
+
+//Info comercial routes
+route.group("/info-comercial", (comercial) => {
+    comercial.post('', comercialInfoController.store);
+    comercial.get('/:id', comercialInfoController.show);
+    comercial.put('/:id', comercialInfoController.update);
+});
+
+//Amount routes
+// route.group("/amount", (amount) => {
+//     amount.post('', amountController.store);
+//     amount.get('/:id', amountController.show);
+//     amount.put('/:id', amountController.update);
+// });
 
 //Documents routes
 route.group("/upload", (upload) => {
