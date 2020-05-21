@@ -27,15 +27,13 @@ const referenceController = {
         let id = request.params.id;//id de referencia
 
         try{
-            let reference = await Reference.findById(id);
-
             let referenceParams = {
                 name : request.name1,
                 phone : request.phone1,
                 relative : request.relative1
             }
 
-            reference = await Reference.findByIdAndUpdate(id, referenceParams, (error, referenceUpdated) => {
+            let reference = await Reference.findByIdAndUpdate(id, referenceParams, (error, referenceUpdated) => {
                 return referenceUpdated;
             });
 
