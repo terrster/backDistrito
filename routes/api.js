@@ -21,6 +21,8 @@ const clientController = require("../app/http/controllers/clientController");
 const amountController = require("../app/http/controllers/amountController");
 const comercialInfoController = require("../app/http/controllers/comercialInfoController");
 const generalInfoController = require("../app/http/controllers/generalInfoController");
+const addressController = require("../app/http/controllers/addressController");
+const referenceController = require("../app/http/controllers/referenceController");
 const documentsController = require("../app/http/controllers/documentsController");
 
 route.use(verifyToken);
@@ -69,8 +71,20 @@ route.group("/info-general", (general) => {
     general.put('/:id', generalInfoController.update);
 });
 
+//Address routes
+route.group("/address", (address) => {
+    address.get('/:id', addressController.show);
+    address.put('/:id', addressController.update);
+});
+
+//Reference routes
+route.group("/reference", (reference) => {
+    reference.get('/:id', referenceController.show);
+    reference.put('/:id', referenceController.update);
+});
+
 //Documents routes
-route.group("/upload", (upload) => {
+route.group("/documents", (upload) => {
     upload.post('', documentsController.store);
     upload.put('/:id', documentsController.update);
 });

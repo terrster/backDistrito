@@ -7,7 +7,7 @@ const Reference = require("../models/Reference");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
 
-var generalInfoController = {
+const generalInfoController = {
 
     store: async(request) => {
         let id = request.headers.tokenDecoded.data.id;//id de user

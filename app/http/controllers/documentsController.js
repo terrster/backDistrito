@@ -1,54 +1,88 @@
 'use strict'
 
-const aws = require('../services/s3/awsBucketUtils');
-const { MongoUserService } = require("../services/MongoUserService");
-const { MongoDocumentService } = require("../services/MongoDocumentService");
-const { MongoClientService } = require("../services/MongoClientService");
-require('dotenv').config({
-    path: `.env.${process.env.NODE_ENV}`
-});
+const fileManager = require('../services/fileManager');
+const User = require("../models/User");
+const Documents = require("../models/Documents");
+const Appliance = require("../models/Appliance");
+const Client = require("../models/Client");
 
-var documentsController = {
+const documentsController = {
 
     store: async(request, response) => {
-		let id = request.headers.tokenDecoded.data.id;
-		console.log(request.body);
-        var User = await MongoUserService.getFullUser(id);
-        console.log(User);
-        var idDocument = "";
-
-        if(User.idClient[0].idDocuments == ""){
-			console.log("No hay documentos antiguos");
-            var newDocument = await MongoDocumentService.store(User.idClient[0]);
-            var updatedClient = await MongoClientService.updateClient_Documents(User.idClient[0]._id, newDocument._id);
-            idDocument = newDocument._id;
-            response.json({ status: 'OK', code: 200, user: updatedClient });
-        }
-        else{
-            idDocument = User.idClient[0].idDocuments[0];
-        }
+        let id = request.headers.tokenDecoded.data.id;//id de user
         
-        if(!request.files){
-            response.status(304).send({ status: 'ERROR', code: 304, data: 'Sin archivos' });
-        } 
-        else{
-            try{
-              const {file}  = request.files;
-              // Nombre del archivo en el bucket, modificar conforme se necesite
-              const filePath = await aws.moveFile(file);
-              const contentType = aws.getContentType(file.name);
-              const base64 = await aws.getBase64(filePath);
-              const filename = `${new Date().getTime()}-${file.name}`;
-              const url = await aws.uploadFile(filename, base64, contentType);
+        const {files} = request;
 
-              var updateDocument = await MongoDocumentService.update(idDocument, request.body.nameFile, url);
-              response.send({ status: 'OK', code: 200, data: url });
-              
-            } 
-            catch(err){
-              console.log(err);
-              response.status(500).send({ error: Boolean , message: String, data: url });
-            }
+        if(!files){
+            return response.json({
+                code: 200,
+                msg: 'Sin archivos'
+            });
+        }
+
+        try{
+            let filesUploaded = await fileManager.filesUploadCore(files);
+
+            let user = await User.findById(id);
+
+            let { 
+                oficialID,
+                proofAddress,
+                bankStatements,
+                constitutiveAct,
+                otherActs,
+                financialStatements,
+                rfc,
+                lastDeclarations,
+                acomplishOpinion,
+                facturacion,
+                others,
+                cventerprise,
+                proofAddressMainFounders,
+            } = filesUploaded;
+
+            let document = new Documents();
+            document.idClient = {
+                _id: user.idClient[0]._id
+            };
+            oficialID ? document.oficialID[0] = oficialID : undefined;
+            proofAddress ? document.proofAddress[0] = proofAddress : undefined;
+            bankStatements ? document.bankStatements[0] = bankStatements : undefined;
+            constitutiveAct ? document.constitutiveAct[0] = constitutiveAct : undefined;
+            otherActs ? document.otherActs[0] = otherActs : undefined;
+            financialStatements ? document.financialStatements[0] =  financialStatements : undefined;
+            rfc ? document.rfc[0] = rfc : undefined;
+            lastDeclarations ? document.lastDeclarations[0] = lastDeclarations : undefined;
+            acomplishOpinion ? document.acomplishOpinion[0] = acomplishOpinion : undefined;
+            facturacion ? document.facturacion[0] = facturacion : undefined;
+            others ? document.others[0] = others : undefined;
+            cventerprise ? document.cventerprise[0] = cventerprise : undefined;
+            proofAddressMainFounders ? document.proofAddressMainFounders[0] = proofAddressMainFounders : undefined;
+            let documentStored = await document.save();
+
+            await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
+                idDocuments : {
+                    _id : documentStored._id
+                }
+            });
+
+            await Client.findByIdAndUpdate(user.idClient[0]._id, {
+                idDocuments: {
+                    _id: documentStored._id
+                }
+            });
+
+            return response.json({
+                code: 200,
+                msg : 'Documento(s) cargado(s) exitosamente'
+            });
+        }
+        catch(error){console.log(error);
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de cargar documentos",
+                error: error
+            });
         }
     },
     update: async(request, response) => {

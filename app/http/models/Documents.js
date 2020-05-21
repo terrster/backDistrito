@@ -9,7 +9,7 @@ const documentsSchema = new Schema({
     otherActs: Array,
     financialStatements: Array,
     rfc: Array,
-    status: Boolean,
+    status: { type: Boolean, default: false },
     lastDeclarations: Array,
     acomplishOpinion: Array,
     facturacion: Array,
@@ -17,7 +17,7 @@ const documentsSchema = new Schema({
     cventerprise:Array,
     proofAddressMainFounders: Array
 }, { collection: 'Documents' });
-
+  
 var collectionName = 'Documents';
 
 module.exports = model('Documents', documentsSchema, collectionName);

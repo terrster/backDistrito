@@ -6,7 +6,7 @@ const Address = require("../models/Address");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
 
-var comercialInfoController = {
+const comercialInfoController = {
 
     store: async(request, response) => {
         let id = request.headers.tokenDecoded.data.id;//id de user

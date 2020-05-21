@@ -17,7 +17,6 @@ const options = require("../../../config/jwt_options");
 
 router.use((request, response, next) => {
     const token = request.headers['token'];
-    console.log(token);
     if(token){
       jwt.verify(token, publicKey, options, (error, decoded) => {      
         if(error){

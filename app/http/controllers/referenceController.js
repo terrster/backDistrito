@@ -4,22 +4,51 @@ const Reference = require("../models/Reference");
 
 const referenceController = {
 
-    store: async(request) => {
+    show: async(request, response) => {
+        let id = request.params.id;//id de referencia
+
         try{
-            let referenceStored = await Reference.create(request);
-            return referenceStored;
+            let reference = await Reference.findById(id);
+
+            return response.json({ 
+                code: 200,
+                reference: reference 
+            });
         }
         catch(error){
-            console.log(error);
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de obtener la referencia",
+                error: error
+            });
         }
     },
-    update: async(id, request) => {
+    update: async(request, response) => {
+        let id = request.params.id;//id de referencia
+
         try{
-            let referenceUpdated = await Reference.findByIdAndUpdate(id, request);
-            return referenceUpdated;
+            let reference = await Reference.findById(id);
+
+            let referenceParams = {
+                name : request.name1,
+                phone : request.phone1,
+                relative : request.relative1
+            }
+
+            let referenceUpdated = await Reference.findByIdAndUpdate(reference._id, referenceParams);
+
+            return response.json({ 
+                code: 200,
+                msg: "Referencia actualizada exitosamente",
+                reference: referenceUpdated 
+            });
         }
         catch(error){
-            console.log(error);
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de actualizar de la referencia",
+                error: error
+            });
         }
     }
 

@@ -5,7 +5,7 @@ const path = require("path");
 require('dotenv').config({
     path: `.env.${process.env.NODE_ENV}`
 });
-const S3 = require('../../../config/s3/buckets');
+const S3 = require('../services/s3/buckets');
 const uploadDir = "../../../public/tmpFiles/";
 
 const moveFile = async(files) => {
@@ -23,17 +23,6 @@ const moveFile = async(files) => {
     });
 
     let uploadedFiles = await Promise.all(UploadFiles);
-
-    // Object.keys(files).forEach(async(key) => {
-    //     const filePath = path.resolve(__dirname, uploadDir + files[key].name);
-    //         files[key].mv(filePath, (error) => {
-    //             if(error){
-    //                 return error;
-    //             }
-    //         });     
-    //     //uploadedFiles.push(uploadDir + files[key].name);
-    //     //uploadedFiles.push(filePath);
-    // });
 
     return uploadedFiles;
 };
@@ -85,7 +74,7 @@ const setNewName = async(files) => {
     try{
 
         Object.keys(files).forEach(key => {
-            names.push(`${new Date().getTime()}-${files[key].name}`);
+            names.push([key, `${new Date().getTime()}-${files[key].name}`]);
         });
 
         return names;
@@ -163,7 +152,7 @@ const deleteFromS3 = async(files) => {
 const uploadFileS3 = async(name, base64, contentType) => {
     return new Promise((resolve, reject) => {
       const params = {
-        Key: `${name}`, ACL: 'public-read', Body: base64, ContentType: contentType,
+        Key: `${name[1]}`, ACL: 'public-read', Body: base64, ContentType: contentType,
       };
       const bucket = S3.bucket();
       const callback = (error, data) => {
@@ -171,7 +160,8 @@ const uploadFileS3 = async(name, base64, contentType) => {
           reject(error);
           return;
         }
-        resolve(data.Location);
+        let url = {}
+        resolve({[name[0]] : data.Location});
       };
       bucket.upload(params, callback);
     });
@@ -191,7 +181,7 @@ const filesUploadCore = async(files) => {
             const filesName = await setNewName(files);
             const urls = await uploadFile(filesName, filesBase64, contentsType);
 
-            resolve(urls);
+            resolve(urls[0]);
 
         }
         catch(error){
