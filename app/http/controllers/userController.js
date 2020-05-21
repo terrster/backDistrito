@@ -21,7 +21,7 @@ const userController = {
 		let id = request.params.id || request.headers.tokenDecoded.data.id;
 
         try{
-            let user = await User.findById(id).select('-idClient');
+            let user = await User.findById(id);
 
             return response.json({ 
                 code: 200,
