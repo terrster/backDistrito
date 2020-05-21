@@ -57,21 +57,21 @@ route.group('/client', (client) => {
 
 //Amount routes
 route.group("/amount", (amount) => {
-    amount.post('', amountController.store);
+    amount.post('/:id', amountController.store);
     amount.get('/:id', amountController.show);
     amount.put('/:id', amountController.update);
 });
 
 //Info comercial routes
 route.group("/info-comercial", (comercial) => {
-    comercial.post('', comercialInfoController.store);
+    comercial.post('/:id', comercialInfoController.store);
     comercial.get('/:id', comercialInfoController.show);
     comercial.put('/:id', comercialInfoController.update);
 });
 
 //Info general routes
 route.group("/info-general", (general) => {
-    general.post('', generalInfoController.store);
+    general.post('/:id', generalInfoController.store);
     general.get('/:id', generalInfoController.show);
     general.put('/:id', generalInfoController.update);
 });
@@ -90,7 +90,7 @@ route.group("/reference", (reference) => {
 
 //Documents routes
 route.group("/documents", (upload) => {
-    upload.post('', documentsController.store);
+    upload.post('/:id', documentsController.store);
     upload.put('/:id', documentsController.update);
 });
     
