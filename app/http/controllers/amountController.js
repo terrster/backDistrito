@@ -1,5 +1,6 @@
 'user strict'
 
+const User = require("../models/User");
 const Amount = require("../models/Amount");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
