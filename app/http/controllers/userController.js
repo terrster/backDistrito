@@ -18,7 +18,7 @@ const userController = {
 		}
 	},
 	show: async(request, response) => {
-		let id = request.params.id || request.headers.tokenDecoded.data.id;
+		let id = request.params.id;
 
         try{
             let user = await User.findById(id);

@@ -44,11 +44,6 @@ route.group('/user', (user) => {
     user.put('/:id', userController.update);
 });
 
-route.group('/user', (client) => {
-    client.get('/:id', clientController.show);
-    client.put('/:id', clientController.update);
-});
-
 //Client routes
 route.group('/client', (client) => {
     client.get('/:id', clientController.show);
@@ -89,9 +84,9 @@ route.group("/reference", (reference) => {
 });
 
 //Documents routes
-route.group("/documents", (upload) => {
-    upload.post('/:id', documentsController.store);
-    upload.put('/:id', documentsController.update);
+route.group("/documents", (documents) => {
+    documents.post('/:id', documentsController.store);
+    documents.put('/:id', documentsController.update);
 });
     
 module.exports = route;
