@@ -9,7 +9,7 @@ const Client = require("../models/Client");
 const comercialInfoController = {
 
     store: async(request, response) => {
-        let id = request.headers.tokenDecoded.data.id;//id de user
+        let id = request.params.id;//id de user
 
         try{
             let user = await User.findById(id);

@@ -101,6 +101,24 @@ const uploadFile = async(filesName, filesBase64, contentsType) => {
     }
 };
 
+const uploadFileS3 = async(name, base64, contentType) => {
+    return new Promise((resolve, reject) => {
+      const params = {
+        Key: `${name[1]}`, ACL: 'public-read', Body: base64, ContentType: contentType,
+      };
+      const bucket = S3.bucket();
+      const callback = (error, data) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        let url = {}
+        resolve({[name[0]] : data.Location});
+      };
+      bucket.upload(params, callback);
+    });
+}
+
 const deleteFromServer = async() => {
     try{
 
@@ -120,62 +138,13 @@ const deleteFromServer = async() => {
     }
 }
 
-const deleteFromS3 = async(files) => {
-    //return new Promise((resolve, reject) => {
-
-        try{
-            //console.log(files.file);
-            const bucket = S3.bucket();
-            // const callback = (error, data) => {
-            // if(error){
-            //     reject(error);
-            //     return;
-            // }
-            //     console.log(data);
-            //     resolve(data);
-            // };
-            var params = {
-                Key: files.file
-            };
-            console.log(params);
-            bucket.deleteObject(params,(err, data) => {
-                console.log(err);
-                console.log(data);
-            });
-        }
-        catch(error){
-            console.log("Something went wrong trying to delete a file from S3");
-        }
-    //});
-}
-
-const uploadFileS3 = async(name, base64, contentType) => {
-    return new Promise((resolve, reject) => {
-      const params = {
-        Key: `${name[1]}`, ACL: 'public-read', Body: base64, ContentType: contentType,
-      };
-      const bucket = S3.bucket();
-      const callback = (error, data) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        let url = {}
-        resolve({[name[0]] : data.Location});
-      };
-      bucket.upload(params, callback);
-    });
-}
-
-
-
-const filesUploadCore = async(files) => {
+const UploadFilesToS3 = async(files) => {
 
     return new Promise(async(resolve, reject) => {
 
         try{
 
-            const filesPath = await moveFile(files);
+            const filesPath = await moveFile(files);console.log(filesPath);
             const contentsType = await getContentType(files);
             const filesBase64 = await getBase64(filesPath);
             const filesName = await setNewName(files);
@@ -185,16 +154,13 @@ const filesUploadCore = async(files) => {
 
         }
         catch(error){
-            console.log("Something went wrong in the files upload core");
+            console.log("Something went wrong trying to upload files");
         }
 
     });
 
-
 }
 
-//moveFile, getContentType, getBase64, setNewName, uploadFile
-
 module.exports = {
-    filesUploadCore, deleteFromS3
+    UploadFilesToS3
 };
