@@ -35,7 +35,7 @@ const referenceController = {
                 relative : request.relative1
             }
 
-            let reference = await Reference.findByIdAndUpdate(id, referenceParams, (error, referenceUpdated) => {
+            reference = await Reference.findByIdAndUpdate(id, referenceParams, (error, referenceUpdated) => {
                 return referenceUpdated;
             });
 
