@@ -5,7 +5,7 @@ const Client = require("../models/Client");
 const clientController = {
 
     show: async(request, response) => {
-        let id = request.params.id || request.headers.tokenDecoded.data.id;
+        let id = request.params.id;//id de client
 
         try{
             let client = await Client.findById(id);
@@ -24,10 +24,10 @@ const clientController = {
         }
     },
     update: async(request, response) => {
-        let id = request.params.id;
+        let id = request.params.id;//id de client
 
         try{
-            let clientUpdated = await Client.findByIdAndUpdate(id, request);
+            let clientUpdated = await Client.findByIdAndUpdate(id, request.body);
 
             return response.json({ 
                 code: 200,

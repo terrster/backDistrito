@@ -10,10 +10,10 @@ const Client = require("../models/Client");
 var generalInfoController = {
 
     store: async(request) => {
-        let id = request.headers.tokenDecoded.data.id;
+        let id = request.headers.tokenDecoded.data.id;//id de user
 
         try{
-            let user = await User.find(id).select('-idClient');
+            let user = await User.findById(id);
 
             let {
                 street, 
@@ -29,6 +29,7 @@ var generalInfoController = {
                 town, 
                 zipCode
             };
+
             let addressStored = await Address.create(addressParams);
 
             let reference1 = {
@@ -94,30 +95,24 @@ var generalInfoController = {
                 status : true
             });
 
-            let GeneralInfoStored = await GeneralInfo.create(generalInfoParams);
+            let generalInfoStored = await GeneralInfo.create(generalInfoParams);
 
-            let applianceStored = await Appliance.create({
-                idClient: {
-                    _id: user.idClient[0]._id
-                },
-                idGeneralInfo : {
-                    _id : GeneralInfoStored._id
+            await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
+                idComercialInfo : {
+                    _id : generalInfoStored._id
                 }
             });
 
-            await Client.findByIdAndUpdate(user.idClient[0]._id,{
-                appliance: {
-                    _id: applianceStored._id
-                },
+            await Client.findByIdAndUpdate(user.idClient[0]._id, {
                 idGeneralInfo: {
-                    _id: GeneralInfoStored._id
+                    _id: generalInfoStored._id
                 }
             });
 
             return response.json({ 
                 code: 200,
                 msg: "Información general guardada exitosamente",
-                general: GeneralInfoStored 
+                general: generalInfoStored 
             });
 
         } 
@@ -130,7 +125,7 @@ var generalInfoController = {
         }
     },
     show: async(request, response) => {        
-        let id = request.params.id || request.headers.tokenDecoded.data.id;
+        let id = request.params.id;//id de info general
 
         try{
             let user = await User.findById(id);
@@ -150,12 +145,88 @@ var generalInfoController = {
             });
         }
     },
-    update: async(request) => {//Pendiente
-        try{
+    update: async(request, response) => {
+        let id = request.params.id;//id de info general
 
+        try{
+            let general = await GeneralInfo.findById(id);
+
+            let {
+                street, 
+                extNumber, 
+                intNumber, 
+                town, 
+                zipCode
+            } = request.body;
+            let addressParams = {
+                street, 
+                extNumber, 
+                intNumber, 
+                town, 
+                zipCode
+            };
+
+            let addressUpdated = await Address.findByIdAndUpdate(general.address[0]._id, addressParams);
+
+            let reference1 = {
+                name : request.name1,
+                phone : request.phone1,
+                relative : request.relative1
+            }
+
+            let reference1Stored = await Reference.findByIdAndUpdate(general.contactWith[0]._id, reference1);
+
+            let reference2 = {
+                name : request.name2,
+                phone : request.phone2,
+                relative : request.relative2
+            }
+
+            let reference2Stored = await Reference.findByIdAndUpdate(general.contactWith[1]._id, reference2);
+
+            let {
+                name,
+                lastname,
+                secondLastname,
+                civilStatus,
+                birthDate,
+                rfcPerson,
+                ciec,
+                phone,
+                mortgageCredit,
+                carCredit,
+                creditCard,
+                last4
+            } = request.body;
+            let generalInfoParams = {
+                name,
+                lastname,
+                secondLastname,
+                civilStatus,
+                birthDate,
+                rfcPerson,
+                ciec,
+                phone,
+                mortgageCredit,
+                carCredit,
+                creditCard,
+                last4
+            };
+
+            let generalInfoUpdated = await GeneralInfo.findByIdAndUpdate(general._id, generalInfoParams);
+
+            return response.json({ 
+                code: 200,
+                msg: "Información general actualizada exitosamente",
+                general: generalInfoUpdated 
+            });
         } 
         catch(error){
-            console.log(error);
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de actualizar la información general",
+                error: error
+            });
         }
     }
 

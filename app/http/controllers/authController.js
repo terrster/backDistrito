@@ -5,9 +5,9 @@ const fs = require("fs");
 const path = require("path");
 
 const User = require("../models/User");
+const Client = require("../models/Client");
 const userController = require("../controllers/userController");
 const dealController = require("../controllers/dealController");
-const clientController = require("../controllers/clientController");
 
 const privateKey = fs.readFileSync(path.resolve("config/private.key"));
 const options = require("../../../config/jwt_options");
@@ -27,7 +27,7 @@ const authController = {
 
             let userStored = await User.create(data);
 
-            let clientStored = await clientController.store({ idUser: userStored._id});
+            let clientStored = await Client.create({ idUser: userStored._id});
 
             await User.findByIdAndUpdate(userStored._id, { 
                 idClient: {

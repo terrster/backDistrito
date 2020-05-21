@@ -9,8 +9,10 @@ const Client = require("../models/Client");
 var comercialInfoController = {
 
     store: async(request, response) => {
+        let id = request.headers.tokenDecoded.data.id;//id de user
+
         try{
-            let user = await userController.show(request);
+            let user = await User.findById(id);
 
             let {
                 street, 
@@ -26,6 +28,7 @@ var comercialInfoController = {
                 town, 
                 zipCode
             };
+
             let addressStored = await Address.create(addressParams);
 
             let {
@@ -63,19 +66,13 @@ var comercialInfoController = {
 
             let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
 
-            let applianceStored = await Appliance.create({
-                idClient: {
-                    _id: user.idClient[0]._id
-                },
+            await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
                 idComercialInfo : {
                     _id : comercialInfoStored._id
                 }
             });
 
-            await Client.findByIdAndUpdate(user.idClient[0]._id,{
-                appliance: {
-                    _id: applianceStored._id
-                },
+            await Client.findByIdAndUpdate(user.idClient[0]._id, {
                 idComercialInfo: {
                     _id: comercialInfoStored._id
                 }
@@ -96,12 +93,10 @@ var comercialInfoController = {
         }
     },
     show: async(request, response) => {
-        let id = request.params.id || request.headers.tokenDecoded.data.id;
+        let id = request.params.id;//id de info comercial
 
         try{
-            let user = await User.findById(id);
-
-            let comercial = await ComercialInfo.findById(user.idClient[0].idComerciallInfo[0]);
+            let comercial = await ComercialInfo.findById(id);
 
             return response.json({ 
                 code: 200,
@@ -116,12 +111,70 @@ var comercialInfoController = {
             });
         }
     },
-    update: async(id, request) => {//Pendiente
+    update: async(request, response) => {
+        let id = request.params.id;//id de info comercial
+
         try{
+            let comercial = await ComercialInfo.findById(id);
+
+            let {
+                street, 
+                extNumber, 
+                intNumber, 
+                town, 
+                zipCode
+            } = request.body;
+            let addressParams = {
+                street, 
+                extNumber, 
+                intNumber, 
+                town, 
+                zipCode
+            };
+
+            await Address.findByIdAndUpdate(comercial.address[0]._id, addressParams);
+
+            let {
+                comercialName,
+                businessName,
+                gyre,
+                rfc,
+                specific,
+                phone,
+                webSite,
+                facebook,
+                terminal,
+                warranty
+            } = request.body;
+
+            let comercialInfoParams = {
+                comercialName,
+                businessName,
+                gyre,
+                rfc,
+                specific,
+                phone,
+                webSite,
+                facebook,
+                terminal,
+                warranty
+            };
+
+            let comercialInfoUpdated = await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
+
+            return response.json({ 
+                code: 200,
+                msg: "Información comercial actualizada exitosamente",
+                comercial: comercialInfoUpdated 
+            });
 
         } 
         catch(error){
-            console.log(error);
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de actualizar la información comercial",
+                error: error
+            });
         }
     }
 

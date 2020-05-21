@@ -1,74 +1,123 @@
 'user strict'
 
-const { HubspotService } = require("../services/HubspotService");
-const { MongoUserService } = require("../services/MongoUserService");
-const { MongoAmountService } = require("../services/MongoAmountService");
-const { MongoApplianceService } = require("../services/MongoApplianceService");
+const Amount = require("../models/Amount");
+const Appliance = require("../models/Appliance");
+const Client = require("../models/Client");
 
-require('dotenv').config({
-    path: `.env.${process.env.NODE_ENV}`
-});
+const amountController = {
 
-var amountController = {
+    store: async(request, response) => {
+        let id = request.headers.tokenDecoded.data.id;//id de user
 
-    getAmount: async(request, response) => {
-        let id = request.headers.tokenDecoded.data.id;
-        
-        let user = await MongoUserService.getUser(id);
-        //console.log(user);
+        try{
+            let user = await User.findById(id);
 
-        if(user.idClient != ""){//Get amount info
-           let amount = await MongoAmountService.getAmount(user.idClient[0]);
-           //console.log(amount);
-           return response.status(200).send(amount);
+            let { 
+                howMuch, 
+                whyNeed, 
+                whenNeed, 
+                term, 
+                yearSales
+            } = request.body;
+            let amountParams = {
+                howMuch,
+                whyNeed,
+                whenNeed,
+                term,
+                yearSales
+            };
+            amountParams.push({
+                idClient: {
+                    _id: user.idClient[0]._id
+                },
+                status : true
+            });
+
+            let amountStored = await Amount.create(amountParams);
+
+            let applianceStored = await Appliance.create({
+                idClient: {
+                    _id: user.idClient[0]._id
+                },
+                idAmount : {
+                    _id : amountStored._id
+                }
+            });
+
+            await Client.findByIdAndUpdate(user.idClient[0]._id, {
+                appliance: {
+                    _id: applianceStored._id
+                }
+            });
+
+            return response.json({ 
+                code: 200,
+                msg: "Información de monto guardada exitosamente",
+                amount: amountStored 
+            });
+        } 
+        catch(error){
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de guardar la información de monto",
+                error: error
+            });
         }
-
-        return response.status(200).send(null);
     },
-    storeOrUpdateAmount: async(request, response) => {
-        let id = request.headers.tokenDecoded.data.id;
-        
-        let user = await MongoUserService.getFullUser(id);
-        let amount = await MongoAmountService.getAmount(user.idClient[0]);
+    show: async(request, response) => {
+        let id = request.params.id;//id de amount
 
-        if(amount == ""){//Create
-            const { howMuch, whyNeed, whenNeed, term, yearSales, status} = request;
-            const amountParams = {
-                howMuch,
-                whyNeed,
-                whenNeed,
-                term,
-                yearSales,
-                status
-            };
-            let amountStored = await MongoAmountService.storeAmount(user.idClient[0], amountParams);
+        try{
+            let amount = await Amount.findById(id);
 
-            if(user.idClient[0].appliance == ""){//Este appliance está en duda, está confuso
-		let infoStored = await MongoAmountService.storeAmount(user.idClient[0]._id, request.body);
-                let applianceStored = await MongoApplianceService.storeAppliance({
-                    idGeneralInfo : {
-                        _id : infoStored._id
-                    }
-                });
-		console.log(infoStored)
-            }
-		return response.json({msg:"datos creados"});
+            return response.json({ 
+                code: 200,
+                amount: amount 
+            });
+        } 
+        catch(error){
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de obtener la información de monto",
+                error: error
+            });
         }
-        else{//Edit
-            const { howMuch, whyNeed, whenNeed, term, yearSales, status} = request;
-            const amountParams = {
+    },
+    update: async(request, response) => {
+        let id = request.params.id;//id de amount
+
+        try{
+            let { 
+                howMuch, 
+                whyNeed, 
+                whenNeed, 
+                term, 
+                yearSales
+            } = request.body;
+            let amountParams = {
                 howMuch,
                 whyNeed,
                 whenNeed,
                 term,
-                yearSales,
-                status
+                yearSales
             };
-            let amountUpdated = await MongoAmountService.updateAmount(amount._id, amountParams);
-            return amountUpdated;
+
+            let amountUpdated = await Amount.findByIdAndUpdate(id, amountParams);
+
+            return response.json({ 
+                code: 200,
+                msg: "Información de monto actualizada exitosamente",
+                amount: amountUpdated
+            });
+        } 
+        catch(error){
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de actualizar la información de monto",
+                error: error
+            });
         }
     }
-
 }
 
 module.exports = amountController;
