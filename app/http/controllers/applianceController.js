@@ -27,14 +27,14 @@ const applianceController = {
         let id = request.params.id;//id de solicitud
 
         try{
-            let appliance = await Appliance.findById(id);
-
-            let applianceUpdated = await Appliance.findByIdAndUpdate(appliance._id, request.body);
+            let appliance = await Appliance.findByIdAndUpdate(id, request.body, (error, applianceUpdated) => {
+                return applianceUpdated;
+            });
 
             return response.json({ 
                 code: 200,
                 msg: "Solicitud actualizada exitosamente",
-                appliance: applianceUpdated 
+                appliance: appliance 
             });
         }
         catch(error){

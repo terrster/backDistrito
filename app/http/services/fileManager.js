@@ -144,7 +144,7 @@ const UploadFilesToS3 = async(files) => {
 
         try{
 
-            const filesPath = await moveFile(files);console.log(filesPath);
+            const filesPath = await moveFile(files);
             const contentsType = await getContentType(files);
             const filesBase64 = await getBase64(filesPath);
             const filesName = await setNewName(files);

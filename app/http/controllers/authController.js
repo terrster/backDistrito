@@ -29,13 +29,14 @@ const authController = {
 
             let clientStored = await Client.create({ idUser: userStored._id});
 
-            await User.findByIdAndUpdate(userStored._id, { 
+            let user = await User.findByIdAndUpdate(userStored._id, { 
                 idClient: {
                     _id: clientStored._id
                 }
+            },
+            (error, userUpdated) => {
+                return userUpdated;
             });
-
-            let user = await User.findById(userStored._id).select('-idClient');
  
             return response.json({ 
                  code: 200, 

@@ -74,10 +74,7 @@ const generalInfoController = {
                 mortgageCredit,
                 carCredit,
                 creditCard,
-                last4
-            };
-
-            generalInfoParams.push({
+                last4,
                 address: {
                     _id: addressStored._id
                 },
@@ -93,7 +90,7 @@ const generalInfoController = {
                     _id: user.idClient[0]._id
                 },
                 status : true
-            });
+            };
 
             let generalInfoStored = await GeneralInfo.create(generalInfoParams);
 
@@ -213,7 +210,9 @@ const generalInfoController = {
                 last4
             };
 
-            let generalInfoUpdated = await GeneralInfo.findByIdAndUpdate(general._id, generalInfoParams);
+            let generalInfoUpdated = await GeneralInfo.findByIdAndUpdate(general._id, generalInfoParams, (error, generalInfoUpdated) => {
+                return generalInfoUpdated;
+            });
 
             return response.json({ 
                 code: 200,

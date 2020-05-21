@@ -24,14 +24,12 @@ const amountController = {
                 whyNeed,
                 whenNeed,
                 term,
-                yearSales
-            };
-            amountParams.push({
+                yearSales,
                 idClient: {
                     _id: user.idClient[0]._id
                 },
                 status : true
-            });
+            };
 
             let amountStored = await Amount.create(amountParams);
 
@@ -102,12 +100,14 @@ const amountController = {
                 yearSales
             };
 
-            let amountUpdated = await Amount.findByIdAndUpdate(id, amountParams);
+            let amount = await Amount.findByIdAndUpdate(id, amountParams, (error, amountUpdated) => {
+                return amountUpdated;
+            });
 
             return response.json({ 
                 code: 200,
                 msg: "Información de monto actualizada exitosamente",
-                amount: amountUpdated
+                amount: amount
             });
         } 
         catch(error){

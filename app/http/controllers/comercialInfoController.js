@@ -54,15 +54,12 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
-                warranty
-            };
-
-            comercialInfoParams.push({
+                warranty,
                 address: {
                     _id: addressStored._id
                 },
                 status : true
-            });
+            };
 
             let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
 
@@ -160,7 +157,9 @@ const comercialInfoController = {
                 warranty
             };
 
-            let comercialInfoUpdated = await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
+            let comercialInfoUpdated = await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams, (error, comercialInfoUpdated) => {
+                return comercialInfoUpdated;
+            });
 
             return response.json({ 
                 code: 200,

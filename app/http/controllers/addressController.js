@@ -27,8 +27,6 @@ const addressController = {
         let id = request.params.id;//id de address
 
         try{
-            let address = await Address.findById(id);
-
             let {
                 street, 
                 extNumber, 
@@ -44,12 +42,14 @@ const addressController = {
                 zipCode
             };
 
-            let addressUpdated = await Address.findByIdAndUpdate(address._id, addressParams);
+            let address = await Address.findByIdAndUpdate(id, addressParams, (error, addressUpdated) => {
+                return addressUpdated;
+            });
 
             return response.json({ 
                 code: 200,
                 msg: "Dirección actualizada exitosamente",
-                address: addressUpdated 
+                address: address 
             });
         }
         catch(error){

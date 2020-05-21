@@ -35,12 +35,14 @@ const referenceController = {
                 relative : request.relative1
             }
 
-            let referenceUpdated = await Reference.findByIdAndUpdate(reference._id, referenceParams);
+            let reference = await Reference.findByIdAndUpdate(id, referenceParams, (error, referenceUpdated) => {
+                return referenceUpdated;
+            });
 
             return response.json({ 
                 code: 200,
                 msg: "Referencia actualizada exitosamente",
-                reference: referenceUpdated 
+                reference: reference
             });
         }
         catch(error){

@@ -27,12 +27,14 @@ const clientController = {
         let id = request.params.id;//id de client
 
         try{
-            let clientUpdated = await Client.findByIdAndUpdate(id, request.body);
+            let client = await Client.findByIdAndUpdate(id, request.body, (error, clientUpdated) => {
+                return clientUpdated;
+            });
 
             return response.json({ 
                 code: 200,
                 msg: "Cliente actualizado exitosamente",
-                client: clientUpdated 
+                client: client 
             });
         }
         catch(error){
