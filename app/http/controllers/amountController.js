@@ -3,6 +3,7 @@
 const Amount = require("../models/Amount");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
+const User = require("../models/User");
 
 const amountController = {
 
@@ -64,10 +65,9 @@ const amountController = {
     },
     show: async(request, response) => {
         let id = request.params.id;//id de amount
-
         try{
-            let amount = await Amount.findById(id);
-
+            //let amount = await Amount.findById(id);
+			let amount = await User.findById(id);
             return response.json({ 
                 code: 200,
                 amount: amount 
