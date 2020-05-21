@@ -51,14 +51,14 @@ route.group('/user', (client) => {
 //Info general routes
 route.group("/info-general", (general) => {
     general.post('', generalInfoController.store);
-    general.get('/:id', generalInfoController.show);
+    general.get('/:id?', generalInfoController.show);
     general.put('/:id', generalInfoController.update);
 });
 
 //Info comercial routes
 route.group("/info-comercial", (comercial) => {
     comercial.post('', comercialInfoController.store);
-    comercial.get('/:id', comercialInfoController.show);
+    comercial.get('/:id?', comercialInfoController.show);
     comercial.put('/:id', comercialInfoController.update);
 });
 
