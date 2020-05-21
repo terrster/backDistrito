@@ -1,6 +1,7 @@
 'use strict'
 
 const Appliance = require("../models/Appliance");
+const User = require("../models/User");
 
 const applianceController = {
 
@@ -8,11 +9,11 @@ const applianceController = {
         let id = request.params.id;//id de solicitud
 
         try{
-            let applianceStored = await Appliance.findById(id);
+            let appliance = await Appliance.findById(id);
             
             return response.json({ 
                 code: 200,
-                appliance: applianceStored 
+                appliance: appliance
             });
         }
         catch(error){
@@ -25,16 +26,17 @@ const applianceController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de solicitud
+        let idUser = request.headers.tokenDecoded.data.id;
 
         try{
-            let appliance = await Appliance.findByIdAndUpdate(id, request.body, (error, applianceUpdated) => {
-                return applianceUpdated;
-            });
+            await Appliance.findByIdAndUpdate(id, request.body);
+
+            let user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
                 msg: "Solicitud actualizada exitosamente",
-                appliance: appliance 
+                user: user 
             });
         }
         catch(error){

@@ -1,6 +1,7 @@
 'use strict'
 
 const Client = require("../models/Client");
+const User = require("../models/User");
 
 const clientController = {
 
@@ -25,16 +26,17 @@ const clientController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de client
+        let idUser = request.headers.tokenDecoded.data.id;
 
         try{
-            let client = await Client.findByIdAndUpdate(id, request.body, (error, clientUpdated) => {
-                return clientUpdated;
-            });
+            await Client.findByIdAndUpdate(id, request.body);
+
+            let user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
                 msg: "Cliente actualizado exitosamente",
-                client: client 
+                user: user 
             });
         }
         catch(error){

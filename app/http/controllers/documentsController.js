@@ -31,7 +31,7 @@ const documentsController = {
                 }
             });
 
-            let documentsUpdated = await Documents.findByIdAndUpdate(documentStored._id, { $push : filesUploaded });
+            await Documents.findByIdAndUpdate(documentStored._id, { $push : filesUploaded });
             
             await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
                 idDocuments : {
@@ -45,10 +45,12 @@ const documentsController = {
                 }
             });
 
+            user = await User.findById(id);
+
             return response.json({
                 code: 200,
                 msg: 'Documento(s) cargado(s) exitosamente',
-                documents: documentsUpdated
+                user: user
             });
         }
         catch(error){
@@ -74,12 +76,14 @@ const documentsController = {
         try{
             let filesUploaded = await fileManager.UploadFilesToS3(files);
 
-            let documentsUpdated = await Documents.findByIdAndUpdate(id, { $push : filesUploaded });
+            await Documents.findByIdAndUpdate(id, { $push : filesUploaded });
+
+            let user = await User.findById(idUser);
 
             return response.json({
                 code: 200,
                 msg: 'Documento(s) actualizado(s) exitosamente',
-                documents: documentsUpdated
+                user: user
             });
         }
         catch(error){

@@ -4,7 +4,6 @@ const User = require("../models/User");
 const Amount = require("../models/Amount");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
-const User = require("../models/User");
 
 const amountController = {
 
@@ -50,10 +49,12 @@ const amountController = {
                 }
             });
 
+            user = await User.findById(id);
+
             return response.json({ 
                 code: 200,
                 msg: "Información de monto guardada exitosamente",
-                amount: amountStored 
+                user: user 
             });
         } 
         catch(error){
@@ -66,9 +67,10 @@ const amountController = {
     },
     show: async(request, response) => {
         let id = request.params.id;//id de amount
+
         try{
-            //let amount = await Amount.findById(id);
-			let amount = await User.findById(id);
+            let amount = await Amount.findById(id);
+
             return response.json({ 
                 code: 200,
                 amount: amount 
@@ -84,6 +86,7 @@ const amountController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de amount
+        let idUser = request.headers.tokenDecoded.data.id;
 
         try{
             let { 
@@ -101,14 +104,14 @@ const amountController = {
                 yearSales
             };
 
-            let amount = await Amount.findByIdAndUpdate(id, amountParams, (error, amountUpdated) => {
-                return amountUpdated;
-            });
+            await Amount.findByIdAndUpdate(id, amountParams);
+
+            let user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
                 msg: "Información de monto actualizada exitosamente",
-                amount: amount
+                user: user
             });
         } 
         catch(error){

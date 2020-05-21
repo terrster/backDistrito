@@ -1,6 +1,7 @@
 'use strict'
 
 const Address = require("../models/Address");
+const User = require("../models/User");
 
 const addressController = {
 
@@ -25,6 +26,7 @@ const addressController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de address
+        let idUser = request.headers.tokenDecoded.data.id;
 
         try{
             let {
@@ -42,14 +44,14 @@ const addressController = {
                 zipCode
             };
 
-            let address = await Address.findByIdAndUpdate(id, addressParams, (error, addressUpdated) => {
-                return addressUpdated;
-            });
+            await Address.findByIdAndUpdate(id, addressParams);
+
+            let user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
                 msg: "Dirección actualizada exitosamente",
-                address: address 
+                user: user 
             });
         }
         catch(error){
