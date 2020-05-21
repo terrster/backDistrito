@@ -44,8 +44,13 @@ route.group('/user', (user) => {
     user.put('/:id', userController.update);
 });
 
-//Client routes
 route.group('/user', (client) => {
+    client.get('/:id', clientController.show);
+    client.put('/:id', clientController.update);
+});
+
+//Client routes
+route.group('/client', (client) => {
     client.get('/:id', clientController.show);
     client.put('/:id', clientController.update);
 });
