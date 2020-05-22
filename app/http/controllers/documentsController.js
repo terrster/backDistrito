@@ -61,7 +61,7 @@ const documentsController = {
             });
         }
     },
-    update: async(request, response) => {//pendiente
+    update: async(request, response) => {//pendiente no distigue posición de array para editar
         let id = request.params.id;//id de user
 
         const {files} = request;
@@ -94,7 +94,7 @@ const documentsController = {
             });
         }
     }
-
+    
 }
 
 module.exports = documentsController;

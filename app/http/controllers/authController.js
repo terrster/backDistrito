@@ -22,8 +22,11 @@ const authController = {
             let lastUser = await userController.lastUser();
             data.idDistrito = lastUser.idDistrito + 1;
 
-            let dealStored = hubspotController.deal.store(data);return dealStored;
-            // let dealStored = await dealController.store(data);
+            // let contactStored = await hubspotController.contact.store(data); //Pendiente - da error
+            // data.hubspotContactId = contactStored.vid;
+            // console.log(contactStored);console.log(data)
+
+            let dealStored = await hubspotController.deal.store(data);
             data.hubspotDealId = dealStored.dealId;
 
             let userStored = await User.create(data);

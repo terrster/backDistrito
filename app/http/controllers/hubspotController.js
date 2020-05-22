@@ -4,7 +4,7 @@ const _axios = require("axios").default;
 const axios = _axios.create({
     baseURL: 'http://api.hubapi.com/',
     headers: {
-        'content-type': 'application/json'
+        'Content-Type': 'application/json'
     }
 });
 require('dotenv').config({
@@ -28,6 +28,10 @@ const deal = {
                         "name": "nombre_comercial"
                     },
                     {
+                        "value": request.email,
+                        "name": "email"
+                    },
+                    {
                         "value": request.phone,
                         "name": "celular"
                     },
@@ -40,9 +44,9 @@ const deal = {
                         "name": "dealstage" 
                     },
                 ]
-            };console.log(dealParams);
+            };
             
-            //const {data} = await axios.post('deals/v1/deal' + hapiKey, dealParams);
+            const {data} = await axios.post('deals/v1/deal' + hapiKey, dealParams);
             return data;
         }
         catch(error){
@@ -52,61 +56,386 @@ const deal = {
             });
         }
     },
-    show: async(request) => {
+    show: async(hubspotDealId) => {
         try{
-            const {data} = await axios.get(globalUrl + "/" + request.id + hapiKey);
-            
-            return data;
-        }
-        catch(error){
-            console.log(error);
-        }
-    },
-    update: async(request) => {
-        try{
-            const {data} = await axios.put(globalUrl + "/" + request.params.id + hapiKey, request.body);
-            
-            return data;
-
-        }
-        catch(error){
-            console.log(error);
-        }
-    }
-
-};
-
-const contact = {
-
-    store: async(request) =>{
-        try{
-            let contactParams = {
-                "properties": [
-                    {
-                        "value": request.email,
-                        "name": "email"
-                    },
-                    {
-                        "value": request.phone,
-                        "name": "mobilephone"
-                    },
-                    {
-                        "value": request.name,
-                        "name": "firstname"
-                    },
-                    {
-                        "value" : process.env.DATE_HUB,
-                        "name": "dealstage" 
-                    },
-                ]
-            };
-
-            const {data} = await axios.post('contacts/v1/contact' + hapiKey, dealParams);
+            const {data} = await axios.get('deals/v1/deal/' + hubspotDealId + hapiKey);
             return data;
         }
         catch(error){
             console.log({
-                msg: "Hubspot: Algo salió mal tratando de crear un contacto",
+                msg: "Hubspot: Algo salió mal tratando de obtener la información de un deal",
+                error: error
+            });
+        }
+    },
+    update: async(hubspotDealId, stage, request) => {
+        try{
+            let dealParams = getParams(stage);
+
+            function getParams(stage){
+                switch(stage){
+                    case 'type'://tipo de negocio
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.type,
+                                    "name": "tipo_de_persona"
+                                }
+                            ]
+                        }
+                    case 'amount'://elige tu monto
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.howMuch,
+                                    "name": "amount"
+                                },
+                                {
+                                    "value": request.term,
+                                    "name": "n2_2_tiempo_para_pago"
+                                },
+                                {
+                                    "value": request.whyNeed,
+                                    "name": "necesidad_de_financiamiento"
+                                },
+                                {
+                                    "value": request.whenNeed,
+                                    "name": "n2_4_urgencia_de_financiamiento"
+                                },
+                                {
+                                    "value": request.yearSales,
+                                    "name": "n2_5_ventas_anuales"
+                                },
+                                {
+                                    "value": request.old,
+                                    "name": "n2_6_antig_edad_del_negocio"
+                                }
+                            ]
+                        }
+                    case 'comercial'://datos comerciales
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.comercialName,
+                                    "name": "n3_nombre_comercial"
+                                },
+                                {
+                                    "value": request.businessName,
+                                    "name": "n3_16_razon_social"
+                                },
+                                {
+                                    "value": request.gyre,
+                                    "name": "giro"
+                                },
+                                {
+                                    "value": request.specific,
+                                    "name": "n3_actividad_espec_fica"
+                                },
+                                {
+                                    "value": request.rfc,
+                                    "name": "n3_rfc"
+                                },
+                                {
+                                    "value": request.phone,
+                                    "name": "telefono"
+                                },
+                                {
+                                    "value": request.webSite,
+                                    "name": "n3_11_sitio_web"
+                                },
+                                {
+                                    "value": request.facebook,
+                                    "name": "n3_12_facebook"
+                                },
+                                {
+                                    "value": request.terminal,
+                                    "name": "n3_13_tpv"
+                                },
+                                {
+                                    "value": request.warranty,
+                                    "name": "n3_14_garant_a"
+                                },
+                                {//datos comerciales - domicilio negocio
+                                    "value": request.street,
+                                    "name": "n3_calle"
+                                },
+                                {
+                                    "value": request.extNumber,
+                                    "name": "n3_num_ext"
+                                },
+                                {
+                                    "value": request.intNumber,
+                                    "name": "n3_num_int"
+                                },
+                                {
+                                    "value": request.zipCode,
+                                    "name": "codigo_postal"
+                                },
+                                {
+                                    "value": request.town,
+                                    "name": "n3_9_colonia"
+                                }             
+                            ]
+                        }
+                    case 'general'://información general
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.name,
+                                    "name": "n4_1_nombre"
+                                },
+                                {
+                                    "value": request.lastname,
+                                    "name": "n4_2_apellido_paterno"
+                                },
+                                {
+                                    "value": request.secondLastname,
+                                    "name": "n4_3_apellido_materno"
+                                },
+                                {
+                                    "value": request.civilStatus,
+                                    "name": "n4_4_estado_civil"
+                                },
+                                {
+                                    "value": request.birthDate,
+                                    "name": "n4_5_fecha_de_nacimiento"
+                                },
+                                {
+                                    "value": request.phone,
+                                    "name": "n4_92_tel_fono"
+                                },
+                                {
+                                    "value": request.ciec,
+                                    "name": "n4_93_ciec"
+                                },
+                                {
+                                    "value": request.mortgageCredit,
+                                    "name": "n6_1_cr_dito_hipotecario"
+                                },
+                                {
+                                    "value": request.carCredit,
+                                    "name": "n6_2_cr_dito_automotriz"
+                                },
+                                {
+                                    "value": request.creditCard,
+                                    "name": "n6_3_tarjeta_de_cr_dito"
+                                },
+                                {
+                                    "value": request.last4,
+                                    "name": "n6_4_tdc_4_d_gitos"
+                                },
+                                {//información general - domicilio
+                                    "value": request.street,
+                                    "name": "n4_6_calle"
+                                },
+                                {
+                                    "value": request.extNumber,
+                                    "name": "n4_7_num_ext"
+                                },
+                                {
+                                    "value": request.intNumber,
+                                    "name": "n4_8_num_int"
+                                },
+                                {
+                                    "value": request.zipCode,
+                                    "name": "n4_9_c_p_"
+                                },
+                                {
+                                    "value": request.town,
+                                    "name": "n4_91_colonia"
+                                },//información general - referencia1
+                                {
+                                    "value": request.reference1.name,
+                                    "name": "n5_1_nombre_referencia"
+                                },
+                                {
+                                    "value": request.reference1.phone,
+                                    "name": "n5_2_tel_fono_referencia"
+                                },
+                                {
+                                    "value": request.reference1.relative,
+                                    "name": "n5_3_parentesco_referencia"
+                                },//información general - referencia2
+                                {
+                                    "value": request.reference2.name,
+                                    "name": "n5_4_nombre"
+                                },
+                                {
+                                    "value": request.reference2.phone,
+                                    "name": "n5_5_tel_fono"
+                                },
+                                {
+                                    "value": request.reference2.relative,
+                                    "name": "n5_6_parentesco"
+                                }     
+                            ]
+                        }
+                    case 'documentos'://documentos **********Pendiente
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.oficialID,
+                                    "name": "n9_1_id"
+                                },
+                                {
+                                    "value": request.oficialID,
+                                    "name": "n9_1_2_id"
+                                },
+                                {
+                                    "value": request.oficialID,
+                                    "name": "n9_1_3_id"
+                                },
+                                {
+                                    "value": request.oficialID,
+                                    "name": "n9_1_4_id"
+                                },
+                                {
+                                    "value": request.proofAddress,
+                                    "name": "n9_2_comp_domicilio"
+                                },
+                                {
+                                    "value": request.proofAddress,
+                                    "name": "n9_2_1_comp_domicilio_2"
+                                },
+                                {
+                                    "value": request.proofAddress,
+                                    "name": "n9_2_2_comp_domicilio_3"
+                                },
+                                {
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_1_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_2_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_3_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_4_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_5_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_6_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_7_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_8_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_9_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_10_estados_de_cuenta"
+                                },
+                                {    
+                                    "value": request.bankStatements,
+                                    "name": "n9_3_11_estados_de_cuenta"
+                                },
+                                {
+                                    "value": request.rfc,
+                                    "name": "n9_4_rfc"
+                                },
+                                {
+                                    "value": request.lastDeclarations,
+                                    "name": "n9_5_declaraci_n"
+                                },
+                                {
+                                    "value": request.lastDeclarations,
+                                    "name": "n9_5_1_declaraci_n"
+                                },
+                                {
+                                    "value": request.lastDeclarations,
+                                    "name": "n9_5_2_declaraci_n"
+                                },
+                                {
+                                    "value": request.lastDeclarations,
+                                    "name": "n9_5_3_declaraci_n"
+                                },
+                                {
+                                    "value": request.acomplishOpinion,
+                                    "name": "n9_6_opini_n_de_cumplimiento"
+                                },
+                                {
+                                    "value": request.facturacion,
+                                    "name": "n9_7_xmls"
+                                },
+                                {
+                                    "value": request.otherActs,
+                                    "name": "n9_8_otros"
+                                },
+                                {
+                                    "value": request.constitutiveAct,
+                                    "name": "n9_9_acta_constitutiva"
+                                },
+                                {
+                                    "value": request.others,
+                                    "name": "n9_91_reporte_de_cr_dito"
+                                },
+                                {
+                                    "value": request.others,
+                                    "name": "n9_92_1_escritura"
+                                },
+                                {
+                                    "value": request.others,
+                                    "name": "n9_92_2_escritura"
+                                },
+                                {
+                                    "value": request.others,
+                                    "name": "n9_92_3_escritura"
+                                },
+                                {
+                                    "value": request.financialStatements,
+                                    "name": "n9_93_1_eeff"
+                                },
+                                {
+                                    "value": request.financialStatements,
+                                    "name": "n9_93_1_1_eeff"
+                                },
+                                {
+                                    "value": request.financialStatements,
+                                    "name": "n9_93_2_eeff"
+                                }
+                                // {
+                                //     "value": request,
+                                //     "name": "n9_93_2_1_eeff"
+                                // },
+                                // {
+                                //     "value": request,
+                                //     "name": "n9_93_3_eeff"
+                                // }, 
+                                // {
+                                //     "value": request,
+                                //     "name": "n9_93_3_1_eeff"
+                                // }            
+                            ]
+                        }
+                }
+            }
+            
+            const {data} = await axios.put('deals/v1/deal/' + hubspotDealId + hapiKey, dealParams);
+            return data;
+        }
+        catch(error){
+            console.log({
+                msg: "Hubspot: Algo salió mal tratando de actualizar la información del deal",
                 error: error
             });
         }
@@ -114,32 +443,78 @@ const contact = {
 
 };
 
-const amount = {
+const contact = {
+
+    store: async(request) => {
+        try{
+            let contactParams = {
+                "properties": [
+                    {
+                        "value": request.email,
+                        "property": "email"
+                    },
+                    {
+                        "value": request.phone,
+                        "property": "mobilephone"
+                    },
+                    {
+                        "value": request.name,
+                        "property": "firstname"
+                    }
+                ]
+            };
+
+            const {data} = await axios.post('contacts/v1/contact' + hapiKey, contactParams);
+            return data;
+        }
+        catch(error){
+            console.log({
+                msg: "Hubspot: Algo salió mal tratando de crear un contact",
+                error: error
+            });
+        }
+    },
+    show: async(hubspotContactEmail) => {
+        try{
+            const {data} = await axios.get('contacts/v1/contact/email/' + hubspotContactEmail + '/profile' + hapiKey);
+            return data;
+        }
+        catch(error){
+            console.log({
+                msg: "Hubspot: Algo salió mal tratando de obtener la información de un contact",
+                error: error
+            });
+        }
+    }
 
 };
 
-const comercialInfo = {
+// const amount = {
 
-};
+// };
 
-const generalInfo = {
+// const comercialInfo = {
 
-};
+// };
 
-const reference = {
+// const generalInfo = {
 
-};
+// };
 
-const documents = {
+// const reference = {
 
-};
+// };
+
+// const documents = {
+
+// };
 
 module.exports = {
     deal,
     contact,
-    amount,
-    comercialInfo,
-    generalInfo,
-    reference,
-    documents
+    // amount,
+    // comercialInfo,
+    // generalInfo,
+    // reference,
+    // documents
 };
