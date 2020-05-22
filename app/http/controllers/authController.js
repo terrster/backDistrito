@@ -19,6 +19,15 @@ const authController = {
         try{
             let data = request.body;
 
+            let userExist = await User.findOne({ email: data.email });
+
+            if(userExist){
+                return response.json({ 
+                    code: 500,
+                    msg: "El correo electrónico ya existe"
+                });
+            }
+
             let lastUser = await userController.lastUser();
             data.idDistrito = lastUser.idDistrito + 1;
 
@@ -55,9 +64,9 @@ const authController = {
          }
     },
     login: async (request, response) => { 
-        const { email, password } = request.body;
+        let { email, password } = request.body;
 
-        const user = await User.findOne({ email: email });
+        let user = await User.findOne({ email: email });
 
         if(!user){
             return response.status(200).json({ 
@@ -66,7 +75,7 @@ const authController = {
             });
         }
 
-        const validPassword = await user.validatePassword(password);
+        let validPassword = await user.validatePassword(password);
 
         if(!validPassword) {
             return response.status(200).json({ 
@@ -76,10 +85,10 @@ const authController = {
         }
 
         if(user && validPassword){
-            const payload = {
+            let payload = {
                 id : user._id
             };
-            const token = jwt.sign(payload, privateKey, options);
+            let token = jwt.sign(payload, privateKey, options);
             return response.json({
                 code: 200,
                 user: user,
