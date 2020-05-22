@@ -18,6 +18,11 @@ const deal = {
         try{
 
             let dealParams = {
+                "associations": {
+                    "associatedVids": [
+                        request.hubspotContactId,
+                    ],
+                },
                 "properties": [
                     {
                         "value": request.idDistrito,
@@ -460,6 +465,14 @@ const contact = {
                     {
                         "value": request.name,
                         "property": "firstname"
+                    },
+                    {
+                        "value": request.lastName,
+                        "property": "lastname"
+                    },
+                    {
+                        "property": "company",
+                        "value": "HubSpot"
                     }
                 ]
             };

@@ -53,7 +53,9 @@ const generalInfoController = {
                 lastname,
                 secondLastname,
                 civilStatus,
-                birthDate,
+                day,//birthDate
+                month,//birthDate
+                year,//birthDate
                 rfcPerson,
                 ciec,
                 phone,
@@ -67,7 +69,6 @@ const generalInfoController = {
                 lastname,
                 secondLastname,
                 civilStatus,
-                birthDate,
                 rfcPerson,
                 ciec,
                 phone,
@@ -75,6 +76,7 @@ const generalInfoController = {
                 carCredit,
                 creditCard,
                 last4,
+                birthDate: `${day}/${month}/${year}`,
                 address: {
                     _id: addressStored._id
                 },
@@ -89,7 +91,7 @@ const generalInfoController = {
                 idClient: {
                     _id: user.idClient[0]._id
                 },
-                status : true
+                status: true
             };
 
             let generalInfoStored = await GeneralInfo.create(generalInfoParams);

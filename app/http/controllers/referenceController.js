@@ -30,9 +30,9 @@ const referenceController = {
 
         try{
             let referenceParams = {
-                name : request.name1,
-                phone : request.phone1,
-                relative : request.relative1
+                name: request.name,
+                phone: request.phone,
+                relative: request.relative
             }
 
             await Reference.findByIdAndUpdate(id, referenceParams);
