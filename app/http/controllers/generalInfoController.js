@@ -33,17 +33,17 @@ const generalInfoController = {
             let addressStored = await Address.create(addressParams);
 
             let reference1 = {
-                name : request.name1,
-                phone : request.phone1,
-                relative : request.relative1
+                name: request.body.name1,
+                phone: request.body.phone1,
+                relative: request.body.relative1
             }
 
             let reference1Stored = await Reference.create(reference1);
 
             let reference2 = {
-                name : request.name2,
-                phone : request.phone2,
-                relative : request.relative2
+                name: request.body.name2,
+                phone: request.body.phone2,
+                relative: request.body.relative2
             }
 
             let reference2Stored = await Reference.create(reference2);
@@ -53,7 +53,9 @@ const generalInfoController = {
                 lastname,
                 secondLastname,
                 civilStatus,
-                birthDate,
+                day,//birthDate
+                month,//birthDate
+                year,//birthDate
                 rfcPerson,
                 ciec,
                 phone,
@@ -67,7 +69,6 @@ const generalInfoController = {
                 lastname,
                 secondLastname,
                 civilStatus,
-                birthDate,
                 rfcPerson,
                 ciec,
                 phone,
@@ -75,6 +76,7 @@ const generalInfoController = {
                 carCredit,
                 creditCard,
                 last4,
+                birthDate: `${day}/${month}/${year}`,
                 address: {
                     _id: addressStored._id
                 },
@@ -89,7 +91,7 @@ const generalInfoController = {
                 idClient: {
                     _id: user.idClient[0]._id
                 },
-                status : true
+                status: true
             };
 
             let generalInfoStored = await GeneralInfo.create(generalInfoParams);
