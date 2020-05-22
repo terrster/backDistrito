@@ -95,7 +95,7 @@ const generalInfoController = {
             let generalInfoStored = await GeneralInfo.create(generalInfoParams);
 
             await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
-                idComercialInfo : {
+                idGeneralInfo : {
                     _id : generalInfoStored._id
                 }
             });
