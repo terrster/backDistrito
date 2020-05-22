@@ -40,9 +40,7 @@ const userController = {
         let id = request.params.id;
 
         try{
-            let user = await User.findByIdAndUpdate(id, request.body, (error, userUpdated) => {
-                return userUpdated;
-            });
+            let user = await User.findByIdAndUpdate(id, request.body, { new: true });
 
             return response.json({ 
                 code: 200,

@@ -164,7 +164,7 @@ const generalInfoController = {
                 zipCode
             };
 
-            let addressUpdated = await Address.findByIdAndUpdate(general.address[0]._id, addressParams);
+            await Address.findByIdAndUpdate(general.address[0]._id, addressParams);
 
             let reference1 = {
                 name : request.name1,
@@ -172,7 +172,7 @@ const generalInfoController = {
                 relative : request.relative1
             }
 
-            let reference1Stored = await Reference.findByIdAndUpdate(general.contactWith[0]._id, reference1);
+            await Reference.findByIdAndUpdate(general.contactWith[0]._id, reference1);
 
             let reference2 = {
                 name : request.name2,
@@ -180,7 +180,7 @@ const generalInfoController = {
                 relative : request.relative2
             }
 
-            let reference2Stored = await Reference.findByIdAndUpdate(general.contactWith[1]._id, reference2);
+            await Reference.findByIdAndUpdate(general.contactWith[1]._id, reference2);
 
             let {
                 name,

@@ -9,6 +9,10 @@ class validationsManager {
             }
         }
 
+        if(!errors){
+            return "No hay errores en modelo User";
+        }
+
         return this.extractor(errors, messages);
     }
 

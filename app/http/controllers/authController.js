@@ -37,10 +37,7 @@ const authController = {
                 idClient: {
                     _id: clientStored._id
                 }
-            },
-            (error, userUpdated) => {
-                return userUpdated;
-            });
+            }, { new: true });
  
             return response.json({ 
                  code: 200, 
@@ -50,7 +47,7 @@ const authController = {
          }
          catch(error){
              let messages = validationsManager.user(error.errors);
-			console.log(error);
+			
              return response.json({
                  code: 500,
                  msg : "Ha ocurrido un error al registrarse",
