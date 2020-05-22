@@ -75,10 +75,12 @@ const comercialInfoController = {
                 }
             });
 
+            user = await User.findById(id);
+
             return response.json({ 
                 code: 200,
                 msg: "Información comercial guardada exitosamente",
-                comercial: comercialInfoStored 
+                user: user
             });
         } 
         catch(error){
@@ -110,6 +112,7 @@ const comercialInfoController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de info comercial
+        let idUser = request.headers.tokenDecoded.data.id;
 
         try{
             let comercial = await ComercialInfo.findById(id);
@@ -157,14 +160,14 @@ const comercialInfoController = {
                 warranty
             };
 
-            let comercialInfoUpdated = await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams, (error, comercialInfoUpdated) => {
-                return comercialInfoUpdated;
-            });
+            await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
+
+            let user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
                 msg: "Información comercial actualizada exitosamente",
-                comercial: comercialInfoUpdated 
+                user: user 
             });
 
         } 

@@ -1,6 +1,7 @@
 'use strict'
 
 const Reference = require("../models/Reference");
+const User = require("../models/User");
 
 const referenceController = {
 
@@ -25,24 +26,23 @@ const referenceController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de referencia
+        let idUser = request.headers.tokenDecoded.data.id;
 
         try{
-            let reference = await Reference.findById(id);
-
             let referenceParams = {
                 name : request.name1,
                 phone : request.phone1,
                 relative : request.relative1
             }
 
-            let reference = await Reference.findByIdAndUpdate(id, referenceParams, (error, referenceUpdated) => {
-                return referenceUpdated;
-            });
+            await Reference.findByIdAndUpdate(id, referenceParams);
+
+            let user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
                 msg: "Referencia actualizada exitosamente",
-                reference: reference
+                user: user
             });
         }
         catch(error){

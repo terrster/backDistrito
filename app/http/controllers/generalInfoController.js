@@ -106,10 +106,12 @@ const generalInfoController = {
                 }
             });
 
+            user = await User.findById(id);
+
             return response.json({ 
                 code: 200,
                 msg: "Información general guardada exitosamente",
-                general: generalInfoStored 
+                user: user 
             });
 
         } 
@@ -125,9 +127,7 @@ const generalInfoController = {
         let id = request.params.id;//id de info general
 
         try{
-            let user = await User.findById(id);
-
-            let general = await GeneralInfo.findById(user.idClient[0].idGeneralInfo[0]);
+            let general = await GeneralInfo.findById(id);
 
             return response.json({ 
                 code: 200,
@@ -144,6 +144,7 @@ const generalInfoController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de info general
+        let idUser = request.headers.tokenDecoded.data.id;
 
         try{
             let general = await GeneralInfo.findById(id);
@@ -210,14 +211,14 @@ const generalInfoController = {
                 last4
             };
 
-            let generalInfoUpdated = await GeneralInfo.findByIdAndUpdate(general._id, generalInfoParams, (error, generalInfoUpdated) => {
-                return generalInfoUpdated;
-            });
+            await GeneralInfo.findByIdAndUpdate(general._id, generalInfoParams);
+
+            let user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
                 msg: "Información general actualizada exitosamente",
-                general: generalInfoUpdated 
+                user: user 
             });
         } 
         catch(error){

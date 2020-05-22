@@ -47,7 +47,7 @@ const authController = {
          }
          catch(error){
              let messages = validationsManager.user(error.errors);
- 
+			console.log(error);
              return response.json({
                  code: 500,
                  msg : "Ha ocurrido un error al registrarse",

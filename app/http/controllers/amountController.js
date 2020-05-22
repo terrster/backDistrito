@@ -1,5 +1,6 @@
 'user strict'
 
+const User = require("../models/User");
 const Amount = require("../models/Amount");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
@@ -17,14 +18,17 @@ const amountController = {
                 whyNeed, 
                 whenNeed, 
                 term, 
-                yearSales
+                yearSales,
+                old
             } = request.body;
+            old = parseInt(old)
             let amountParams = {
                 howMuch,
                 whyNeed,
                 whenNeed,
                 term,
                 yearSales,
+                old,
                 idClient: {
                     _id: user.idClient[0]._id
                 },
@@ -48,10 +52,12 @@ const amountController = {
                 }
             });
 
+            user = await User.findById(id);
+
             return response.json({ 
                 code: 200,
                 msg: "Información de monto guardada exitosamente",
-                amount: amountStored 
+                user: user 
             });
         } 
         catch(error){
@@ -83,6 +89,7 @@ const amountController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de amount
+        let idUser = request.headers.tokenDecoded.data.id;
 
         try{
             let { 
@@ -90,24 +97,27 @@ const amountController = {
                 whyNeed, 
                 whenNeed, 
                 term, 
-                yearSales
+                yearSales,
+                old
             } = request.body;
+            old = parseInt(old)
             let amountParams = {
                 howMuch,
                 whyNeed,
                 whenNeed,
                 term,
-                yearSales
+                yearSales,
+                old
             };
 
-            let amount = await Amount.findByIdAndUpdate(id, amountParams, (error, amountUpdated) => {
-                return amountUpdated;
-            });
+            await Amount.findByIdAndUpdate(id, amountParams);
+
+            let user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
                 msg: "Información de monto actualizada exitosamente",
-                amount: amount
+                user: user
             });
         } 
         catch(error){
