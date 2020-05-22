@@ -7,7 +7,7 @@ const path = require("path");
 const User = require("../models/User");
 const Client = require("../models/Client");
 const userController = require("../controllers/userController");
-const dealController = require("../controllers/dealController");
+const hubspotController = require("../controllers/hubspotController");
 
 const privateKey = fs.readFileSync(path.resolve("config/private.key"));
 const options = require("../../../config/jwt_options");
@@ -22,7 +22,8 @@ const authController = {
             let lastUser = await userController.lastUser();
             data.idDistrito = lastUser.idDistrito + 1;
 
-            let dealStored = await dealController.store(data);
+            let dealStored = hubspotController.deal.store(data);return dealStored;
+            // let dealStored = await dealController.store(data);
             data.hubspotDealId = dealStored.dealId;
 
             let userStored = await User.create(data);

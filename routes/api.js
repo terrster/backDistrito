@@ -15,7 +15,7 @@ const verifyToken = require("../app/http/middlewares/verifyToken");
 const tokenManager = require("../app/http/services/tokenManager");
 
 //Controllers
-const dealController = require("../app/http/controllers/dealController");
+const hubspotController = require("../app/http/controllers/hubspotController");
 const userController = require("../app/http/controllers/userController");
 const clientController = require("../app/http/controllers/clientController");
 const amountController = require("../app/http/controllers/amountController");
@@ -33,9 +33,9 @@ route.use(async(request, response, next) => {
 
 //Deal routes
 route.group("/deal", (deal) => {
-    deal.post('', dealController.store);
-    deal.get('/:id', dealController.show);
-    deal.put('/:id', dealController.update);
+    deal.post('', hubspotController.deal.store);
+    deal.get('/:id', hubspotController.deal.show);
+    deal.put('/:id', hubspotController.deal.update);
 });
 
 //User routes
