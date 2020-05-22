@@ -9,7 +9,7 @@ const Client = require("../models/Client");
 
 const generalInfoController = {
 
-    store: async(request) => {
+    store: async(request, response) => {
         let id = request.params.id;//id de user
 
         try{
@@ -33,17 +33,17 @@ const generalInfoController = {
             let addressStored = await Address.create(addressParams);
 
             let reference1 = {
-                name : request.name1,
-                phone : request.phone1,
-                relative : request.relative1
+                name : request.body.name1,
+                phone : request.body.phone1,
+                relative : request.body.relative1
             }
 
             let reference1Stored = await Reference.create(reference1);
 
             let reference2 = {
-                name : request.name2,
-                phone : request.phone2,
-                relative : request.relative2
+                name : request.body.name2,
+                phone : request.body.phone2,
+                relative : request.body.relative2
             }
 
             let reference2Stored = await Reference.create(reference2);
@@ -167,17 +167,17 @@ const generalInfoController = {
             await Address.findByIdAndUpdate(general.address[0]._id, addressParams);
 
             let reference1 = {
-                name : request.name1,
-                phone : request.phone1,
-                relative : request.relative1
+                name : request.body.name1,
+                phone : request.body.phone1,
+                relative : request.body.relative1
             }
 
             await Reference.findByIdAndUpdate(general.contactWith[0]._id, reference1);
 
             let reference2 = {
-                name : request.name2,
-                phone : request.phone2,
-                relative : request.relative2
+                name : request.body.name2,
+                phone : request.body.phone2,
+                relative : request.body.relative2
             }
 
             await Reference.findByIdAndUpdate(general.contactWith[1]._id, reference2);
