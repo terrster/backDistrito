@@ -18,14 +18,17 @@ const amountController = {
                 whyNeed, 
                 whenNeed, 
                 term, 
-                yearSales
+                yearSales,
+                old
             } = request.body;
+            old = parseInt(old)
             let amountParams = {
                 howMuch,
                 whyNeed,
                 whenNeed,
                 term,
                 yearSales,
+                old,
                 idClient: {
                     _id: user.idClient[0]._id
                 },
@@ -94,14 +97,17 @@ const amountController = {
                 whyNeed, 
                 whenNeed, 
                 term, 
-                yearSales
+                yearSales,
+                old
             } = request.body;
+            old = parseInt(old)
             let amountParams = {
                 howMuch,
                 whyNeed,
                 whenNeed,
                 term,
-                yearSales
+                yearSales,
+                old
             };
 
             await Amount.findByIdAndUpdate(id, amountParams);
