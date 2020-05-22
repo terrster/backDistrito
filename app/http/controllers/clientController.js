@@ -1,5 +1,6 @@
 'use strict'
 
+const hubspotController = require("../controllers/hubspotController");
 const Client = require("../models/Client");
 const User = require("../models/User");
 
@@ -28,7 +29,20 @@ const clientController = {
         let id = request.params.id;//id de client
         let idUser = request.headers.tokenDecoded.data.id;
 
-        try{
+        try{            
+            if(request.body.type){//tipo de negocio
+                let _user = await User.findById(idUser);
+                if(_user){
+                   await hubspotController.deal.update(_user.hubspotDealId,'type',request.body);
+                }
+                else{
+                    return response.json({
+                        code: 500,
+                        msg: "Algo salió mal tratando de obtener un usuario"
+                    });
+                }
+            }
+
             await Client.findByIdAndUpdate(id, request.body);
 
             let user = await User.findById(idUser);

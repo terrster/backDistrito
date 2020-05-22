@@ -80,10 +80,16 @@ const deal = {
             function getParams(stage){
                 switch(stage){
                     case 'type'://tipo de negocio
+                        const PERSON_TYPE = {
+                            PF: 'Persona Física',
+                            RIF: 'RIF',
+                            PFAE: 'Persona Física con A.E.',
+                            PM: 'Persona Moral',
+                        };
                         return {
                             "properties": [
                                 {
-                                    "value": request.type,
+                                    "value": PERSON_TYPE[request.type],
                                     "name": "tipo_de_persona"
                                 }
                             ]
