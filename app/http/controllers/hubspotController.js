@@ -227,8 +227,8 @@ const deal = {
                             WIDOWER: "Viudo", 
                         }
 
-                        const CAR = {//carCredit
-                            MORE4: 'Hace 4 años o más',
+                        const CAR_CREDIT = {//carCredit
+                            MORE4: "Hace 4 años o más",
                             YES: "Sí",
                             NO: "No"               
                         }
@@ -270,15 +270,15 @@ const deal = {
                                     "name": "n4_93_ciec"
                                 },
                                 {
-                                    "value": (request.mortgageCredit == '1' || request.mortgageCredit == 1 ? 'Sí' : 'No'),
+                                    "value": request.mortgageCredit === '1' || request.mortgageCredit == '1' ? 'Sí' : 'No',
                                     "name": "n6_1_cr_dito_hipotecario"
                                 },
                                 {
-                                    "value": CAR[request.carCredit],
+                                    "value": CAR_CREDIT[request.carCredit],
                                     "name": "n6_2_cr_dito_automotriz"
                                 },
                                 {
-                                    "value": (request.creditCard == '1' || request.creditCard ==  1 ? 'Sí' : 'No'),
+                                    "value": request.creditCard === '1' || request.creditCard == '1' ? 'Sí' : 'No',
                                     "name": "n6_3_tarjeta_de_cr_dito"
                                 },
                                 {
