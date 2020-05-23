@@ -220,6 +220,25 @@ const deal = {
                             ]
                         }
                     case 'general'://información general
+                        const CIVIL_STATUS = {//civilStatus
+                            "SINGLE": "Soltero",   
+                            "MARRIED": "Casado", 
+                            "DIVORCED": "Divorciado", 
+                            "WIDOWER": "Viudo", 
+                        }
+
+                        const CAR = {//carCredit
+                            "MORE4": 'Hace 4 años o más',
+                            "YES": "Sí",
+                            "NO": "No"               
+                        }
+
+                        const RELATIVE = {//relative
+                            "FAMILY": "Familiar",
+                            "FRIEND": "Amigo",
+                            "CLIENT": "Cliente" ,
+                            "PROVIDER": "Proveedor" 
+                        }
                         return {
                             "properties": [
                                 {
@@ -235,7 +254,7 @@ const deal = {
                                     "name": "n4_3_apellido_materno"
                                 },
                                 {
-                                    "value": request.civilStatus,
+                                    "value": CIVIL_STATUS[request.civilStatus],
                                     "name": "n4_4_estado_civil"
                                 },
                                 {
@@ -255,7 +274,7 @@ const deal = {
                                     "name": "n6_1_cr_dito_hipotecario"
                                 },
                                 {
-                                    "value": request.carCredit,
+                                    "value": CAR[request.carCredit],
                                     "name": "n6_2_cr_dito_automotriz"
                                 },
                                 {
@@ -295,7 +314,7 @@ const deal = {
                                     "name": "n5_2_tel_fono_referencia"
                                 },
                                 {
-                                    "value": request.reference1.relative,
+                                    "value": RELATIVE[request.reference1.relative],
                                     "name": "n5_3_parentesco_referencia"
                                 },//información general - referencia2
                                 {
@@ -307,7 +326,7 @@ const deal = {
                                     "name": "n5_5_tel_fono"
                                 },
                                 {
-                                    "value": request.reference2.relative,
+                                    "value": RELATIVE[request.reference2.relative],
                                     "name": "n5_6_parentesco"
                                 }     
                             ]
@@ -539,32 +558,7 @@ const contact = {
 
 };
 
-// const amount = {
-
-// };
-
-// const comercialInfo = {
-
-// };
-
-// const generalInfo = {
-
-// };
-
-// const reference = {
-
-// };
-
-// const documents = {
-
-// };
-
 module.exports = {
     deal,
-    contact,
-    // amount,
-    // comercialInfo,
-    // generalInfo,
-    // reference,
-    // documents
+    contact
 };

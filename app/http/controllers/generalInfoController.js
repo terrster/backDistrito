@@ -12,16 +12,71 @@ const generalInfoController = {
     store: async(request, response) => {
         let id = request.params.id;//id de user
 
+        request.body.birthDate = `${request.body.day}/${request.body.month}/${request.body.year}`;
+
         try{
             let user = await User.findById(id);
 
             let {
-                street, 
+                street,//info address  
                 extNumber, 
                 intNumber, 
                 town, 
-                zipCode
+                zipCode,
+                name1,//info reference 1
+                phone1,
+                relative1,
+                name2,//info reference 2
+                phone2,
+                relative2,
+                name,//info general
+                lastname,
+                secondLastname,
+                civilStatus,
+                rfcPerson,
+                ciec,
+                phone,
+                mortgageCredit,
+                carCredit,
+                creditCard,
+                last4,
+                birthDate
             } = request.body;
+
+            if(user){
+                await hubspotController.deal.update(user.hubspotDealId,'general', { 
+                    street,//info address  
+                    extNumber, 
+                    intNumber, 
+                    town, 
+                    zipCode,
+                    name1,//info reference 1
+                    phone1,
+                    relative1,
+                    name2,//info reference 2
+                    phone2,
+                    relative2,
+                    name,//info general
+                    lastname,
+                    secondLastname,
+                    civilStatus,
+                    rfcPerson,
+                    ciec,
+                    phone,
+                    mortgageCredit,
+                    carCredit,
+                    creditCard,
+                    last4,
+                    birthDate
+                });
+            }
+            else{
+                return response.json({
+                    code: 500,
+                    msg: "Algo salió mal tratando de guardar información | Hubspot: general"
+                });
+            }
+
             let addressParams = {
                 street, 
                 extNumber, 
@@ -33,37 +88,21 @@ const generalInfoController = {
             let addressStored = await Address.create(addressParams);
 
             let reference1 = {
-                name : request.body.name1,
-                phone : request.body.phone1,
-                relative : request.body.relative1
+                name: name1,
+                phone: phone1,
+                relative: relative1
             }
 
             let reference1Stored = await Reference.create(reference1);
 
             let reference2 = {
-                name : request.body.name2,
-                phone : request.body.phone2,
-                relative : request.body.relative2
+                name: name2,
+                phone: phone2,
+                relative: relative2
             }
 
             let reference2Stored = await Reference.create(reference2);
 
-            let {
-                name,
-                lastname,
-                secondLastname,
-                civilStatus,
-                day,//birthDate
-                month,//birthDate
-                year,//birthDate
-                rfcPerson,
-                ciec,
-                phone,
-                mortgageCredit,
-                carCredit,
-                creditCard,
-                last4
-            } = request.body;
             let generalInfoParams = {
                 name,
                 lastname,
@@ -76,7 +115,7 @@ const generalInfoController = {
                 carCredit,
                 creditCard,
                 last4,
-                birthDate: `${day}/${month}/${year}`,
+                birthDate,
                 address: {
                     _id: addressStored._id
                 },
@@ -148,16 +187,72 @@ const generalInfoController = {
         let id = request.params.id;//id de info general
         let idUser = request.headers.tokenDecoded.data.id;
 
+        request.body.birthDate = `${request.body.day}/${request.body.month}/${request.body.year}`;
+
         try{
             let general = await GeneralInfo.findById(id);
+            let user = await User.findById(idUser);
 
             let {
-                street, 
+                street,//info address  
                 extNumber, 
                 intNumber, 
                 town, 
-                zipCode
+                zipCode,
+                name1,//info reference 1
+                phone1,
+                relative1,
+                name2,//info reference 2
+                phone2,
+                relative2,
+                name,//info general
+                lastname,
+                secondLastname,
+                civilStatus,
+                rfcPerson,
+                ciec,
+                phone,
+                mortgageCredit,
+                carCredit,
+                creditCard,
+                last4,
+                birthDate
             } = request.body;
+            
+            if(user){
+                await hubspotController.deal.update(user.hubspotDealId,'general', { 
+                    street,//info address  
+                    extNumber, 
+                    intNumber, 
+                    town, 
+                    zipCode,
+                    name1,//info reference 1
+                    phone1,
+                    relative1,
+                    name2,//info reference 2
+                    phone2,
+                    relative2,
+                    name,//info general
+                    lastname,
+                    secondLastname,
+                    civilStatus,
+                    rfcPerson,
+                    ciec,
+                    phone,
+                    mortgageCredit,
+                    carCredit,
+                    creditCard,
+                    last4,
+                    birthDate
+                });
+            }
+            else{
+                return response.json({
+                    code: 500,
+                    msg: "Algo salió mal tratando de actualizar información | Hubspot: general"
+                });
+            }
+
             let addressParams = {
                 street, 
                 extNumber, 
@@ -169,53 +264,39 @@ const generalInfoController = {
             await Address.findByIdAndUpdate(general.address[0]._id, addressParams);
 
             let reference1 = {
-                name : request.body.name1,
-                phone : request.body.phone1,
-                relative : request.body.relative1
+                name: name1,
+                phone: phone1,
+                relative: relative1
             }
 
             await Reference.findByIdAndUpdate(general.contactWith[0]._id, reference1);
 
             let reference2 = {
-                name : request.body.name2,
-                phone : request.body.phone2,
-                relative : request.body.relative2
+                name: name2,
+                phone: phone2,
+                relative: relative2
             }
 
             await Reference.findByIdAndUpdate(general.contactWith[1]._id, reference2);
 
-            let {
-                name,
-                lastname,
-                secondLastname,
-                civilStatus,
-                birthDate,
-                rfcPerson,
-                ciec,
-                phone,
-                mortgageCredit,
-                carCredit,
-                creditCard,
-                last4
-            } = request.body;
             let generalInfoParams = {
                 name,
                 lastname,
                 secondLastname,
                 civilStatus,
-                birthDate,
                 rfcPerson,
                 ciec,
                 phone,
                 mortgageCredit,
                 carCredit,
                 creditCard,
-                last4
+                last4,
+                birthDate
             };
 
             await GeneralInfo.findByIdAndUpdate(general._id, generalInfoParams);
 
-            let user = await User.findById(idUser);
+            user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,
