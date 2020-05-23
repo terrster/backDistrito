@@ -270,7 +270,7 @@ const deal = {
                                     "name": "n4_93_ciec"
                                 },
                                 {
-                                    "value": (request.mortgageCredit == true || request.mortgageCredit == 1 ? 'Sí' : 'No'),
+                                    "value": (request.mortgageCredit == true || request.mortgageCredit == '1' ? 'Sí' : 'No'),
                                     "name": "n6_1_cr_dito_hipotecario"
                                 },
                                 {
@@ -278,7 +278,7 @@ const deal = {
                                     "name": "n6_2_cr_dito_automotriz"
                                 },
                                 {
-                                    "value": (request.creditCard == true || request.creditCard == 1 ? 'Sí' : 'No'),
+                                    "value": (request.creditCard == true || request.creditCard == '1' ? 'Sí' : 'No'),
                                     "name": "n6_3_tarjeta_de_cr_dito"
                                 },
                                 {
