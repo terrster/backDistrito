@@ -10,7 +10,7 @@ const amountSchema = new Schema({
   whenNeed: String,
   term: Number,
   yearSales: Number,
-  old: Number,
+  old: String,
   registerDate: { type: Date, default: utc},
   status: { type: Boolean, default: false }
 }, { collection: 'Amount' });

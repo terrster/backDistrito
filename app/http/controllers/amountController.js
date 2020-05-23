@@ -1,5 +1,6 @@
 'user strict'
 
+const hubspotController = require("../controllers/hubspotController");
 const User = require("../models/User");
 const Amount = require("../models/Amount");
 const Appliance = require("../models/Appliance");
@@ -21,7 +22,24 @@ const amountController = {
                 yearSales,
                 old
             } = request.body;
-            old = parseInt(old)
+
+            if(user){
+                await hubspotController.deal.update(user.hubspotDealId,'amount', { 
+                    howMuch, 
+                    whyNeed, 
+                    whenNeed, 
+                    term, 
+                    yearSales,
+                    old
+                });
+             }
+             else{
+                 return response.json({
+                     code: 500,
+                     msg: "Algo salió mal tratando de obtener un usuario | Hubspot: amount"
+                 });
+             }
+
             let amountParams = {
                 howMuch,
                 whyNeed,

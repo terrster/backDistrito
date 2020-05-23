@@ -86,6 +86,7 @@ const deal = {
                             PFAE: 'Persona Física con A.E.',
                             PM: 'Persona Moral',
                         };
+                        
                         return {
                             "properties": [
                                 {
@@ -95,6 +96,28 @@ const deal = {
                             ]
                         }
                     case 'amount'://elige tu monto
+                        const REASON = {//whyNeed
+                            EXPANSION: "Expansión",
+                            NEWPROYECTS: "Nuevos proyectos",
+                            MERCHANDISE: "Comprar mercancía",
+                            PAYMENTS: "Pagos administrativos",
+                            REMODELING: "Remodelación",
+                            DEBT: "Consolidar deuda",
+                            EQUIPMENT: "Compra de equipo",
+                            OTHER: "Otro"
+                        };
+                        const TERM = {//term
+                            ASAP: "Cuanto antes",
+                            WAIT: "Puedo esperar"
+                        }
+                        const OLD = {//old
+                            LESS6: "Menos de 6 meses",
+                            ONE: "1 año",
+                            TWO: "2 años",
+                            THREE: "3 años",
+                            PFOUR: "4 años o más"
+                        };
+                        
                         return {
                             "properties": [
                                 {
@@ -106,7 +129,7 @@ const deal = {
                                     "name": "n2_2_tiempo_para_pago"
                                 },
                                 {
-                                    "value": request.whyNeed,
+                                    "value": REASON[request.whyNeed],
                                     "name": "necesidad_de_financiamiento"
                                 },
                                 {
@@ -118,7 +141,7 @@ const deal = {
                                     "name": "n2_5_ventas_anuales"
                                 },
                                 {
-                                    "value": request.old,
+                                    "value": OLD[request.old],
                                     "name": "n2_6_antig_edad_del_negocio"
                                 }
                             ]
