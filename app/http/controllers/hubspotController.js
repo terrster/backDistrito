@@ -147,6 +147,14 @@ const deal = {
                             ]
                         }
                     case 'comercial'://datos comerciales
+                        const GYRE = {//gyre
+                            COMERCE: "Comercio",
+                            SERVICE: "Servicios",
+                            PRODUCTS: "Productos",
+                            CONSTRUCTION: "Construcción",
+                            PRIMARY: "Sector primario",
+                            OTROS: "Otro"
+                        }
                         return {
                             "properties": [
                                 {
@@ -158,7 +166,7 @@ const deal = {
                                     "name": "n3_16_razon_social"
                                 },
                                 {
-                                    "value": request.gyre,
+                                    "value": GYRE[request.gyre],
                                     "name": "giro"
                                 },
                                 {

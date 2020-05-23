@@ -1,5 +1,6 @@
 'use strict'
 
+const hubspotController = require("../controllers/hubspotController");
 const ComercialInfo = require("../models/ComercialInfo");
 const User = require("../models/User");
 const Address = require("../models/Address");
@@ -15,24 +16,12 @@ const comercialInfoController = {
             let user = await User.findById(id);
 
             let {
-                street, 
+                street,//info address 
                 extNumber, 
                 intNumber, 
                 town, 
-                zipCode
-            } = request.body;
-            let addressParams = {
-                street, 
-                extNumber, 
-                intNumber, 
-                town, 
-                zipCode
-            };
-
-            let addressStored = await Address.create(addressParams);
-
-            let {
-                comercialName,
+                zipCode,
+                comercialName,//info comercial
                 businessName,
                 gyre,
                 rfc,
@@ -43,6 +32,42 @@ const comercialInfoController = {
                 terminal,
                 warranty
             } = request.body;
+
+            if(user){
+                await hubspotController.deal.update(user.hubspotDealId,'comercial', { 
+                    street,//info address 
+                    extNumber, 
+                    intNumber, 
+                    town, 
+                    zipCode,
+                    comercialName,//info comercial
+                    businessName,
+                    gyre,
+                    rfc,
+                    specific,
+                    phone,
+                    webSite,
+                    facebook,
+                    terminal,
+                    warranty
+                });
+             }
+             else{
+                 return response.json({
+                     code: 500,
+                     msg: "Algo salió mal tratando de guardar información | Hubspot: comercial"
+                 });
+             }
+
+            let addressParams = {
+                street, 
+                extNumber, 
+                intNumber, 
+                town, 
+                zipCode
+            };
+
+            let addressStored = await Address.create(addressParams);
 
             let comercialInfoParams = {
                 comercialName,
@@ -116,26 +141,15 @@ const comercialInfoController = {
 
         try{
             let comercial = await ComercialInfo.findById(id);
+            let user = await User.findById(idUser);
 
             let {
-                street, 
+                street,//info address 
                 extNumber, 
                 intNumber, 
                 town, 
-                zipCode
-            } = request.body;
-            let addressParams = {
-                street, 
-                extNumber, 
-                intNumber, 
-                town, 
-                zipCode
-            };
-
-            await Address.findByIdAndUpdate(comercial.address[0]._id, addressParams);
-
-            let {
-                comercialName,
+                zipCode,
+                comercialName,//info comercial
                 businessName,
                 gyre,
                 rfc,
@@ -146,6 +160,42 @@ const comercialInfoController = {
                 terminal,
                 warranty
             } = request.body;
+
+            if(user){
+                await hubspotController.deal.update(user.hubspotDealId,'comercial', { 
+                    street,//info address 
+                    extNumber, 
+                    intNumber, 
+                    town, 
+                    zipCode,
+                    comercialName,//info comercial
+                    businessName,
+                    gyre,
+                    rfc,
+                    specific,
+                    phone,
+                    webSite,
+                    facebook,
+                    terminal,
+                    warranty
+                });
+            }
+            else{
+                return response.json({
+                    code: 500,
+                    msg: "Algo salió mal tratando de actualizar información | Hubspot: comercial"
+                });
+            }
+
+            let addressParams = {
+                street, 
+                extNumber, 
+                intNumber, 
+                town, 
+                zipCode
+            };
+
+            await Address.findByIdAndUpdate(comercial.address[0]._id, addressParams);
 
             let comercialInfoParams = {
                 comercialName,
@@ -162,7 +212,7 @@ const comercialInfoController = {
 
             await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
 
-            let user = await User.findById(idUser);
+            user = await User.findById(idUser);
 
             return response.json({ 
                 code: 200,

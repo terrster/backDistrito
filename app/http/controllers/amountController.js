@@ -120,7 +120,7 @@ const amountController = {
             } = request.body;
             
             let _user = await User.findById(idUser);
-            if(user){
+            if(_user){
                 await hubspotController.deal.update(_user.hubspotDealId,'amount', { 
                     howMuch, 
                     whyNeed, 
