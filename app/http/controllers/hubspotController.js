@@ -41,7 +41,7 @@ const deal = {
                         "name": "celular"
                     },
                     {
-                        "value": request.idDistrito + " "+ request.name + " " + request.lastName,
+                        "value": request.idDistrito + " " + request.name + " " + request.lastName,
                         "name": "dealname"
                     },
                     {
@@ -551,14 +551,46 @@ const contact = {
             });
         }
     },
-    show: async(hubspotContactEmail) => {
+    show: async(hubspotContactId) => {
         try{
-            const {data} = await axios.get('contacts/v1/contact/email/' + hubspotContactEmail + '/profile' + hapiKey);
+            const {data} = await axios.get('contacts/v1/contact/vid/' + hubspotContactId + '/profile' + hapiKey);
             return data;
         }
         catch(error){
             console.log({
                 msg: "Hubspot: Algo salió mal tratando de obtener la información de un contact",
+                error: error
+            });
+        }
+    },
+    update: async(hubspotContactId, request) => {
+        try{
+            let contactParams = {
+                "properties": [
+                    {
+                        "value": request.email,
+                        "property": "email"
+                    },
+                    {
+                        "value": request.phone,
+                        "property": "mobilephone"
+                    },
+                    {
+                        "value": request.name,
+                        "property": "firstname"
+                    },
+                    {
+                        "value": request.lastName,
+                        "property": "lastname"
+                    }
+                ]
+            };
+            const {data} = await axios.post('contacts/v1/contact/vid/' + hubspotContactId + '/profile' + hapiKey, contactParams);
+            return data;
+        }
+        catch(error){
+            console.log({
+                msg: "Hubspot: Algo salió mal tratando de actualizar la información de un contact",
                 error: error
             });
         }

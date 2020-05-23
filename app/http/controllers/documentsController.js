@@ -1,5 +1,6 @@
 'use strict'
 
+const hubspotController = require("../controllers/hubspotController");
 const fileManager = require('../services/fileManager');
 const User = require("../models/User");
 const Documents = require("../models/Documents");
