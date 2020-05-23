@@ -36,7 +36,7 @@ const amountController = {
              else{
                  return response.json({
                      code: 500,
-                     msg: "Algo salió mal tratando de obtener un usuario | Hubspot: amount"
+                     msg: "Algo salió mal tratando de guardar información | Hubspot: amount"
                  });
              }
 
@@ -118,7 +118,25 @@ const amountController = {
                 yearSales,
                 old
             } = request.body;
-            old = parseInt(old)
+            
+            let _user = await User.findById(idUser);
+            if(user){
+                await hubspotController.deal.update(_user.hubspotDealId,'amount', { 
+                    howMuch, 
+                    whyNeed, 
+                    whenNeed, 
+                    term, 
+                    yearSales,
+                    old
+                });
+             }
+             else{
+                 return response.json({
+                     code: 500,
+                     msg: "Algo salió mal tratando de actualizar información | Hubspot: amount"
+                 });
+             }
+
             let amountParams = {
                 howMuch,
                 whyNeed,

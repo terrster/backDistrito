@@ -38,7 +38,7 @@ const clientController = {
                 else{
                     return response.json({
                         code: 500,
-                        msg: "Algo salió mal tratando de obtener un usuario | Hubspot: type"
+                        msg: "Algo salió mal tratando de actualizar información | Hubspot: type"
                     });
                 }
             }
