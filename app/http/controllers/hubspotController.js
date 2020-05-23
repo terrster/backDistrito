@@ -106,10 +106,12 @@ const deal = {
                             EQUIPMENT: "Compra de equipo",
                             OTHER: "Otro"
                         };
+
                         const TERM = {//term
                             ASAP: "Cuanto antes",
                             WAIT: "Puedo esperar"
-                        }
+                        };
+
                         const OLD = {//old
                             LESS6: "Menos de 6 meses",
                             ONE: "1 año",
@@ -154,7 +156,12 @@ const deal = {
                             CONSTRUCTION: "Construcción",
                             PRIMARY: "Sector primario",
                             OTROS: "Otro"
-                        }
+                        };
+
+                        const YES_NO_QUESTION = {
+                            "1": "Sí",
+                            "0": "No"
+                        };
                         return {
                             "properties": [
                                 {
@@ -190,11 +197,11 @@ const deal = {
                                     "name": "n3_12_facebook"
                                 },
                                 {//exporta a EU, antes TPV
-                                    "value": (request.terminal == true || request.terminal == 1 ? 'Sí' : 'No'),
+                                    "value": YES_NO_QUESTION[request.terminal],
                                     "name": "n3_13_tpv"
                                 },
                                 {
-                                    "value": (request.warranty == true || request.warranty == 1 ? 'Sí' : 'No'),
+                                    "value": YES_NO_QUESTION[request.warranty],
                                     "name": "n3_14_garant_a"
                                 },
                                 {//datos comerciales - domicilio negocio
@@ -225,20 +232,21 @@ const deal = {
                             MARRIED: "Casado", 
                             DIVORCED: "Divorciado", 
                             WIDOWER: "Viudo", 
-                        }
+                        };
 
                         const CAR_CREDIT = {//carCredit
                             MORE4: "Hace 4 años o más",
                             YES: "Sí",
                             NO: "No"               
-                        }
+                        };
 
                         const RELATIVE = {//relative
                             FAMILY: "Familiar",
                             FRIEND: "Amigo",
                             CLIENT: "Cliente" ,
                             PROVIDER: "Proveedor" 
-                        }
+                        };
+
                         return {
                             "properties": [
                                 {
@@ -270,7 +278,7 @@ const deal = {
                                     "name": "n4_93_ciec"
                                 },
                                 {
-                                    "value": request.mortgageCredit === '1' || request.mortgageCredit == '1' ? 'Sí' : 'No',
+                                    "value": YES_NO_QUESTION[request.mortgageCredit],
                                     "name": "n6_1_cr_dito_hipotecario"
                                 },
                                 {
@@ -278,7 +286,7 @@ const deal = {
                                     "name": "n6_2_cr_dito_automotriz"
                                 },
                                 {
-                                    "value": request.creditCard === '1' || request.creditCard == '1' ? 'Sí' : 'No',
+                                    "value": YES_NO_QUESTION[request.creditCard],
                                     "name": "n6_3_tarjeta_de_cr_dito"
                                 },
                                 {
