@@ -1,5 +1,6 @@
 'use strict'
 
+const hubspotController = require("../controllers/hubspotController");
 const GeneralInfo = require("../models/GeneralInfo");
 const User = require("../models/User");
 const Address = require("../models/Address");

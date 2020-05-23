@@ -189,12 +189,12 @@ const deal = {
                                     "value": request.facebook,
                                     "name": "n3_12_facebook"
                                 },
-                                {
-                                    "value": request.terminal,
+                                {//exporta a EU, antes TPV
+                                    "value": (request.terminal == true || request.terminal == 1 ? 'Sí' : 'No'),
                                     "name": "n3_13_tpv"
                                 },
                                 {
-                                    "value": request.warranty,
+                                    "value": (request.warranty == true || request.warranty == 1 ? 'Sí' : 'No'),
                                     "name": "n3_14_garant_a"
                                 },
                                 {//datos comerciales - domicilio negocio
@@ -270,7 +270,7 @@ const deal = {
                                     "name": "n4_93_ciec"
                                 },
                                 {
-                                    "value": request.mortgageCredit,
+                                    "value": (request.mortgageCredit == true || request.mortgageCredit == 1 ? 'Sí' : 'No'),
                                     "name": "n6_1_cr_dito_hipotecario"
                                 },
                                 {
@@ -278,7 +278,7 @@ const deal = {
                                     "name": "n6_2_cr_dito_automotriz"
                                 },
                                 {
-                                    "value": request.creditCard,
+                                    "value": (request.creditCard == true || request.creditCard == 1 ? 'Sí' : 'No'),
                                     "name": "n6_3_tarjeta_de_cr_dito"
                                 },
                                 {
@@ -306,27 +306,27 @@ const deal = {
                                     "name": "n4_91_colonia"
                                 },//información general - referencia1
                                 {
-                                    "value": request.reference1.name,
+                                    "value": request.name1,
                                     "name": "n5_1_nombre_referencia"
                                 },
                                 {
-                                    "value": request.reference1.phone,
+                                    "value": request.phone1,
                                     "name": "n5_2_tel_fono_referencia"
                                 },
                                 {
-                                    "value": RELATIVE[request.reference1.relative],
+                                    "value": RELATIVE[request.relative1],
                                     "name": "n5_3_parentesco_referencia"
                                 },//información general - referencia2
                                 {
-                                    "value": request.reference2.name,
+                                    "value": request.name2,
                                     "name": "n5_4_nombre"
                                 },
                                 {
-                                    "value": request.reference2.phone,
+                                    "value": request.phone2,
                                     "name": "n5_5_tel_fono"
                                 },
                                 {
-                                    "value": RELATIVE[request.reference2.relative],
+                                    "value": RELATIVE[request.relative2],
                                     "name": "n5_6_parentesco"
                                 }     
                             ]
