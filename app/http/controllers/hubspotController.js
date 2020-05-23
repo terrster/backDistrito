@@ -221,23 +221,23 @@ const deal = {
                         }
                     case 'general'://información general
                         const CIVIL_STATUS = {//civilStatus
-                            "SINGLE": "Soltero",   
-                            "MARRIED": "Casado", 
-                            "DIVORCED": "Divorciado", 
-                            "WIDOWER": "Viudo", 
+                            SINGLE: "Soltero",   
+                            MARRIED: "Casado", 
+                            DIVORCED: "Divorciado", 
+                            WIDOWER: "Viudo", 
                         }
 
                         const CAR = {//carCredit
-                            "MORE4": 'Hace 4 años o más',
-                            "YES": "Sí",
-                            "NO": "No"               
+                            MORE4: 'Hace 4 años o más',
+                            YES: "Sí",
+                            NO: "No"               
                         }
 
                         const RELATIVE = {//relative
-                            "FAMILY": "Familiar",
-                            "FRIEND": "Amigo",
-                            "CLIENT": "Cliente" ,
-                            "PROVIDER": "Proveedor" 
+                            FAMILY: "Familiar",
+                            FRIEND: "Amigo",
+                            CLIENT: "Cliente" ,
+                            PROVIDER: "Proveedor" 
                         }
                         return {
                             "properties": [
@@ -270,7 +270,7 @@ const deal = {
                                     "name": "n4_93_ciec"
                                 },
                                 {
-                                    "value": (request.mortgageCredit == true || request.mortgageCredit == '1' ? 'Sí' : 'No'),
+                                    "value": (request.mortgageCredit === '1' ? 'Sí' : 'No'),
                                     "name": "n6_1_cr_dito_hipotecario"
                                 },
                                 {
@@ -278,7 +278,7 @@ const deal = {
                                     "name": "n6_2_cr_dito_automotriz"
                                 },
                                 {
-                                    "value": (request.creditCard == true || request.creditCard == '1' ? 'Sí' : 'No'),
+                                    "value": (request.creditCard === '1' ? 'Sí' : 'No'),
                                     "name": "n6_3_tarjeta_de_cr_dito"
                                 },
                                 {
