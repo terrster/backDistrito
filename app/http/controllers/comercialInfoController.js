@@ -34,7 +34,7 @@ const comercialInfoController = {
             } = request.body;
 
             if(user){
-                await hubspotController.deal.update(user.hubspotDealId,'comercial', { 
+                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'comercial', { 
                     street,//info address 
                     extNumber, 
                     intNumber, 
@@ -51,6 +51,14 @@ const comercialInfoController = {
                     terminal,
                     warranty
                 });
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de guardar información | Hubspot: comercial",
+                        error: dealUpdated.error
+                    });
+                }
              }
              else{
                  return response.json({
@@ -162,7 +170,7 @@ const comercialInfoController = {
             } = request.body;
 
             if(user){
-                await hubspotController.deal.update(user.hubspotDealId,'comercial', { 
+                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'comercial', { 
                     street,//info address 
                     extNumber, 
                     intNumber, 
@@ -179,6 +187,14 @@ const comercialInfoController = {
                     terminal,
                     warranty
                 });
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de actualizar información | Hubspot: comercial",
+                        error: dealUpdated.error
+                    });
+                }
             }
             else{
                 return response.json({

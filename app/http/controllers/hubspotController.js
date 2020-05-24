@@ -11,6 +11,7 @@ require('dotenv').config({
     path: `.env.${process.env.NODE_ENV}`
 });
 const hapiKey = "?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3";
+const format = require("../services/formatManager");
 
 const deal = {
 
@@ -55,10 +56,13 @@ const deal = {
             return data;
         }
         catch(error){
-            console.log({
+            let response = {
                 msg: "Hubspot: Algo salió mal tratando de crear un deal",
                 error: error
-            });
+            };
+
+            console.log(response);
+            return response;
         }
     },
     show: async(hubspotDealId) => {
@@ -79,47 +83,16 @@ const deal = {
 
             function getParams(stage){
                 switch(stage){
-                    case 'type'://tipo de negocio
-                        const PERSON_TYPE = {
-                            PF: 'Persona Física',
-                            RIF: 'RIF',
-                            PFAE: 'Persona Física con A.E.',
-                            PM: 'Persona Moral',
-                        };
-                        
+                    case 'type'://tipo de negocio                        
                         return {
                             "properties": [
                                 {
-                                    "value": PERSON_TYPE[request.type],
+                                    "value": format.PERSON_TYPE[request.type],
                                     "name": "tipo_de_persona"
                                 }
                             ]
                         }
                     case 'amount'://elige tu monto
-                        const REASON = {//whyNeed
-                            EXPANSION: "Expansión",
-                            NEWPROYECTS: "Nuevos proyectos",
-                            MERCHANDISE: "Comprar mercancía",
-                            PAYMENTS: "Pagos administrativos",
-                            REMODELING: "Remodelación",
-                            DEBT: "Consolidar deuda",
-                            EQUIPMENT: "Compra de equipo",
-                            OTHER: "Otro"
-                        };
-
-                        const TERM = {//term
-                            ASAP: "Cuanto antes",
-                            WAIT: "Puedo esperar"
-                        };
-
-                        const OLD = {//old
-                            LESS6: "Menos de 6 meses",
-                            ONE: "1 año",
-                            TWO: "2 años",
-                            THREE: "3 años",
-                            PFOUR: "4 años o más"
-                        };
-                        
                         return {
                             "properties": [
                                 {
@@ -131,7 +104,7 @@ const deal = {
                                     "name": "n2_2_tiempo_para_pago"
                                 },
                                 {
-                                    "value": REASON[request.whyNeed],
+                                    "value": format.REASON[request.whyNeed],
                                     "name": "necesidad_de_financiamiento"
                                 },
                                 {
@@ -143,25 +116,12 @@ const deal = {
                                     "name": "n2_5_ventas_anuales"
                                 },
                                 {
-                                    "value": OLD[request.old],
+                                    "value": format.OLD[request.old],
                                     "name": "n2_6_antig_edad_del_negocio"
                                 }
                             ]
                         }
                     case 'comercial'://datos comerciales
-                        const GYRE = {//gyre
-                            COMERCE: "Comercio",
-                            SERVICE: "Servicios",
-                            PRODUCTS: "Productos",
-                            CONSTRUCTION: "Construcción",
-                            PRIMARY: "Sector primario",
-                            OTROS: "Otro"
-                        };
-
-                        const YES_NO_QUESTION = {
-                            "1": "Sí",
-                            "0": "No"
-                        };
                         return {
                             "properties": [
                                 {
@@ -173,7 +133,7 @@ const deal = {
                                     "name": "n3_16_razon_social"
                                 },
                                 {
-                                    "value": GYRE[request.gyre],
+                                    "value": format.GYRE[request.gyre],
                                     "name": "giro"
                                 },
                                 {
@@ -197,11 +157,11 @@ const deal = {
                                     "name": "n3_12_facebook"
                                 },
                                 {//exporta a EU, antes TPV
-                                    "value": YES_NO_QUESTION[request.terminal],
+                                    "value": format.YES_NO_QUESTION[request.terminal],
                                     "name": "n3_13_tpv"
                                 },
                                 {
-                                    "value": YES_NO_QUESTION[request.warranty],
+                                    "value": format.YES_NO_QUESTION[request.warranty],
                                     "name": "n3_14_garant_a"
                                 },
                                 {//datos comerciales - domicilio negocio
@@ -227,26 +187,6 @@ const deal = {
                             ]
                         }
                     case 'general'://información general
-                        const CIVIL_STATUS = {//civilStatus
-                            SINGLE: "Soltero",   
-                            MARRIED: "Casado", 
-                            DIVORCED: "Divorciado", 
-                            WIDOWER: "Viudo", 
-                        };
-
-                        const CAR_CREDIT = {//carCredit
-                            MORE4: "Hace 4 años o más",
-                            YES: "Sí",
-                            NO: "No"               
-                        };
-
-                        const RELATIVE = {//relative
-                            FAMILY: "Familiar",
-                            FRIEND: "Amigo",
-                            CLIENT: "Cliente" ,
-                            PROVIDER: "Proveedor" 
-                        };
-
                         return {
                             "properties": [
                                 {
@@ -262,7 +202,7 @@ const deal = {
                                     "name": "n4_3_apellido_materno"
                                 },
                                 {
-                                    "value": CIVIL_STATUS[request.civilStatus],
+                                    "value": format.CIVIL_STATUS[request.civilStatus],
                                     "name": "n4_4_estado_civil"
                                 },
                                 {
@@ -278,15 +218,15 @@ const deal = {
                                     "name": "n4_93_ciec"
                                 },
                                 {
-                                    "value": YES_NO_QUESTION[request.mortgageCredit],
+                                    "value": format.YES_NO_QUESTION[request.mortgageCredit],
                                     "name": "n6_1_cr_dito_hipotecario"
                                 },
                                 {
-                                    "value": CAR_CREDIT[request.carCredit],
+                                    "value": format.CAR_CREDIT[request.carCredit],
                                     "name": "n6_2_cr_dito_automotriz"
                                 },
                                 {
-                                    "value": YES_NO_QUESTION[request.creditCard],
+                                    "value": format.YES_NO_QUESTION[request.creditCard],
                                     "name": "n6_3_tarjeta_de_cr_dito"
                                 },
                                 {
@@ -322,7 +262,7 @@ const deal = {
                                     "name": "n5_2_tel_fono_referencia"
                                 },
                                 {
-                                    "value": RELATIVE[request.relative1],
+                                    "value": format.RELATIVE[request.relative1],
                                     "name": "n5_3_parentesco_referencia"
                                 },//información general - referencia2
                                 {
@@ -334,7 +274,7 @@ const deal = {
                                     "name": "n5_5_tel_fono"
                                 },
                                 {
-                                    "value": RELATIVE[request.relative2],
+                                    "value": format.RELATIVE[request.relative2],
                                     "name": "n5_6_parentesco"
                                 }     
                             ]
@@ -503,10 +443,13 @@ const deal = {
             return data;
         }
         catch(error){
-            console.log({
+            let response = {
                 msg: "Hubspot: Algo salió mal tratando de actualizar la información del deal",
                 error: error
-            });
+            };
+
+            console.log(response);
+            return response;
         }
     }
 
@@ -545,10 +488,13 @@ const contact = {
             return data;
         }
         catch(error){
-            console.log({
+            let response = {
                 msg: "Hubspot: Algo salió mal tratando de crear un contact",
                 error: error
-            });
+            };
+
+            console.log(response);
+            return response;
         }
     },
     show: async(hubspotContactId) => {
@@ -589,10 +535,13 @@ const contact = {
             return data;
         }
         catch(error){
-            console.log({
+            let response = {
                 msg: "Hubspot: Algo salió mal tratando de actualizar la información de un contact",
                 error: error
-            });
+            };
+
+            console.log(response);
+            return response;
         }
     }
 

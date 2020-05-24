@@ -24,7 +24,7 @@ const amountController = {
             } = request.body;
 
             if(user){
-                await hubspotController.deal.update(user.hubspotDealId,'amount', { 
+                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'amount', { 
                     howMuch, 
                     whyNeed, 
                     whenNeed, 
@@ -32,6 +32,14 @@ const amountController = {
                     yearSales,
                     old
                 });
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de guardar información | Hubspot: amount",
+                        error: dealUpdated.error
+                    });
+                }
              }
              else{
                  return response.json({
@@ -121,7 +129,7 @@ const amountController = {
             
             let _user = await User.findById(idUser);
             if(_user){
-                await hubspotController.deal.update(_user.hubspotDealId,'amount', { 
+                let dealUpdated = await hubspotController.deal.update(_user.hubspotDealId, 'amount', { 
                     howMuch, 
                     whyNeed, 
                     whenNeed, 
@@ -129,6 +137,14 @@ const amountController = {
                     yearSales,
                     old
                 });
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de actualizar información | Hubspot: amount",
+                        error: dealUpdated.error
+                    });
+                }
              }
              else{
                  return response.json({

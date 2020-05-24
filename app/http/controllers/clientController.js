@@ -33,7 +33,15 @@ const clientController = {
             if(request.body.type){//tipo de negocio
                 let _user = await User.findById(idUser);
                 if(_user){
-                   await hubspotController.deal.update(_user.hubspotDealId,'type',request.body);
+                   let dealUpdated = await hubspotController.deal.update(_user.hubspotDealId, 'type', request.body);
+
+                   if(dealUpdated.error){
+                        return response.json({
+                            code: 500,
+                            msg : "Algo salió mal tratando de actualizar información | Hubspot: type",
+                            error: dealUpdated.error
+                        });
+                    }
                 }
                 else{
                     return response.json({

@@ -45,7 +45,7 @@ const generalInfoController = {
             } = request.body;
 
             if(user){
-                await hubspotController.deal.update(user.hubspotDealId,'general', { 
+                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'general', { 
                     street,//info address  
                     extNumber, 
                     intNumber, 
@@ -70,6 +70,14 @@ const generalInfoController = {
                     last4,
                     birthDate
                 });
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de guardar información | Hubspot: general",
+                        error: dealUpdated.error
+                    });
+                }
             }
             else{
                 return response.json({
@@ -221,7 +229,7 @@ const generalInfoController = {
             } = request.body;
             
             if(user){
-                await hubspotController.deal.update(user.hubspotDealId,'general', { 
+                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'general', { 
                     street,//info address  
                     extNumber, 
                     intNumber, 
@@ -246,6 +254,14 @@ const generalInfoController = {
                     last4,
                     birthDate
                 });
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de actualizar información | Hubspot: general",
+                        error: dealUpdated.error
+                    });
+                }
             }
             else{
                 return response.json({
