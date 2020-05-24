@@ -24,7 +24,25 @@ const documentsController = {
         try{
             let filesUploaded = await fileManager.UploadFilesToS3(files);
 
+            let filesParams = new Object();
+            filesUploaded.map(async(name, key) => {
+                let index = Object.keys(name)[0];
+                filesParams[index] = filesUploaded[key][index];
+            });
+
             let user = await User.findById(id);
+
+            if(user){
+                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'documents', filesParams);
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de guardar información | Hubspot: documents",
+                        error: dealUpdated.error
+                    });
+                }
+            }
 
             let documentStored = await Documents.create({
                 idClient: {
@@ -32,7 +50,7 @@ const documentsController = {
                 }
             });
 
-            await Documents.findByIdAndUpdate(documentStored._id, { $push : filesUploaded });
+            await Documents.findByIdAndUpdate(documentStored._id, { $push : filesParams });
             
             await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
                 idDocuments : {
@@ -73,6 +91,9 @@ const documentsController = {
                 msg: 'Sin archivos'
             });
         }
+        
+        console.log(files);
+        return response("ok");
 
         try{
             let filesUploaded = await fileManager.UploadFilesToS3(files);

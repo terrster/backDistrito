@@ -279,166 +279,320 @@ const deal = {
                                 }     
                             ]
                         }
-                    case 'documentos'://documentos **********Pendiente
-                        return {
-                            "properties": [
-                                {
+                    case 'documents'://documentos
+                        let data = [];
+
+                        if(request.oficialID){
+                            if(Array.isArray(request.oficialID)){
+                                if(request.oficialID[0]){
+                                    data.push({
+                                        "value": request.oficialID[0],
+                                        "name": "n9_1_id"
+                                    });
+                                }
+                                if(request.oficialID[1]){
+                                    data.push({
+                                        "value": request.oficialID[1],
+                                        "name": "n9_1_2_id"
+                                    });
+                                }
+                                if(request.oficialID[2]){
+                                    data.push({
+                                        "value": request.oficialID[2],
+                                        "name": "n9_1_3_id"
+                                    });
+                                }
+                                if(request.oficialID[3]){
+                                    data.push({
+                                        "value": request.oficialID[3],
+                                        "name": "n9_1_4_id"
+                                    });
+                                }
+                            }
+                            else{
+                                data.push({
                                     "value": request.oficialID,
                                     "name": "n9_1_id"
-                                },
-                                {
-                                    "value": request.oficialID,
-                                    "name": "n9_1_2_id"
-                                },
-                                {
-                                    "value": request.oficialID,
-                                    "name": "n9_1_3_id"
-                                },
-                                {
-                                    "value": request.oficialID,
-                                    "name": "n9_1_4_id"
-                                },
-                                {
+                                });
+                            }
+                        }
+
+                        if(request.proofAddress){
+                            if(Array.isArray(request.proofAddress)){
+                                if(request.proofAddress[0]){
+                                    data.push({
+                                        "value": request.proofAddress[0],
+                                        "name": "n9_2_comp_domicilio"
+                                    });
+                                }
+                                if(request.proofAddress[1]){
+                                    data.push({
+                                        "value": request.proofAddress[1],
+                                        "name": "n9_2_1_comp_domicilio_2"
+                                    });
+                                }
+                                if(request.proofAddress[2]){
+                                    data.push({
+                                        "value": request.proofAddress[2],
+                                        "name": "n9_2_2_comp_domicilio_3"
+                                    });
+                                }
+                            }
+                            else{
+                                data.push({
                                     "value": request.proofAddress,
                                     "name": "n9_2_comp_domicilio"
-                                },
-                                {
-                                    "value": request.proofAddress,
-                                    "name": "n9_2_1_comp_domicilio_2"
-                                },
-                                {
-                                    "value": request.proofAddress,
-                                    "name": "n9_2_2_comp_domicilio_3"
-                                },
-                                {
+                                });
+                            }
+                        }
+
+                        if(request.bankStatements){
+                            if(Array.isArray(request.bankStatements)){
+                                if(request.bankStatements[0]){
+                                    data.push({
+                                        "value": request.bankStatements[0],
+                                        "name": "n9_3_estados_de_cuenta"
+                                    });
+                                }
+                                if(request.bankStatements[1]){
+                                    data.push({    
+                                        "value": request.bankStatements[1],
+                                        "name": "n9_3_1_estados_de_cuenta"
+                                    });
+                                }
+                                if(request.bankStatements[2]){
+                                    data.push({    
+                                        "value": request.bankStatements[2],
+                                        "name": "n9_3_2_estados_de_cuenta"
+                                    });
+
+                                }
+                                if(request.bankStatements[3]){
+                                    data.push({    
+                                        "value": request.bankStatements[3],
+                                        "name": "n9_3_3_estados_de_cuenta"
+                                    });
+                                }
+                                if(request.bankStatements[4]){
+                                    data.push({    
+                                        "value": request.bankStatements[4],
+                                        "name": "n9_3_4_estados_de_cuenta"
+                                    });
+                                }
+                                if(request.bankStatements[5]){
+                                    data.push({    
+                                        "value": request.bankStatements[5],
+                                        "name": "n9_3_5_estados_de_cuenta"
+                                    });
+                                }
+                                if(request.bankStatements[6]){
+                                    data.push({    
+                                        "value": request.bankStatements[6],
+                                        "name": "n9_3_6_estados_de_cuenta"
+                                    });
+                                }
+                                if(request.bankStatements[7]){
+                                    data.push({    
+                                        "value": request.bankStatements[7],
+                                        "name": "n9_3_7_estados_de_cuenta"
+                                    });
+                                }
+                                if(request.bankStatements[8]){
+                                    data.push({    
+                                        "value": request.bankStatements[8],
+                                        "name": "n9_3_8_estados_de_cuenta"
+                                    });
+                                }
+                                if(request.bankStatements[9]){
+                                    data.push({    
+                                        "value": request.bankStatements[9],
+                                        "name": "n9_3_9_estados_de_cuenta"
+                                    });
+                                }
+                                if(equest.bankStatements[10]){
+                                    data.push({    
+                                        "value": request.bankStatements[10],
+                                        "name": "n9_3_10_estados_de_cuenta"
+                                    });
+                                }
+                                if(equest.bankStatements[11]){
+                                    data.push({    
+                                        "value": request.bankStatements[11],
+                                        "name": "n9_3_11_estados_de_cuenta"
+                                    });
+                                }
+                            }
+                            else{
+                                data.push({
                                     "value": request.bankStatements,
                                     "name": "n9_3_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_1_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_2_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_3_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_4_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_5_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_6_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_7_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_8_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_9_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_10_estados_de_cuenta"
-                                },
-                                {    
-                                    "value": request.bankStatements,
-                                    "name": "n9_3_11_estados_de_cuenta"
-                                },
-                                {
-                                    "value": request.rfc,
-                                    "name": "n9_4_rfc"
-                                },
-                                {
-                                    "value": request.lastDeclarations,
-                                    "name": "n9_5_declaraci_n"
-                                },
-                                {
-                                    "value": request.lastDeclarations,
-                                    "name": "n9_5_1_declaraci_n"
-                                },
-                                {
-                                    "value": request.lastDeclarations,
-                                    "name": "n9_5_2_declaraci_n"
-                                },
-                                {
-                                    "value": request.lastDeclarations,
-                                    "name": "n9_5_3_declaraci_n"
-                                },
-                                {
-                                    "value": request.acomplishOpinion,
-                                    "name": "n9_6_opini_n_de_cumplimiento"
-                                },
-                                {
-                                    "value": request.facturacion,
-                                    "name": "n9_7_xmls"
-                                },
-                                {
-                                    "value": request.otherActs,
-                                    "name": "n9_8_otros"
-                                },
-                                {
-                                    "value": request.constitutiveAct,
-                                    "name": "n9_9_acta_constitutiva"
-                                },
-                                {
-                                    "value": request.others,
-                                    "name": "n9_91_reporte_de_cr_dito"
-                                },
-                                {
-                                    "value": request.others,
-                                    "name": "n9_92_1_escritura"
-                                },
-                                {
-                                    "value": request.others,
-                                    "name": "n9_92_2_escritura"
-                                },
-                                {
-                                    "value": request.others,
-                                    "name": "n9_92_3_escritura"
-                                },
-                                {
+                                });
+                            }
+                        }
+
+                        if(request.constitutiveAct){
+                            data.push({
+                                "value": request.constitutiveAct,
+                                "name": "n9_9_acta_constitutiva"
+                            });
+                        }
+
+                        if(request.otherActs){
+                            data.push({
+                                "value": request.otherActs,
+                                "name": "n9_8_otros"
+                            });
+                        }
+
+                        if(request.financialStatements){
+                            if(Array.isArray(request.financialStatements)){
+                                if(request.financialStatements[0]){
+                                    data.push({
+                                        "value": request.financialStatements[0],
+                                        "name": "n9_93_1_eeff"
+                                    });
+                                }
+                                if(request.financialStatements[1]){
+                                    data.push({
+                                        "value": request.financialStatements[1],
+                                        "name": "n9_93_1_1_eeff"
+                                    });
+                                }
+                                if(request.financialStatements[2]){
+                                    data.push({
+                                        "value": request.financialStatements[2],
+                                        "name": "n9_93_2_eeff"
+                                    });
+                                }
+                            }
+                            else{
+                                data.push({
                                     "value": request.financialStatements,
                                     "name": "n9_93_1_eeff"
-                                },
-                                {
-                                    "value": request.financialStatements,
-                                    "name": "n9_93_1_1_eeff"
-                                },
-                                {
-                                    "value": request.financialStatements,
-                                    "name": "n9_93_2_eeff"
-                                }
-                                // {
-                                //     "value": request,
-                                //     "name": "n9_93_2_1_eeff"
-                                // },
-                                // {
-                                //     "value": request,
-                                //     "name": "n9_93_3_eeff"
-                                // }, 
-                                // {
-                                //     "value": request,
-                                //     "name": "n9_93_3_1_eeff"
-                                // }            
-                            ]
+                                });
+                            }
                         }
+
+                        if(request.rfc){
+                            data.push({
+                                "value": request.rfc,
+                                "name": "n9_4_rfc"
+                            });
+                        }
+
+                        if(request.lastDeclarations){
+                            if(Array.isArray(request.lastDeclarations)){
+                                if(request.lastDeclarations[0]){
+                                    data.push({
+                                        "value": request.lastDeclarations[0],
+                                        "name": "n9_5_declaraci_n"
+                                    });
+                                }
+                                if(request.lastDeclarations[1]){
+                                    data.push({
+                                        "value": request.lastDeclarations[1],
+                                        "name": "n9_5_1_declaraci_n"
+                                    });
+                                }
+                                if(request.lastDeclarations[2]){
+                                    data.push({
+                                        "value": request.lastDeclarations[2],
+                                        "name": "n9_5_2_declaraci_n"
+                                    });
+                                }
+                                if(request.lastDeclarations[3]){
+                                    data.push({
+                                        "value": request.lastDeclarations[3],
+                                        "name": "n9_5_3_declaraci_n"
+                                    });
+                                }
+                            }
+                            else{
+                                data.push({
+                                    "value": request.lastDeclarations,
+                                    "name": "n9_5_declaraci_n"
+                                });
+                            }
+                        }
+
+                        if(request.acomplishOpinion){
+                            data.push({
+                                "value": request.acomplishOpinion,
+                                "name": "n9_6_opini_n_de_cumplimiento"
+                            });
+                        }
+
+                        if(request.facturacion){
+                            data.push({
+                                "value": request.facturacion,
+                                "name": "n9_7_xmls"
+                            });
+                        }
+
+                        if(request.others){
+                            if(Array.isArray(request.others)){
+                                if(request.others[0]){
+                                    data.push({
+                                        "value": request.others[0],
+                                        "name": "n9_91_reporte_de_cr_dito"
+                                    });
+                                }
+                                if(request.others[1]){
+                                    data.push({
+                                        "value": request.others[1],
+                                        "name": "n9_92_1_escritura"
+                                    });
+                                }
+                                if(request.others[2]){
+                                    data.push({
+                                        "value": request.others[2],
+                                        "name": "n9_92_2_escritura"
+                                    });
+                                }
+                                if(request.others[3]){
+                                    data.push({
+                                        "value": request.others[3],
+                                        "name": "n9_92_3_escritura"
+                                    });
+                                }
+                            }
+                            else{
+                                data.push({
+                                    "value": request.others,
+                                    "name": "n9_91_reporte_de_cr_dito"
+                                });
+                            }
+                        }
+
+                        let params = {
+                            "properties": data
+                        };
+
+                        return params;
+
+                        // if(request.cventerprise){
+
+                        // }
+
+                        // if(request.proofAddressMainFounders){
+
+                        // }    
+                        
+                        // {
+                        //     "value": request,
+                        //     "name": "n9_93_2_1_eeff"
+                        // },
+                        // {
+                        //     "value": request,
+                        //     "name": "n9_93_3_eeff"
+                        // }, 
+                        // {
+                        //     "value": request,
+                        //     "name": "n9_93_3_1_eeff"
+                        // }  
                 }
             }
-            
+           
             const {data} = await axios.put('deals/v1/deal/' + hubspotDealId + hapiKey, dealParams);
             return data;
         }
