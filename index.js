@@ -10,8 +10,8 @@ require('dotenv').config({
 require('./config/database')
 
 async function init() {
-    await app.listen(3900);
-    console.log('Server running on port 3900')
+    await app.listen(`${process.env.PORT}`);
+    console.log(`Server running on port ${process.env.PORT}`)
 }
 
 init()
