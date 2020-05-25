@@ -10,7 +10,7 @@ const axios = _axios.create({
 require('dotenv').config({
     path: `.env.${process.env.NODE_ENV}`
 });
-const hapiKey = "?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3";
+const hapiKey = `?hapikey=${process.env.HAPIKEY}`;
 const format = require("../services/formatManager");
 
 const deal = {
