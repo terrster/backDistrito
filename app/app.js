@@ -21,7 +21,7 @@ app.use(fileUpload({
 }));
 
 //CORS
-app.use(cors());
+app.use('*', cors());
 
 //Prefix or routes
 app.use(webRoutes);
