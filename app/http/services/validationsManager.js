@@ -1,8 +1,8 @@
 'use strict'
 
-class validationsManager {
+var validationsManager = {
 
-    user = (errors) => {
+    user: (errors) => {
         let messages = {
             email: {
                 unique: "El campo email debe de ser único"
@@ -14,9 +14,8 @@ class validationsManager {
         }
 
         return this.extractor(errors, messages);
-    }
-
-    extractor = (errors, messages) => {
+    },
+    extractor: (errors, messages) => {
         let errmsgs = [];
 
         Object.keys(errors).forEach((key) => {
@@ -29,4 +28,4 @@ class validationsManager {
     }
 }
 
-module.exports = new validationsManager();
+module.exports = validationsManager;
