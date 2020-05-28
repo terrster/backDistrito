@@ -16,6 +16,7 @@ const comercialInfoSchema = new Schema({
   facebook: String,
   terminal: Boolean,
   warranty: Boolean,
+  ciec: String,
   status: { type: Boolean, default: false }
 }, { collection: 'ComercialInfo' });
 

@@ -32,7 +32,8 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
-                warranty
+                warranty,
+                ciec,
             } = request.body;
 
             if(user){
@@ -53,7 +54,9 @@ const comercialInfoController = {
                     webSite,
                     facebook,
                     terminal,
+                    ciec,
                     warranty
+                    
                 });
 
                 if(dealUpdated.error){
@@ -93,6 +96,7 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
+                ciec,
                 warranty,
                 address: {
                     _id: addressStored._id
@@ -174,6 +178,7 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
+                ciec,
                 warranty
             } = request.body;
 
@@ -195,6 +200,7 @@ const comercialInfoController = {
                     webSite,
                     facebook,
                     terminal,
+                    ciec,
                     warranty
                 });
 
@@ -235,6 +241,7 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
+                ciec,
                 warranty
             };
 
