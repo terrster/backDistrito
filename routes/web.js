@@ -19,5 +19,8 @@ route.get("/", (request, response) => {
 
 route.post('/signin', authController.sigin);
 route.post('/login', authController.login);
+route.post("/forgot_password", authController.forgotten_password);
+route.get("/validate_resetHash/:hash", authController.validate_resetHash);
+route.post("/reset_password/:hash", authController.reset_password);
 
 module.exports = route;

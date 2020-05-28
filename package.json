@@ -32,6 +32,7 @@
     "mongoose-autopopulate": "^0.12.2",
     "mongoose-unique-validator": "^2.0.3",
     "node-cron": "^2.0.3",
+    "nodemailer": "^6.4.8",
     "validator": "^12.2.0"
   },
   "devDependencies": {
