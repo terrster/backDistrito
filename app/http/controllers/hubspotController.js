@@ -165,6 +165,14 @@ const deal = {
                                     "name": "n3_14_garant_a"
                                 },
                                 {//datos comerciales - domicilio negocio
+                                    "value": request.state,
+                                    "name": "estado_de_la_rep_del_negocio"
+                                },
+                                {
+                                    "value": request.municipality,
+                                    "name": "municipio_negocio"
+                                },
+                                {
                                     "value": request.street,
                                     "name": "n3_calle"
                                 },
@@ -234,6 +242,14 @@ const deal = {
                                     "name": "n6_4_tdc_4_d_gitos"
                                 },
                                 {//información general - domicilio
+                                    "value": request.state,
+                                    "name": "estado_de_la_rep_de_la_persona"
+                                },
+                                {
+                                    "value": request.municipality,
+                                    "name": "municipio_de_la_persona"
+                                },
+                                {
                                     "value": request.street,
                                     "name": "n4_6_calle"
                                 },

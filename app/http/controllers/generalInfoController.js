@@ -19,7 +19,9 @@ const generalInfoController = {
             let user = await User.findById(id);
 
             let {
-                street,//info address  
+                state,//info address  
+                municipality,
+                street,
                 extNumber, 
                 intNumber, 
                 town, 
@@ -46,7 +48,9 @@ const generalInfoController = {
 
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'general', { 
-                    street,//info address  
+                    state,//info address  
+                    municipality,
+                    street, 
                     extNumber, 
                     intNumber, 
                     town, 
@@ -87,6 +91,8 @@ const generalInfoController = {
             }
 
             let addressParams = {
+                state,//info address  
+                municipality,
                 street, 
                 extNumber, 
                 intNumber, 
@@ -203,7 +209,9 @@ const generalInfoController = {
             let user = await User.findById(idUser);
 
             let {
-                street,//info address  
+                state,//info address  
+                municipality,
+                street,
                 extNumber, 
                 intNumber, 
                 town, 
@@ -230,7 +238,9 @@ const generalInfoController = {
             
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'general', { 
-                    street,//info address  
+                    state,//info address  
+                    municipality,
+                    street,
                     extNumber, 
                     intNumber, 
                     town, 
@@ -271,6 +281,8 @@ const generalInfoController = {
             }
 
             let addressParams = {
+                state,
+                municipality,
                 street, 
                 extNumber, 
                 intNumber, 

@@ -4,6 +4,8 @@ var now = new Date();
 var utc = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
 
 const addressSchema = new Schema({
+    state: String,
+    municipality: String,
     street: String,
     extNumber: String,
     intNumber: String,

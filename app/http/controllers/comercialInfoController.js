@@ -16,7 +16,9 @@ const comercialInfoController = {
             let user = await User.findById(id);
 
             let {
-                street,//info address 
+                state,//info address 
+                municipality,
+                street,
                 extNumber, 
                 intNumber, 
                 town, 
@@ -35,7 +37,9 @@ const comercialInfoController = {
 
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'comercial', { 
-                    street,//info address 
+                    state,//info address 
+                    municipality,
+                    street,
                     extNumber, 
                     intNumber, 
                     town, 
@@ -68,6 +72,8 @@ const comercialInfoController = {
              }
 
             let addressParams = {
+                state,
+                municipality,
                 street, 
                 extNumber, 
                 intNumber, 
@@ -152,7 +158,9 @@ const comercialInfoController = {
             let user = await User.findById(idUser);
 
             let {
-                street,//info address 
+                state,//info address
+                municipality,
+                street,
                 extNumber, 
                 intNumber, 
                 town, 
@@ -171,7 +179,9 @@ const comercialInfoController = {
 
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'comercial', { 
-                    street,//info address 
+                    state,//info address
+                    municipality,
+                    street, 
                     extNumber, 
                     intNumber, 
                     town, 
@@ -204,6 +214,8 @@ const comercialInfoController = {
             }
 
             let addressParams = {
+                state,
+                municipality,
                 street, 
                 extNumber, 
                 intNumber, 
