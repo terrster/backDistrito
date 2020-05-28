@@ -164,6 +164,10 @@ const deal = {
                                     "value": format.YES_NO_QUESTION[request.warranty],
                                     "name": "n3_14_garant_a"
                                 },
+                                {
+                                    "value": request.ciec,
+                                    "name": "n4_93_ciec"
+                                },
                                 {//datos comerciales - domicilio negocio
                                     "value": request.state,
                                     "name": "estado_de_la_rep_del_negocio"
@@ -191,7 +195,7 @@ const deal = {
                                 {
                                     "value": request.town,
                                     "name": "n3_9_colonia"
-                                }             
+                                },             
                             ]
                         }
                     case 'general'://información general
@@ -220,10 +224,6 @@ const deal = {
                                 {
                                     "value": request.phone,
                                     "name": "n4_92_tel_fono"
-                                },
-                                {
-                                    "value": request.ciec,
-                                    "name": "n4_93_ciec"
                                 },
                                 {
                                     "value": format.YES_NO_QUESTION[request.mortgageCredit],

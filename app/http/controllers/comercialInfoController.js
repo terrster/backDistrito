@@ -56,7 +56,6 @@ const comercialInfoController = {
                     terminal,
                     ciec,
                     warranty
-                    
                 });
 
                 if(dealUpdated.error){
