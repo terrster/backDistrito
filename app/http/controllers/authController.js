@@ -144,7 +144,7 @@ const authController = {
                 });
             }
         }
-        catch(error){console.log(error)
+        catch(error){
             return response.json({
                 code: 500,
                 msg: "Ha ocurrido un error al crear el hash de recuperación de contraseña"
