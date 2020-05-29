@@ -43,6 +43,13 @@ const documentsController = {
                     });
                 }
             }
+            else{
+                return response.json({
+                    code: 500,
+                    msg : "Algo salió mal tratando de guardar información | Hubspot: documents",
+                    error: dealUpdated.error
+                });
+            }
 
             let documentStored = await Documents.create({
                 idClient: {
@@ -81,7 +88,8 @@ const documentsController = {
         }
     },
     update: async(request, response) => {//pendiente no distigue posición de array para editar
-        let id = request.params.id;//id de user
+        let id = request.params.id;//id de documents
+        let idUser = request.headers.tokenDecoded.data.id;
 
         const {files} = request;
 
@@ -91,16 +99,39 @@ const documentsController = {
                 msg: 'Sin archivos'
             });
         }
-        
-        console.log(files);
-        return response("ok");
 
         try{
             let filesUploaded = await fileManager.UploadFilesToS3(files);
 
-            await Documents.findByIdAndUpdate(id, { $push : filesUploaded });
+            let filesParams = new Object();
+            filesUploaded.map(async(name, key) => {
+                let index = Object.keys(name)[0];
+                filesParams[index] = filesUploaded[key][index];
+            });
 
             let user = await User.findById(idUser);
+
+            if(user){
+                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'documents', filesParams);
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de actualizar información | Hubspot: documents",
+                        error: dealUpdated.error
+                    });
+                }
+            }
+            else{
+                return response.json({
+                    code: 500,
+                    msg: "Algo salió mal tratando de actualizar información | Hubspot: documents"
+                });
+            }
+
+            await Documents.findByIdAndUpdate(id, { $push : filesUploaded });
+
+            user = await User.findById(idUser);
 
             return response.json({
                 code: 200,
