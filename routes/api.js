@@ -24,12 +24,19 @@ const generalInfoController = require("../app/http/controllers/generalInfoContro
 const addressController = require("../app/http/controllers/addressController");
 const referenceController = require("../app/http/controllers/referenceController");
 const documentsController = require("../app/http/controllers/documentsController");
+const applianceController = require("../app/http/controllers/applianceController");
 
 route.use(verifyToken);
 route.use(async(request, response, next) => {
     request.headers.tokenDecoded = await tokenManager.decode(request.headers.token);
     next();
 });
+
+// Appliance routes
+route.group("/appliance", appliance => {
+	appliance.put('/:id', applianceController.update);
+});
+
 
 //Deal routes
 route.group("/deal", (deal) => {

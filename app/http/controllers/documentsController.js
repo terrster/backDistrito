@@ -7,12 +7,59 @@ const Documents = require("../models/Documents");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
 
+const getDocsMethod = (type) => {
+    let docFiles = [];
+    switch (type) {
+      case "PF":
+        docFiles = ["oficialID", "proofAddress", "bankStatements", "others"];
+        break;
+      case "PFAE":
+        docFiles = [
+          "oficialID",
+          "rfc",
+          "proofAddress",
+          "bankStatements",
+          "lastDeclarations",
+          "acomplishOpinion",
+          "others",
+        ];
+        break;
+      case "RIF":
+        docFiles = [
+          "oficialID",
+          "rfc",
+          "proofAddress",
+          "bankStatements",
+          "lastDeclarations",
+          "acomplishOpinion",
+          "others",
+        ];
+        break;
+      case "PM":
+        docFiles = [
+          "constitutiveAct",
+          "rfc",
+          "proofAddress",
+          "financialStatements",
+          "bankStatements",
+          "lastDeclarations",
+          "oficialID",
+          "proofAddressMainFounders",
+          "others",
+        ];
+        break;
+      default:
+        break;
+    }
+    return docFiles;
+  };
+
 const documentsController = {
 
     store: async(request, response) => {//aún no ha sido probado con multiple archivos de un mismo nombre
         let id = request.params.id;//id de user
         
-        const {files} = request;
+        const {files} = request;		
 
         if(!files){
             return response.json({
@@ -23,10 +70,13 @@ const documentsController = {
 
         try{
             let filesUploaded = await fileManager.UploadFilesToS3(files);
-
+			let status = true;
+			const idDocuments = [];
+			
             let filesParams = new Object();
             filesUploaded.map(async(name, key) => {
                 let index = Object.keys(name)[0];
+                idDocuments.push(index);
                 filesParams[index] = filesUploaded[key][index];
             });
 
@@ -58,6 +108,20 @@ const documentsController = {
             });
 
             await Documents.findByIdAndUpdate(documentStored._id, { $push : filesParams });
+            
+			// Verificar si ya se han subido todos los documentos
+			if (user.idClient[0].type !== null){
+				const keyDocs = getDocsMethod(user.idClient[0].type);
+				
+				for (let x = 0; x < keyDocs.length; x++){
+					const key = keyDocs[x];
+					if (!idDocuments.includes(key)){
+						status = false;
+						break;
+					}
+				}
+			}
+            await Documents.findByIdAndUpdate(documentStored._id , { status });
             
             await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
                 idDocuments : {
@@ -101,7 +165,7 @@ const documentsController = {
         }
 
         try{
-            let filesUploaded = await fileManager.UploadFilesToS3(files);
+            let filesUploaded = await fileManager.UploadFilesToS3(files);			
 
             let filesParams = new Object();
             filesUploaded.map(async(name, key) => {
