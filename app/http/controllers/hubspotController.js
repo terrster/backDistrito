@@ -637,7 +637,7 @@ const contact = {
                     },
                     {
                         "value": request.phone,
-                        "property": "mobilephone"
+                        "property": "phone"
                     },
                     {
                         "value": request.name,
