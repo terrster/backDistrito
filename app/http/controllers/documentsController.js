@@ -56,7 +56,7 @@ const getDocsMethod = (type) => {
 
 const documentsController = {
 
-    store: async(request, response) => {//aún no ha sido probado con multiple archivos de un mismo nombre
+    store: async(request, response) => {
         let id = request.params.id;//id de user
         
         const {files} = request;		
@@ -336,9 +336,45 @@ const documentsController = {
                 filesParamsDocs.others[3] = dealUpdated.properties.n9_92_3_escritura.value;
             }
 
-            await Documents.findByIdAndUpdate(id, {$set: filesParamsDocs},{multi: true});
+            let documents = await Documents.findByIdAndUpdate(id, {$set: filesParamsDocs},{multi: true, new: true });
 
             user = await User.findById(idUser);
+
+            var statusValue = false;
+
+            if(user.idClient[0].type == 'PF'){
+
+                if(documents.oficialID.length > 0 && documents.proofAddress.length > 0 && documents.bankStatements.length > 0 && documents.others.length > 0){
+                    statusValue = true;
+                }
+
+            }
+
+            if(user.idClient[0].type == 'PFAE'){
+
+                if(documents.oficialID.length > 0 && documents.rfc.length > 0 && documents.proofAddress.length > 0 && documents.bankStatements.length > 0 && documents.lastDeclarations.length > 0 && documents.acomplishOpinion.length > 0 && documents.others.length > 0){
+                    statusValue = true;
+                }
+
+            }
+
+            if(user.idClient[0].type == 'RIF'){
+
+                if(documents.oficialID.length > 0 && documents.rfc.length > 0 && documents.proofAddress.length > 0 && documents.bankStatements.length > 0 && documents.lastDeclarations.length > 0 && documents.acomplishOpinion.length > 0 && documents.others.length > 0){
+                    statusValue = true;
+                }
+
+            }
+
+            if(user.idClient[0].type == 'PM'){
+
+                if(documents.constitutiveAct.length > 0 && documents.rfc.length > 0 && documents.proofAddress.length > 0 && documents.financialStatements.length > 0 && documents.bankStatements.length > 0 && documents.lastDeclarations.length > 0 && documents.oficialID.length > 0 && documents.proofAddressMainFounders.length > 0 && documents.others.length > 0){
+                    statusValue = true;
+                }
+
+            }
+
+            await Documents.findByIdAndUpdate(id, {status: statusValue});
 
             return response.json({
                 code: 200,
@@ -346,7 +382,7 @@ const documentsController = {
                 user: user
             });
         }
-        catch(error){console.log(error)
+        catch(error){
             return response.json({
                 code: 500,
                 msg: "Algo salió mal tratando de cargar documentos",
