@@ -6,7 +6,7 @@ const userController = {
 
 	lastUser: async(request) => {
 		try{
-			let user = await User.findOne({}, {}, { sort: { 'createdAt' : -1 } });
+            let user = await User.findOne().sort({ _id: -1 });
 			return user;
 		}
 		catch(error){

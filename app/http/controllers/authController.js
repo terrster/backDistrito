@@ -32,7 +32,7 @@ const authController = {
             }
 
             let lastUser = await userController.lastUser();
-            data.idDistrito = parseInt(lastUser.idDistrito) + 1;
+            data.idDistrito = lastUser.idDistrito + 1;
 
             let contactStored = await hubspotController.contact.store(data);
             data.hubspotContactId = contactStored.vid;
