@@ -8,6 +8,7 @@ const userSchema = new Schema({
     idClient: [{ type: Schema.Types.ObjectId, ref: 'Client', autopopulate: true }],
     name: String,
     lastName: String,
+    secondLastname: String,
     access: { type:  String, default: 'USER' },
     email: { type: String, index: true, unique: true, required: true, uniqueCaseInsensitive: true },
     password: String,

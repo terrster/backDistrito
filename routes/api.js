@@ -15,34 +15,22 @@ const verifyToken = require("../app/http/middlewares/verifyToken");
 const tokenManager = require("../app/http/services/tokenManager");
 
 //Controllers
-const hubspotController = require("../app/http/controllers/hubspotController");
 const userController = require("../app/http/controllers/userController");
+const hubspotController = require("../app/http/controllers/hubspotController");
 const clientController = require("../app/http/controllers/clientController");
+const applianceController = require("../app/http/controllers/applianceController");
 const amountController = require("../app/http/controllers/amountController");
 const comercialInfoController = require("../app/http/controllers/comercialInfoController");
 const generalInfoController = require("../app/http/controllers/generalInfoController");
 const addressController = require("../app/http/controllers/addressController");
 const referenceController = require("../app/http/controllers/referenceController");
 const documentsController = require("../app/http/controllers/documentsController");
-const applianceController = require("../app/http/controllers/applianceController");
+const finerioController = require("../app//http/controllers/finerioController");
 
 route.use(verifyToken);
 route.use(async(request, response, next) => {
     request.headers.tokenDecoded = await tokenManager.decode(request.headers.token);
     next();
-});
-
-// Appliance routes
-route.group("/appliance", appliance => {
-	appliance.put('/:id', applianceController.update);
-});
-
-
-//Deal routes
-route.group("/deal", (deal) => {
-    deal.post('', hubspotController.deal.store);
-    deal.get('/:id', hubspotController.deal.show);
-    deal.put('/:id', hubspotController.deal.update);
 });
 
 //User routes
@@ -51,10 +39,22 @@ route.group('/user', (user) => {
     user.put('/:id', userController.update);
 });
 
+//Deal routes
+route.group("/deal", (deal) => {
+    deal.post('', hubspotController.deal.store);
+    deal.get('/:id', hubspotController.deal.show);
+    deal.put('/:id', hubspotController.deal.update);
+});
+
 //Client routes
 route.group('/client', (client) => {
     client.get('/:id', clientController.show);
     client.put('/:id', clientController.update);
+});
+
+// Appliance routes
+route.group("/appliance", appliance => {
+	appliance.put('/:id', applianceController.update);
 });
 
 //Amount routes
@@ -94,6 +94,35 @@ route.group("/reference", (reference) => {
 route.group("/documents", (documents) => {
     documents.post('/:id', documentsController.store);
     documents.put('/:id', documentsController.update);
+});
+
+//Finerio routes - Open banking
+route.group("/finerio", (finerio) => {
+
+    //Banks
+    finerio.get('/banks', finerioController.getBanks);
+    finerio.get('/bank/:id/fields', finerioController.getBank);
+
+    //Customers
+    finerio.post('/customers', finerioController.storeCustomer);
+    finerio.get('/customers', finerioController.getCustomers);
+    finerio.get('/customers/:id', finerioController.getCustomer);
+    finerio.put('/customers/:id', finerioController.updateCustomer);
+    finerio.delete('/customers/:id', finerioController.deleteCustomer);
+
+    //Credentials
+    finerio.post('/credentials', finerioController.storeCredential);
+    finerio.get('/credentials', finerioController.getCredentials);
+    finerio.get('/credentials/:id', finerioController.getCredential);
+    finerio.put('/credentials/:id', finerioController.updateCredential);
+    finerio.delete('/credentials/:id', finerioController.deleteCredential);
+
+    //Accounts
+    finerio.get('/accounts/:id', finerioController.getAccounts);
+    finerio.get('/accounts/:id/details', finerioController.getAccount);
+
+    //Transactions
+    finerio.get('/transactions/:id', finerioController.getTransactions);
 });
     
 module.exports = route;
