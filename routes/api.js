@@ -112,7 +112,7 @@ route.group("/finerio", (finerio) => {
 
     //Credentials
     finerio.post('/credentials', finerioController.storeCredential);
-    finerio.get('/credentials', finerioController.getCredentials);
+    finerio.get('/credentials/customer/:id', finerioController.getCredentials);
     finerio.get('/credentials/:id', finerioController.getCredential);
     finerio.put('/credentials/:id', finerioController.updateCredential);
     finerio.delete('/credentials/:id', finerioController.deleteCredential);
