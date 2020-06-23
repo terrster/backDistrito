@@ -17,7 +17,7 @@ let credentials = {
 const finerioCredentials = {
     getToken: async() => {
         try{
-            const {data} = await axios.post("https://api-v2.finerio.mx/oauth/token",
+            let {data} = await axios.post("https://api-v2.finerio.mx/oauth/token",
                 querystring.stringify(credentials), {
                 headers: {
                     'Content-Type':'application/x-www-form-urlencoded',  
@@ -31,12 +31,10 @@ const finerioCredentials = {
             return data.access_token;
         }
         catch(error){
+            console.log(error.response)
             let response = {
-                msg: "Finerio: Algo salió mal tratando de obtener el token.",
-                error: error
+                msg: "Finerio: Algo salió mal tratando de obtener el token."
             };
-
-            console.log(response);
             return response;
         };
     }

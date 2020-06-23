@@ -61,7 +61,7 @@ const deal = {
                 error: error
             };
 
-            console.log(response);
+            //console.log(response);
             return response;
         }
     },
@@ -71,10 +71,12 @@ const deal = {
             return data;
         }
         catch(error){
-            console.log({
+            let response = {
                 msg: "Hubspot: Algo salió mal tratando de obtener la información de un deal",
                 error: error
-            });
+            };
+
+            return response;
         }
     },
     update: async(hubspotDealId, stage, request) => {
@@ -161,7 +163,7 @@ const deal = {
                                     "name": "n3_13_tpv"
                                 },
                                 {
-                                    "value": format.YES_NO_QUESTION[request.warranty],
+                                    "value": format.WARRANTY[request.warranty],
                                     "name": "n3_14_garant_a"
                                 },
                                 {

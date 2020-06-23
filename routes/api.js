@@ -98,6 +98,7 @@ route.group("/documents", (documents) => {
 
 //Finerio routes - Open banking
 route.group("/finerio", (finerio) => {
+    finerio.get('/test', finerioController.test);
 
     //Banks
     finerio.get('/banks', finerioController.getBanks);

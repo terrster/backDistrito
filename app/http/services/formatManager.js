@@ -46,6 +46,13 @@ const GYRE = {//gyre
     OTROS: "Otro"
 };
 
+const WARRANTY = {
+    1: "Sí",
+    2: "Sí",
+    3: "Sí",
+    4: "No"
+};
+
 const YES_NO_QUESTION = {
     true: "Sí",
     1: "Sí",
@@ -84,6 +91,7 @@ module.exports = {
     TERM,
     OLD,
     GYRE,
+    WARRANTY,
     YES_NO_QUESTION,
     CIVIL_STATUS,
     CAR_CREDIT,
