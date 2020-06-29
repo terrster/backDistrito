@@ -42,6 +42,7 @@ const generalInfoController = {
                 carCredit,
                 creditCard,
                 last4,
+                tyc,
                 birthDate
             } = request.body;
 
@@ -127,6 +128,7 @@ const generalInfoController = {
                 carCredit,
                 creditCard,
                 last4,
+                tyc,
                 birthDate,
                 address: {
                     _id: addressStored._id
@@ -229,6 +231,7 @@ const generalInfoController = {
                 carCredit,
                 creditCard,
                 last4,
+                tyc,
                 birthDate
             } = request.body;
             
@@ -314,6 +317,7 @@ const generalInfoController = {
                 carCredit,
                 creditCard,
                 last4,
+                tyc,
                 birthDate
             };
 

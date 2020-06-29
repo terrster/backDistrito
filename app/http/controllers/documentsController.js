@@ -70,13 +70,10 @@ const documentsController = {
 
         try{
             let filesUploaded = await fileManager.UploadFilesToS3(files);
-			let status = true;
-			const idDocuments = [];
-			
+		
             let filesParams = new Object();
             filesUploaded.map(async(name, key) => {
                 let index = Object.keys(name)[0];
-                idDocuments.push(index);
                 filesParams[index] = filesUploaded[key][index];
             });
 
@@ -107,21 +104,43 @@ const documentsController = {
                 }
             });
 
-            await Documents.findByIdAndUpdate(documentStored._id, { $push : filesParams });
-            
-			// Verificar si ya se han subido todos los documentos
-			if (user.idClient[0].type !== null){
-				const keyDocs = getDocsMethod(user.idClient[0].type);
-				
-				for (let x = 0; x < keyDocs.length; x++){
-					const key = keyDocs[x];
-					if (!idDocuments.includes(key)){
-						status = false;
-						break;
-					}
-				}
-			}
-            await Documents.findByIdAndUpdate(documentStored._id , { status });
+            let documents = await Documents.findByIdAndUpdate(documentStored._id, { $push : filesParams }, {multi: true, new: true });
+
+            var statusValue = false;
+
+            if(user.idClient[0].type == 'PF'){
+
+                if(documents.oficialID.length > 0 && documents.proofAddress.length > 0 && documents.bankStatements.length > 0 && documents.others.length > 0){
+                    statusValue = true;
+                }
+
+            }
+
+            if(user.idClient[0].type == 'PFAE'){
+
+                if(documents.oficialID.length > 0 && documents.rfc.length > 0 && documents.proofAddress.length > 0 && documents.bankStatements.length > 0 && documents.lastDeclarations.length > 0 && documents.acomplishOpinion.length > 0 && documents.others.length > 0){
+                    statusValue = true;
+                }
+
+            }
+
+            if(user.idClient[0].type == 'RIF'){
+
+                if(documents.oficialID.length > 0 && documents.rfc.length > 0 && documents.proofAddress.length > 0 && documents.bankStatements.length > 0 && documents.lastDeclarations.length > 0 && documents.acomplishOpinion.length > 0 && documents.others.length > 0){
+                    statusValue = true;
+                }
+
+            }
+
+            if(user.idClient[0].type == 'PM'){
+
+                if(documents.constitutiveAct.length > 0 && documents.rfc.length > 0 && documents.proofAddress.length > 0 && documents.financialStatements.length > 0 && documents.bankStatements.length > 0 && documents.lastDeclarations.length > 0 && documents.oficialID.length > 0 && documents.proofAddressMainFounders.length > 0 && documents.others.length > 0){
+                    statusValue = true;
+                }
+
+            }
+
+            await Documents.findByIdAndUpdate(documentStored._id, {status: statusValue});
             
             await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
                 idDocuments : {
@@ -151,7 +170,7 @@ const documentsController = {
             });
         }
     },
-    update: async(request, response) => {//pendiente no distigue posición de array para editar
+    update: async(request, response) => {
         let id = request.params.id;//id de documents
         let idUser = request.headers.tokenDecoded.data.id;
 
@@ -198,7 +217,6 @@ const documentsController = {
                 proofAddress: [],
                 bankStatements: [],
                 constitutiveAct: [],
-                otherActs: [],
                 financialStatements: [],
                 rfc: [],
                 lastDeclarations: [],
@@ -276,10 +294,14 @@ const documentsController = {
             if(dealUpdated.properties.n9_9_acta_constitutiva && dealUpdated.properties.n9_9_acta_constitutiva.value != ''){
                 filesParamsDocs.constitutiveAct[0] = dealUpdated.properties.n9_9_acta_constitutiva.value;
             }
-
-            //otherActs
-            if(dealUpdated.properties.n9_8_otros && dealUpdated.properties.n9_8_otros.value != ''){
-                filesParamsDocs.otherActs[0] = dealUpdated.properties.n9_8_otros.value;
+            if(dealUpdated.properties.n9_92_1_escritura && dealUpdated.properties.n9_92_1_escritura.value != ''){
+                filesParamsDocs.constitutiveAct[1] = dealUpdated.properties.n9_92_1_escritura.value;
+            }
+            if(dealUpdated.properties.n9_92_2_escritura && dealUpdated.properties.n9_92_2_escritura.value != ''){
+                filesParamsDocs.constitutiveAct[2] = dealUpdated.properties.n9_92_2_escritura.value;
+            }
+            if(dealUpdated.properties.n9_92_3_escritura && dealUpdated.properties.n9_92_3_escritura.value != ''){
+                filesParamsDocs.constitutiveAct[3] = dealUpdated.properties.n9_92_3_escritura.value;
             }
 
             //financialStatements
@@ -323,17 +345,17 @@ const documentsController = {
             }
 
             //others
-            if(dealUpdated.properties.n9_91_reporte_de_cr_dito && dealUpdated.properties.n9_91_reporte_de_cr_dito.value != ''){
-                filesParamsDocs.others[0] = dealUpdated.properties.n9_91_reporte_de_cr_dito.value;
+            if(dealUpdated.properties.n9_8_otros && dealUpdated.properties.n9_8_otros.value != ''){
+                filesParamsDocs.others[0] = dealUpdated.properties.n9_8_otros.value;
             }
-            if(dealUpdated.properties.n9_92_1_escritura && dealUpdated.properties.n9_92_1_escritura.value != ''){
-                filesParamsDocs.others[1] = dealUpdated.properties.n9_92_1_escritura.value;
+            if(dealUpdated.properties.n9_8_1_otros_2 && dealUpdated.properties.n9_8_1_otros_2.value != ''){
+                filesParamsDocs.others[1] = dealUpdated.properties.n9_8_1_otros_2.value;
             }
-            if(dealUpdated.properties.n9_92_2_escritura && dealUpdated.properties.n9_92_2_escritura.value != ''){
-                filesParamsDocs.others[2] = dealUpdated.properties.n9_92_2_escritura.value;
+            if(dealUpdated.properties.n9_8_1_otros_3 && dealUpdated.properties.n9_8_1_otros_3.value != ''){
+                filesParamsDocs.others[2] = dealUpdated.properties.n9_8_1_otros_3.value;
             }
-            if(dealUpdated.properties.n9_92_3_escritura && dealUpdated.properties.n9_92_3_escritura.value != ''){
-                filesParamsDocs.others[3] = dealUpdated.properties.n9_92_3_escritura.value;
+            if(dealUpdated.properties.n9_8_1_otros_4 && dealUpdated.properties.n9_8_1_otros_4.value != ''){
+                filesParamsDocs.others[3] = dealUpdated.properties.n9_8_1_otros_4.value;
             }
 
             let documents = await Documents.findByIdAndUpdate(id, {$set: filesParamsDocs},{multi: true, new: true });

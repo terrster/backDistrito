@@ -449,17 +449,38 @@ const deal = {
                         }
 
                         if(request.constitutiveAct){
-                            data.push({
-                                "value": request.constitutiveAct,
-                                "name": "n9_9_acta_constitutiva"
-                            });
-                        }
-
-                        if(request.otherActs){
-                            data.push({
-                                "value": request.otherActs,
-                                "name": "n9_8_otros"
-                            });
+                            if(Array.isArray(request.constitutiveAct)){
+                                if(request.constitutiveAct[0]){
+                                    data.push({
+                                        "value": request.constitutiveAct[0],
+                                        "name": "n9_9_acta_constitutiva"
+                                    });
+                                }
+                                if(request.constitutiveAct[1]){
+                                    data.push({
+                                        "value": request.constitutiveAct[1],
+                                        "name": "n9_92_1_escritura"
+                                    });
+                                }
+                                if(request.constitutiveAct[2]){
+                                    data.push({
+                                        "value": request.constitutiveAct[2],
+                                        "name": "n9_92_2_escritura"
+                                    });
+                                }
+                                if(request.constitutiveAct[3]){
+                                    data.push({
+                                        "value": request.constitutiveAct[3],
+                                        "name": "n9_92_3_escritura"
+                                    });
+                                }
+                            }
+                            else{
+                                data.push({
+                                    "value": request.constitutiveAct,
+                                    "name": "n9_9_acta_constitutiva"
+                                });
+                            }
                         }
 
                         if(request.financialStatements){
@@ -552,32 +573,32 @@ const deal = {
                                 if(request.others[0]){
                                     data.push({
                                         "value": request.others[0],
-                                        "name": "n9_91_reporte_de_cr_dito"
+                                        "name": "n9_8_otros"
                                     });
                                 }
                                 if(request.others[1]){
                                     data.push({
                                         "value": request.others[1],
-                                        "name": "n9_92_1_escritura"
+                                        "name": "n9_8_1_otros_2"
                                     });
                                 }
                                 if(request.others[2]){
                                     data.push({
                                         "value": request.others[2],
-                                        "name": "n9_92_2_escritura"
+                                        "name": "n9_8_2_otros_3"
                                     });
                                 }
                                 if(request.others[3]){
                                     data.push({
                                         "value": request.others[3],
-                                        "name": "n9_92_3_escritura"
+                                        "name": "n9_8_3_otros_4"
                                     });
                                 }
                             }
                             else{
                                 data.push({
                                     "value": request.others,
-                                    "name": "n9_91_reporte_de_cr_dito"
+                                    "name": "n9_8_otros"
                                 });
                             }
                         }
@@ -620,7 +641,7 @@ const deal = {
                 error: error
             };
 
-            console.log(response);
+            // console.log(response);
             return response;
         }
     }
@@ -665,7 +686,7 @@ const contact = {
                 error: error
             };
 
-            console.log(response);
+            // console.log(response);
             return response;
         }
     },
@@ -712,7 +733,7 @@ const contact = {
                 error: error
             };
 
-            console.log(response);
+            // console.log(response);
             return response;
         }
     }

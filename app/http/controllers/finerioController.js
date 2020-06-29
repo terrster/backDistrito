@@ -1486,6 +1486,13 @@ const finerioController = {
                 }
             });
 
+            if(data.data == ''){
+                return response.json({
+                    msg: "Finerio: No hay transacciones que mostrar.",
+                    result: data
+                });
+            }
+
             let transactions = data;
             let map = {};
 

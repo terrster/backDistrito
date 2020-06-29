@@ -20,6 +20,7 @@ const generalInfoSchema = new Schema({
     registerDate: { type: Date, default: utc },
     contactWith: [{ type: Schema.Types.ObjectId, ref: 'Reference', autopopulate: true }],
     last4: String,
+    tyc: { type: Boolean, default: false },
     status: { type: Boolean, default: false }
 }, { collection: 'GeneralInfo' });
 
