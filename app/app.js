@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 app.use(fileUpload({
     limits: { fileSize: 100000 * 1024 * 1024 },
     useTempFiles : true,
-    tempFileDir : '../public/tmpFiles/'
+    tempFileDir : './public/tmpFiles/'
 }));
 
 //CORS
