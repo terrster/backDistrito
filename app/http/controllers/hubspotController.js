@@ -299,7 +299,6 @@ const deal = {
                         }
                     case 'documents'://documentos
                         let data = [];
-
                         if(request.oficialID){
                             if(Array.isArray(request.oficialID)){
                                 if(request.oficialID[0]){
@@ -609,26 +608,15 @@ const deal = {
 
                         return params;
 
-                        // if(request.cventerprise){
-
-                        // }
-
-                        // if(request.proofAddressMainFounders){
-
-                        // }    
-                        
-                        // {
-                        //     "value": request,
-                        //     "name": "n9_93_2_1_eeff"
-                        // },
-                        // {
-                        //     "value": request,
-                        //     "name": "n9_93_3_eeff"
-                        // }, 
-                        // {
-                        //     "value": request,
-                        //     "name": "n9_93_3_1_eeff"
-                        // }  
+                    case 'documents-update'://documentos update
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.value,
+                                    "name": request.name
+                                }
+                            ]
+                        }
                 }
             }
            

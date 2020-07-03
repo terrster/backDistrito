@@ -8,38 +8,39 @@ require('dotenv').config({
 const S3 = require('../services/s3/buckets');
 const uploadDir = "../../../public/tmpFiles/";
 
-const moveFile = async(files) => {
-    const UploadFiles = Object.keys(files).map(async(key) => {
-        if(files[key].length){
-            let filesmv = [];
-            for await(let file of files[key]){
-                let file_moved = await new Promise((resolve, reject) => {
-                    let filePath = path.resolve(__dirname, uploadDir + file.name);
-                    const callback = (error, success) => {
-                        if(error){
-                            console.log("Something went wrong trying to upload the files to the server");
-                        }
-                        resolve(filePath);
-                        };
-                        file.mv(filePath, callback);
-                });
-                filesmv.push(file_moved);
-            }
-            return {[key]: filesmv};
-        }
-        else{
-            return new Promise((resolve, reject) => {
-                let filePath = path.resolve(__dirname, uploadDir + files[key].name);
-                const callback = (error, success) => {
-                    if(error){
-                        console.log("Something went wrong trying to upload the files to the server");
-                    }
-                    resolve({[key]: filePath});
-                    };
-                    files[key].mv(filePath, callback);
-            });
-        }
-    });
+const moveFile = async(file) => {
+    // const UploadFiles = Object.keys(files).map(async(key) => {
+    //     if(files[key].length){
+    //         let filesmv = [];
+    //         for await(let file of files[key]){
+    //             let file_moved = await new Promise((resolve, reject) => {
+    //                 let filePath = path.resolve(__dirname, uploadDir + file.name);
+    //                 const callback = (error, success) => {
+    //                     if(error){
+    //                         console.log("Something went wrong trying to upload the files to the server");
+    //                     }
+    //                     resolve(filePath);
+    //                     };
+    //                     file.mv(filePath, callback);
+    //             });
+    //             filesmv.push(file_moved);
+    //         }
+    //         return {[key]: filesmv};
+    //     }
+    //     else{
+    //         return new Promise((resolve, reject) => {
+    //             let filePath = path.resolve(__dirname, uploadDir + files[key].name);
+    //             const callback = (error, success) => {
+    //                 if(error){
+    //                     console.log("Something went wrong trying to upload the files to the server");
+    //                 }
+    //                 resolve({[key]: filePath});
+    //                 };
+    //                 files[key].mv(filePath, callback);
+    //         });
+    //     }
+    // });
+
     // const UploadFiles = Object.keys(files).map(async(key) => {
     //     return new Promise((resolve, reject) => {
     //         let filePath = path.resolve(__dirname, uploadDir + files[key].name);
@@ -53,60 +54,71 @@ const moveFile = async(files) => {
     //     });
     // });
 
-    let uploadedFiles = await Promise.all(UploadFiles);
+    // let uploadedFiles = await Promise.all(UploadFiles);
 
-    return uploadedFiles;
+    // return uploadedFiles;
+
+    return new Promise((resolve, reject) => {
+        let filePath = path.resolve(__dirname, uploadDir + file.name);
+        const callback = (error, success) => {
+            if(error){
+                console.log("Something went wrong trying to upload the files to the server");
+            }
+            resolve(filePath);
+            };
+            file.mv(filePath, callback);
+    });
 };
 
-const getContentType = async(files) => {
-    let types = [];
+const getContentType = async(file) => {
+    // let types = [];
 
     try{
-        const GetContentTypes = Object.keys(files).map(async(key) => {       
-            if(files[key].length){ 
-                let obj = [];    
-                for await(let file of files[key]){
-                    let rc_result = await new Promise((resolve, reject) => {
-                        let rc = 'application/octet-stream';
-                        const fn = file.name.toLowerCase();
-                        if (fn.indexOf('.pdf') >= 0) rc = 'application/pdf';
-                        else if (fn.indexOf('.zip') >= 0) rc = 'application/zip';
-                        else if (fn.indexOf('.png') >= 0) rc = 'image/png';
-                        else if (fn.indexOf('.jpg') >= 0 || fn.indexOf('.jpeg') >= 0) rc = 'image/jpg';
-                        else if (fn.indexOf('.tiff') >= 0 || fn.indexOf('.tif') >= 0) rc = 'image/tiff';
-                        const callback = (error, success) => {
-                            if(error){
-                                console.log("Something went wrong trying to get the content type");
-                            }
-                            resolve(rc);
-                        };
-                        callback();
-                    });
-                    obj.push(rc_result); 
-                }
-                return {[key]: obj}
-            }
-            else{
-                let rc_result = await new Promise((resolve, reject) => {
-                    let rc = 'application/octet-stream';
-                    const fn = files[key].name.toLowerCase();
-                    if (fn.indexOf('.pdf') >= 0) rc = 'application/pdf';
-                    else if (fn.indexOf('.zip') >= 0) rc = 'application/zip';
-                    else if (fn.indexOf('.png') >= 0) rc = 'image/png';
-                    else if (fn.indexOf('.jpg') >= 0 || fn.indexOf('.jpeg') >= 0) rc = 'image/jpg';
-                    else if (fn.indexOf('.tiff') >= 0 || fn.indexOf('.tif') >= 0) rc = 'image/tiff';
-                    const callback = (error, success) => {
-                        if(error){
-                            console.log("Something went wrong trying to get the content type");
-                        }
-                        resolve(rc);
-                    };
-                    callback();
-                });
+    //     const GetContentTypes = Object.keys(files).map(async(key) => {       
+    //         if(files[key].length){ 
+    //             let obj = [];    
+    //             for await(let file of files[key]){
+    //                 let rc_result = await new Promise((resolve, reject) => {
+    //                     let rc = 'application/octet-stream';
+    //                     const fn = file.name.toLowerCase();
+    //                     if (fn.indexOf('.pdf') >= 0) rc = 'application/pdf';
+    //                     else if (fn.indexOf('.zip') >= 0) rc = 'application/zip';
+    //                     else if (fn.indexOf('.png') >= 0) rc = 'image/png';
+    //                     else if (fn.indexOf('.jpg') >= 0 || fn.indexOf('.jpeg') >= 0) rc = 'image/jpg';
+    //                     else if (fn.indexOf('.tiff') >= 0 || fn.indexOf('.tif') >= 0) rc = 'image/tiff';
+    //                     const callback = (error, success) => {
+    //                         if(error){
+    //                             console.log("Something went wrong trying to get the content type");
+    //                         }
+    //                         resolve(rc);
+    //                     };
+    //                     callback();
+    //                 });
+    //                 obj.push(rc_result); 
+    //             }
+    //             return {[key]: obj}
+    //         }
+    //         else{
+    //             let rc_result = await new Promise((resolve, reject) => {
+    //                 let rc = 'application/octet-stream';
+    //                 const fn = files[key].name.toLowerCase();
+    //                 if (fn.indexOf('.pdf') >= 0) rc = 'application/pdf';
+    //                 else if (fn.indexOf('.zip') >= 0) rc = 'application/zip';
+    //                 else if (fn.indexOf('.png') >= 0) rc = 'image/png';
+    //                 else if (fn.indexOf('.jpg') >= 0 || fn.indexOf('.jpeg') >= 0) rc = 'image/jpg';
+    //                 else if (fn.indexOf('.tiff') >= 0 || fn.indexOf('.tif') >= 0) rc = 'image/tiff';
+    //                 const callback = (error, success) => {
+    //                     if(error){
+    //                         console.log("Something went wrong trying to get the content type");
+    //                     }
+    //                     resolve(rc);
+    //                 };
+    //                 callback();
+    //             });
 
-                return {[key]: rc_result};
-            }
-        });
+    //             return {[key]: rc_result};
+    //         }
+    //     });
         // Object.keys(files).forEach(key => {
         //     let rc = 'application/octet-stream';
         //     const fn = files[key].name.toLowerCase();
@@ -119,9 +131,19 @@ const getContentType = async(files) => {
         //     types.push(rc);
         // });
 
-        let ContentTypes = await Promise.all(GetContentTypes);
+        // let ContentTypes = await Promise.all(GetContentTypes);
 
-        return ContentTypes;
+        // return ContentTypes;
+
+        let rc = 'application/octet-stream';
+        const fn = file.name.toLowerCase();
+        if (fn.indexOf('.pdf') >= 0) rc = 'application/pdf';
+        else if (fn.indexOf('.zip') >= 0) rc = 'application/zip';
+        else if (fn.indexOf('.png') >= 0) rc = 'image/png';
+        else if (fn.indexOf('.jpg') >= 0 || fn.indexOf('.jpeg') >= 0) rc = 'image/jpg';
+        else if (fn.indexOf('.tiff') >= 0 || fn.indexOf('.tif') >= 0) rc = 'image/tiff';
+
+        return rc;
 
     }
     catch(error){
@@ -129,25 +151,25 @@ const getContentType = async(files) => {
     }
 };
 
-const getBase64 = async(filesPath) => {
-    let bases = [];
+const getBase64 = async(filePath) => {
+    // let bases = [];
 
-    for (var i = 0; i < filesPath.length; i++) {
-        for (var key in filesPath[i]){
-            if(Array.isArray(filesPath[i][key])){
-                let obj = [];    
-                for await(let file of filesPath[i][key]){
-                    const bitmap = fs.readFileSync(file);
-                    obj.push(Buffer.from(bitmap, 'base64'));
-                }
-                bases.push({[key]: obj});
-            }
-            else{
-                const bitmap = fs.readFileSync(filesPath[i][key]);
-                bases.push({[key]: Buffer.from(bitmap, 'base64')});
-            }
-        }
-    }
+    // for (var i = 0; i < filesPath.length; i++) {
+    //     for (var key in filesPath[i]){
+    //         if(Array.isArray(filesPath[i][key])){
+    //             let obj = [];    
+    //             for await(let file of filesPath[i][key]){
+    //                 const bitmap = fs.readFileSync(file);
+    //                 obj.push(Buffer.from(bitmap, 'base64'));
+    //             }
+    //             bases.push({[key]: obj});
+    //         }
+    //         else{
+    //             const bitmap = fs.readFileSync(filesPath[i][key]);
+    //             bases.push({[key]: Buffer.from(bitmap, 'base64')});
+    //         }
+    //     }
+    // }
 
     // Object.keys(filesPath[0]).map(async(key, name) => {
     //     console.log(filesPath[key])
@@ -191,25 +213,28 @@ const getBase64 = async(filesPath) => {
     //         console.log("Something went wrong trying to get the base 64");
     //     }
     // });
+    //
+    //return bases;
 
-    return bases;
+    const bitmap = fs.readFileSync(filePath);
+    return Buffer.from(bitmap, 'base64');
 };
 
-const setNewName = async(files) => {//console.log(files)
-    let names = [];
+const setNewName = async(file) => {
+    //let names = [];
 
     try{
-        Object.keys(files).forEach(key => {
-            if(files[key].length){
-                let obj = []; 
-                for (let i = 0; i<files[key].length; i++){
-                    obj.push(`${new Date().getTime()}-${files[key][i].name}`);
-                }
-                names.push({[key]: obj});
-            }
-            else{
-                names.push({[key]: `${new Date().getTime()}-${files[key].name}`});
-            }
+        // Object.keys(files).forEach(key => {
+        //     if(files[key].length){
+        //         let obj = []; 
+        //         for (let i = 0; i<files[key].length; i++){
+        //             obj.push(`${new Date().getTime()}-${files[key][i].name}`);
+        //         }
+        //         names.push({[key]: obj});
+        //     }
+        //     else{
+        //         names.push({[key]: `${new Date().getTime()}-${files[key].name}`});
+        //     }
             // if(Array.isArray(files[key])){
             //     let obj = []; 
             //     for (let i = 0; i<files[key].length; i++){
@@ -220,10 +245,10 @@ const setNewName = async(files) => {//console.log(files)
             // else{
             //     names.push([key, `${new Date().getTime()}-${files[key].name}`]);
             // }
-        });
-
-        return names;
-
+        //});
+        //
+        //return names;
+        return `${new Date().getTime()}-${file.name}`;
     }
     catch(error){
         console.log("Something went wrong trying to set the new files names");
@@ -243,7 +268,7 @@ const setNewName = async(files) => {//console.log(files)
 
 };
 
-const uploadFile = async(filesName, filesBase64, contentsType) => {
+const uploadFile = async(fileName, fileBase64, contentType) => {
 
     try{
         // const UploadFiles = async() => {
@@ -278,54 +303,65 @@ const uploadFile = async(filesName, filesBase64, contentsType) => {
         //     }
         // }
 
-        const UploadFiles = filesName.map(async(name, key) => {
-            let index = Object.keys(name)[0];
-            //return await uploadFileS3(name, filesBase64[key], contentsType[key]);
-            //console.log(filesName[key][index]);
-            if(Array.isArray(filesName[key][index])){
-                let obj = [];
-                let p = 0;
-                for await(let file of filesName[key][index]){
-                    //console.log(file);
-                    // console.log(filesBase64[key][index][p]);
-                    // console.log(contentsType[key][index][p]);                    
-                    let url = await new Promise(async(resolve, reject) => {
-                        let result = await uploadFileS3(file, filesBase64[key][index][p], contentsType[key][index][p]);
-                        const callback = (error, success) => {
-                            if(error){
-                                console.log("Something went wrong trying to upload the files to S3");
-                            }
-                            resolve(result);
-                        };
-                        callback();
-                    });
-                    obj.push(url); 
-                    p++;
-                }
-                return {[index]: obj};
-            }
-            else{
-                // console.log(filesName[key][index]);
-                // console.log(filesBase64[key][index]);
-                // console.log(contentsType[key][index]);
-                return new Promise(async(resolve, reject) => {
-                    let result = await uploadFileS3(filesName[key][index], filesBase64[key][index], contentsType[key][index]);
-                    const callback = (error, success) => {
-                        if(error){
-                            console.log("Something went wrong trying to upload the files to S3");
-                        }
-                        resolve({[index]: result});
-                    };
-                    callback();
-                });
-            }
-        });
+        // const UploadFiles = filesName.map(async(name, key) => {
+        //     let index = Object.keys(name)[0];
+        //     //return await uploadFileS3(name, filesBase64[key], contentsType[key]);
+        //     //console.log(filesName[key][index]);
+        //     if(Array.isArray(filesName[key][index])){
+        //         let obj = [];
+        //         let p = 0;
+        //         for await(let file of filesName[key][index]){
+        //             //console.log(file);
+        //             // console.log(filesBase64[key][index][p]);
+        //             // console.log(contentsType[key][index][p]);                    
+        //             let url = await new Promise(async(resolve, reject) => {
+        //                 let result = await uploadFileS3(file, filesBase64[key][index][p], contentsType[key][index][p]);
+        //                 const callback = (error, success) => {
+        //                     if(error){
+        //                         console.log("Something went wrong trying to upload the files to S3");
+        //                     }
+        //                     resolve(result);
+        //                 };
+        //                 callback();
+        //             });
+        //             obj.push(url); 
+        //             p++;
+        //         }
+        //         return {[index]: obj};
+        //     }
+        //     else{
+        //         // console.log(filesName[key][index]);
+        //         // console.log(filesBase64[key][index]);
+        //         // console.log(contentsType[key][index]);
+        //         return new Promise(async(resolve, reject) => {
+        //             let result = await uploadFileS3(filesName[key][index], filesBase64[key][index], contentsType[key][index]);
+        //             const callback = (error, success) => {
+        //                 if(error){
+        //                     console.log("Something went wrong trying to upload the files to S3");
+        //                 }
+        //                 resolve({[index]: result});
+        //             };
+        //             callback();
+        //         });
+        //     }
+        // });
 
-        let FilesUploaded = {};
-        FilesUploaded = await Promise.all(UploadFiles);
-        console.log(FilesUploaded.oficialID)
-        deleteFromServer();
-        return FilesUploaded;
+        // let FilesUploaded = {};
+        // FilesUploaded = await Promise.all(UploadFiles);
+        // //console.log(FilesUploaded.oficialID)
+        // deleteFromServer();
+        // return FilesUploaded;
+
+        return new Promise(async(resolve, reject) => {
+            let result = await uploadFileS3(fileName, fileBase64, contentType);
+            const callback = (error, success) => {
+                if(error){
+                    console.log("Something went wrong trying to upload the files to S3");
+                }
+                resolve(result);
+            };
+            callback();
+        });
     }
     catch(error){
         console.log(error);
@@ -384,19 +420,19 @@ const deleteFromServer = async() => {
     }
 }
 
-const UploadFilesToS3 = async(files) => {
+const UploadFilesToS3 = async(file) => {
 
     return new Promise(async(resolve, reject) => {
 
         try{
 
-            const filesPath = await moveFile(files);//console.log(filesPath);
-            const contentsType = await getContentType(files);//console.log(contentsType);
-            const filesBase64 = await getBase64(filesPath);//console.log(filesBase64);
-            const filesName = await setNewName(files);//console.log(filesName);
-            const urls = await uploadFile(filesName, filesBase64, contentsType);//console.log(urls);
-
-            resolve(urls);
+            const filePath = await moveFile(file);//console.log(filesPath);
+            const contentType = await getContentType(file);//console.log(contentType);
+            const fileBase64 = await getBase64(filePath);//console.log(fileBase64);
+            const fileName = await setNewName(file);//console.log(fileName);
+            const url = await uploadFile(fileName, fileBase64, contentType);//console.log(url);
+            
+            resolve(url);
 
         }
         catch(error){
@@ -408,5 +444,6 @@ const UploadFilesToS3 = async(files) => {
 }
 
 module.exports = {
-    UploadFilesToS3
+    UploadFilesToS3,
+    deleteFromServer
 };
