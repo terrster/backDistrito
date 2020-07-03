@@ -152,6 +152,8 @@ const documentsController = {
             });
 
             await Promise.all(UploadFiles);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            fileManager.deleteFromServer();
 
             let user = await User.findById(id);
 
@@ -180,7 +182,7 @@ const documentsController = {
                 }
             });
 
-            let documents = await Documents.findByIdAndUpdate(documentStored._id, { $push : filesParams }, {multi: true, new: true });
+            let documents = await Documents.findByIdAndUpdate(documentStored._id, { $push : filesUploaded }, {multi: true, new: true });
 
             var statusValue = false;
 
@@ -250,7 +252,7 @@ const documentsController = {
         let id = request.params.id;//id de documents
         let idUser = request.headers.tokenDecoded.data.id;
 
-        const {files} = request;console.log(files);console.log("======");
+        const {files} = request;//console.log(files);console.log("======");
         
         if(!files){        
             return response.json({

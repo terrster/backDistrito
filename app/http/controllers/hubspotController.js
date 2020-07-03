@@ -426,13 +426,13 @@ const deal = {
                                         "name": "n9_3_9_estados_de_cuenta"
                                     });
                                 }
-                                if(equest.bankStatements[10]){
+                                if(request.bankStatements[10]){
                                     data.push({    
                                         "value": request.bankStatements[10],
                                         "name": "n9_3_10_estados_de_cuenta"
                                     });
                                 }
-                                if(equest.bankStatements[11]){
+                                if(request.bankStatements[11]){
                                     data.push({    
                                         "value": request.bankStatements[11],
                                         "name": "n9_3_11_estados_de_cuenta"
@@ -619,7 +619,6 @@ const deal = {
                         }
                 }
             }
-           
             const {data} = await axios.put('deals/v1/deal/' + hubspotDealId + hapiKey, dealParams);
             return data;
         }
