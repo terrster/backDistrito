@@ -341,7 +341,7 @@ const documentsController = {
 
             await Promise.all(UploadFiles);
 
-            fileManager.deleteFromServer();
+            //fileManager.deleteFromServer();
 
             console.log(filesUploaded);
             console.log("============");
