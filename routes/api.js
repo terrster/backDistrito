@@ -94,6 +94,7 @@ route.group("/reference", (reference) => {
 route.group("/documents", (documents) => {
     documents.post('/:id', documentsController.store);
     documents.put('/:id', documentsController.update);
+    documents.delete('/:id', documentsController.delete);
 });
 
 //Finerio routes - Open banking

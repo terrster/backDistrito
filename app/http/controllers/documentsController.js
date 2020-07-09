@@ -294,7 +294,7 @@ const documentsController = {
         let id = request.params.id;//id de documents
         let idUser = request.headers.tokenDecoded.data.id;
 
-        const {files} = request;console.log(files);console.log("======");
+        const {files} = request;//console.log(files);console.log("======");
         
         if(!files){        
             return response.json({
@@ -308,12 +308,21 @@ const documentsController = {
             var docs = await Documents.findById(id);
 
             var filesUploaded = {};
-            var filesReplace = [];
+            var filesReplace = {};
 
             const UploadFiles = Object.keys(files).map(async(key) => {
                 if(files[key].length){
                     if(key.length > 25){
-                        filesReplace.push(key);
+                        if(docs.oficialID.indexOf(key) >= 0){
+                            if(!filesReplace["oficialID"]){
+                                filesReplace["oficialID"] = [key];
+                            }
+                            else{
+                                let index = Object.keys(filesReplace["oficialID"])[Object.keys(filesReplace["oficialID"]).length - 1];
+                                filesReplace["oficialID"][parseInt(index) + 1] = key;
+                            }
+                        }
+                        //filesReplace.push(key);
                     }
                     else{
                         for await(let file of files[key]){
@@ -330,7 +339,16 @@ const documentsController = {
                 }
                 else{//console.log("map1")
                     if(key.length > 25){//console.log("map1-reemplazo")
-                        filesReplace.push(key);
+                        //filesReplace.push(key);
+                        if(docs.oficialID.indexOf(key) >= 0){
+                            if(!filesReplace["oficialID"]){
+                                filesReplace["oficialID"] = [key];
+                            }
+                            else{
+                                let index = Object.keys(filesReplace["oficialID"])[Object.keys(filesReplace["oficialID"]).length - 1];
+                                filesReplace["oficialID"][parseInt(index) + 1] = key;
+                            }
+                        }
                     }
                     else{//console.log("map1-nuevo")
                         let fileUrl = await fileManager.UploadFilesToS3(files[key]);
@@ -347,275 +365,46 @@ const documentsController = {
             console.log("============");
             console.log(filesReplace);
 
-            const ReplaceFiles = filesReplace.map(async(file) => {console.log(file)
-                const SearchFileToReplace = async(file) => {
+            // return response.json({
+            //     code: 200,
+            //     msg: 'Sin archivos'
+            // });
+            
+            const ReplaceFiles = Object.keys(filesReplace).map(async(key) => {
+                if(Array.isArray(filesReplace[key])){console.log("mapR-multiple")
+                    for await(let url of filesReplace[key]){
+                        let property = await getNameProperty(key);
+                        let index = docs[key].indexOf(url);
+                        console.log(url);
+                        console.log(property);
+                        console.log(index);
+                        // if(filesUploaded[key] != null){
+                        //     if(Array.isArray(filesUploaded[key])){
 
-                    if(docs.oficialID.indexOf(file) >= 0){
-                        let property = await getNameProperty("oficialID");
-                        let index = docs.oficialID.indexOf(file);
+                        //     }
+                        //     else{
 
-                        if(Array.isArray(filesUploaded.oficialID)){console.log("mapR-multiple")
-                            if(filesUploaded.oficialID[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.oficialID[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`oficialID.${index}`]: filesUploaded.oficialID[index] } }, { new: true });
-                                filesUploaded.oficialID.splice(index, 1);
-                            }
+                        //     }
+                        // }
+                        
+                        let params = {
+                            name: property[index],
+                            value: filesUploaded.oficialID[index]
                         }
-                        else{console.log("mapR-unico");
-                            if(filesUploaded.oficialID){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.oficialID
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`oficialID.${index}`]: filesUploaded.oficialID } }, { new: true });
-                                delete filesUploaded.oficialID;
-                            }
-                        }
+                        console.log(params)
                     }
-
-                    if(docs.proofAddress.indexOf(file) >= 0){
-                        let property = await getNameProperty("proofAddress");
-                        let index = docs.proofAddress.indexOf(file);
-                        if(Array.isArray(filesUploaded.proofAddress)){console.log("mapR-multiple")
-                            if(filesUploaded.proofAddress[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.proofAddress[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`proofAddress.${index}`]: filesUploaded.proofAddress[index] } }, { new: true });
-                                filesUploaded.proofAddress.splice(index, 1);
-                            }
-                        }
-                        else{console.log("mapR-unico");
-                            if(filesUploaded.proofAddress){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.proofAddress
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`proofAddress.${index}`]: filesUploaded.proofAddress } }, { new: true });
-                                delete filesUploaded.proofAddress;
-                            }
-                        }
-                    }
-
-                    if(docs.bankStatements.indexOf(file) >= 0){
-                        let property = await getNameProperty("bankStatements");
-                        let index = docs.bankStatements.indexOf(file);
-                        if(Array.isArray(filesUploaded.bankStatements)){console.log("mapR-multiple")
-                            if(filesUploaded.bankStatements[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.bankStatements[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`bankStatements.${index}`]: filesUploaded.bankStatements[index] } }, { new: true });
-                                filesUploaded.bankStatements.splice(index, 1);
-                            }
-                        }
-                        else{console.log("mapR-unico");
-                            if(filesUploaded.bankStatements){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.bankStatements
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`bankStatements.${index}`]: filesUploaded.bankStatements } }, { new: true });
-                                delete filesUploaded.bankStatements;
-                            }
-                        }
-                    }
-
-                    if(docs.rfc.indexOf(file) >= 0){
-                        let property = await getNameProperty("rfc");
-                        let index = docs.rfc.indexOf(file);
-                        if(Array.isArray(filesUploaded.rfc)){console.log("mapR-multiple")
-                            if(filesUploaded.rfc[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.rfc[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`rfc.${index}`]: filesUploaded.rfc[index] } }, { new: true });
-                                filesUploaded.rfc.splice(index, 1);
-                            }
-                        }
-                        else{console.log("mapR-unico")
-                            if(filesUploaded.rfc){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.rfc
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`rfc.${index}`]: filesUploaded.rfc } }, { new: true });
-                                delete filesUploaded.rfc;
-                            }
-                        }
-                    }
-
-                    if(docs.lastDeclarations.indexOf(file) >= 0){
-                        let property = await getNameProperty("lastDeclarations");
-                        let index = docs.lastDeclarations.indexOf(file);
-                        if(Array.isArray(filesUploaded.lastDeclarations)){console.log("mapR-multiple")
-                            if(filesUploaded.lastDeclarations[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.lastDeclarations[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`lastDeclarations.${index}`]: filesUploaded.lastDeclarations[index] } }, { new: true });
-                                filesUploaded.lastDeclarations.splice(index, 1);
-                            }
-                        }
-                        else{console.log("mapR-unico")
-                            if(filesUploaded.lastDeclarations){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.lastDeclarations
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`lastDeclarations.${index}`]: filesUploaded.lastDeclarations } }, { new: true });
-                                delete filesUploaded.lastDeclarations;
-                            }
-                        }
-                    }
-
-                    if(docs.acomplishOpinion.indexOf(file) >= 0){
-                        let property = await getNameProperty("acomplishOpinion");
-                        let index = docs.acomplishOpinion.indexOf(file);
-                        if(Array.isArray(filesUploaded.acomplishOpinion)){console.log("mapR-multiple")
-                            if(filesUploaded.acomplishOpinion[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.acomplishOpinion[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`acomplishOpinion.${index}`]: filesUploaded.acomplishOpinion[index] } }, { new: true });
-                                filesUploaded.acomplishOpinion.splice(index, 1);
-                            }
-                        }
-                        else{console.log("mapR-unico")
-                            if(filesUploaded.acomplishOpinion){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.acomplishOpinion
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`acomplishOpinion.${index}`]: filesUploaded.acomplishOpinion } }, { new: true });
-                                delete filesUploaded.acomplishOpinion;
-                            }
-                        }
-                    }
-
-                    if(docs.constitutiveAct.indexOf(file) >= 0){
-                        let property = await getNameProperty("constitutiveAct");
-                        let index = docs.constitutiveAct.indexOf(file);
-                        if(Array.isArray(filesUploaded.constitutiveAct)){console.log("mapR-multiple")
-                            if(filesUploaded.constitutiveAct[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.constitutiveAct[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`constitutiveAct.${index}`]: filesUploaded.constitutiveAct[index] } }, { new: true });
-                                filesUploaded.constitutiveAct.splice(index, 1);
-                            }
-                        }
-                        else{console.log("mapR-unico")
-                            if(filesUploaded.constitutiveAct){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.constitutiveAct
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`constitutiveAct.${index}`]: filesUploaded.constitutiveAct } }, { new: true });
-                                delete filesUploaded.constitutiveAct;
-                            }
-                        }
-                    }
-
-                    if(docs.financialStatements.indexOf(file) >= 0){
-                        let property = await getNameProperty("financialStatements");
-                        let index = docs.financialStatements.indexOf(file);
-                        if(Array.isArray(filesUploaded.financialStatements)){console.log("mapR-multiple")
-                            if(filesUploaded.financialStatements[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.financialStatements[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`financialStatements.${index}`]: filesUploaded.financialStatements[index] } }, { new: true });
-                                filesUploaded.financialStatements.splice(index, 1);
-                            }
-                        }
-                        else{console.log("mapR-unico")
-                            if(filesUploaded.financialStatements){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.financialStatements
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`financialStatements.${index}`]: filesUploaded.financialStatements } }, { new: true });
-                                delete filesUploaded.financialStatements;
-                            }
-                        }
-                    }
-
-                    if(docs.others.indexOf(file) >= 0){
-                        let property = await getNameProperty("others");
-                        let index = docs.others.indexOf(file);
-                        if(Array.isArray(filesUploaded.others)){console.log("mapR-multiple")
-                            if(filesUploaded.others[index]){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.others[index]
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`others.${index}`]: filesUploaded.others[index] } }, { new: true });
-                                filesUploaded.others.splice(index, 1);
-                            }
-                        }
-                        else{console.log("mapR-unico")
-                            if(filesUploaded.others){
-                                let params = {
-                                    name: property[index],
-                                    value: filesUploaded.others
-                                }
-                                console.log(params)
-                                await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                                docs = await Documents.findByIdAndUpdate(id, {$set: {[`others.${index}`]: filesUploaded.others } }, { new: true });
-                                delete filesUploaded.others;
-                            }
-                        }
-                    }
-                };
-                await SearchFileToReplace(file);
+                }
+                else{console.log("mapR-unico")
+                    console.log(filesReplace[key]);
+                }
             });
 
             await Promise.all(ReplaceFiles);
+
+            return response.json({
+                code: 200,
+                msg: 'Sin archivos'
+            });
 
             const UpdateFiles = Object.keys(filesUploaded).map(async(key) => {console.log(key);
                 var index = docs[key].length;console.log(index);
@@ -624,7 +413,7 @@ const documentsController = {
                 if(Array.isArray(filesUploaded[key])){console.log("map2-nuevo-multiple");
                     var i = index;
                     Object.keys(filesUploaded[key]).forEach(async(item) => {
-                        if(property[i] != null){
+                        if(property[i] != null && filesUploaded[key][item] != undefined){
                             let params = {
                                 name: property[i],
                                 value: filesUploaded[key][item]
@@ -639,7 +428,7 @@ const documentsController = {
                     });
                 }
                 else{console.log("map2-nuevo-unico");
-                    if(property[index] != null){
+                    if(property[index] != null && filesUploaded[key] != undefined){
                         let params = {
                             name: property[index],
                             value: filesUploaded[key]
@@ -709,6 +498,41 @@ const documentsController = {
                 error: error
             });
         }
+    },
+    delete: async(request, response) => {
+        let id = request.params.id;//id de documents
+        let idUser = request.headers.tokenDecoded.data.id;
+        
+        let data = request.body;
+
+        if(data.name == '' && data.url == ''){
+            return response.json({
+                code: 200,
+                msg: 'Sin datos para eliminar'
+            });
+        }
+
+        let user = await User.findById(idUser);
+        let docs = await Documents.findById(id);
+
+        let property = await getNameProperty(data.name);
+        let index = docs[data.name].indexOf(data.url);
+
+        let params = {
+            name: property[index],
+            value: ""
+        };
+
+        await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
+        await Documents.findByIdAndUpdate(id, {$pull: {[data.name]: docs[data.name][index] } });
+
+        user = await User.findById(idUser);
+
+        return response.json({
+            code: 200,
+            msg: 'Documento eliminado exitosamente',
+            user: user
+        });
     }
     
 }
