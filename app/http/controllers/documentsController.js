@@ -396,8 +396,9 @@ const documentsController = {
                         for(let f = 0; f<property.length; f++){
                             if(hubspot.properties[property[f]].value == ''){
                                 propNull = hubspot.properties[property[f]].versions[0].name;
-                                console.log(propNull)
+                                console.log(propNull);
                                 propPos = f;
+                                console.log(propPos);
                                 break;
                             }
                         }
@@ -412,8 +413,9 @@ const documentsController = {
                             console.log(params);
                             hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
                             hubspot.properties[params.name].value = params.value;
-                            docs[key].splice(propPos, 0, filesUploaded[key][item]);
-                            docs = await Documents.findByIdAndUpdate(id, {[key]: docs[key]}, { new: true });
+                            await docs[key].splice(propPos, 0, filesUploaded[key][item]);
+                            //console.log(docs[key]);
+                            docs = await Documents.findByIdAndUpdate(id, {[key]: docs[key]}, {multi: true, new: true });
                         }
                         // else{console.log("push");console.log(property[i]);
                         //     if(property[propPos] != null){
