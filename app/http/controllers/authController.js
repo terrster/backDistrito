@@ -91,7 +91,6 @@ const authController = {
             let payload = {
                 id : user._id
             };
-            // let token = jwt.sign(payload, privateKey, options);
             let token = jwt.sign(payload, privateKey, { algorithm: "RS256" });//Generate a token without expiration
             return response.json({
                 code: 200,

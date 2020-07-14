@@ -66,13 +66,11 @@ const deal = {
         }
     },
     show: async(hubspotDealId) => {
-        //let hubspotDealId = request.params.id;
-        //console.log(hubspotDealId)
         try{
             const {data} = await axios.get('deals/v1/deal/' + hubspotDealId + hapiKey);
             return data;
         }
-        catch(error){//console.log(error)
+        catch(error){
             let response = {
                 msg: "Hubspot: Algo salió mal tratando de obtener la información de un deal",
                 error: error
@@ -722,7 +720,6 @@ const contact = {
                 error: error
             };
 
-            // console.log(response);
             return response;
         }
     }
