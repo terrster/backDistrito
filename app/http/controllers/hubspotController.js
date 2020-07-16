@@ -224,6 +224,10 @@ const deal = {
                                     "name": "n4_5_fecha_de_nacimiento"
                                 },
                                 {
+                                    "value": request.rfcPerson,
+                                    "name": "n3_15_rfc_pm"
+                                },
+                                {
                                     "value": request.phone,
                                     "name": "n4_92_tel_fono"
                                 },
