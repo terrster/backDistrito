@@ -142,20 +142,20 @@ const generalInfoController = {
                     }
                 ],
                 idClient: {
-                    _id: user.idClient[0]._id
+                    _id: user.idClient._id
                 },
                 status: true
             };
 
             let generalInfoStored = await GeneralInfo.create(generalInfoParams);
 
-            await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
+            await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
                 idGeneralInfo : {
                     _id : generalInfoStored._id
                 }
             });
 
-            await Client.findByIdAndUpdate(user.idClient[0]._id, {
+            await Client.findByIdAndUpdate(user.idClient._id, {
                 idGeneralInfo: {
                     _id: generalInfoStored._id
                 }
@@ -288,7 +288,7 @@ const generalInfoController = {
                 zipCode
             };
 
-            await Address.findByIdAndUpdate(general.address[0]._id, addressParams);
+            await Address.findByIdAndUpdate(general.address._id, addressParams);
 
             let reference1 = {
                 name: name1,

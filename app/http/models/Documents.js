@@ -1,7 +1,7 @@
 const { Schema, model }= require('mongoose');
 
 const documentsSchema = new Schema({
-    idClient: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
+    idClient: { type: Schema.Types.ObjectId, ref: 'Client' },
     oficialID: Array,
     proofAddress: Array,
     bankStatements: Array,

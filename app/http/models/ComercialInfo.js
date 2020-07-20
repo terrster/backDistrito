@@ -10,7 +10,7 @@ const comercialInfoSchema = new Schema({
   rfc: String,
   specific:String,
   phone: String ,
-  address: [{ type: Schema.Types.ObjectId, ref: 'Address', autopopulate: true }],
+  address: { type: Schema.Types.ObjectId, ref: 'Address', autopopulate: true },
   registerDate: { type: Date, default: utc },
   webSite: String,
   facebook: String,

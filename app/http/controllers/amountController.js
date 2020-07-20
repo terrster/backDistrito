@@ -56,7 +56,7 @@ const amountController = {
                 yearSales,
                 old,
                 idClient: {
-                    _id: user.idClient[0]._id
+                    _id: user.idClient._id
                 },
                 status : true
             };
@@ -65,14 +65,14 @@ const amountController = {
 
             let applianceStored = await Appliance.create({
                 idClient: {
-                    _id: user.idClient[0]._id
+                    _id: user.idClient._id
                 },
                 idAmount : {
                     _id : amountStored._id
                 }
             });
 
-            await Client.findByIdAndUpdate(user.idClient[0]._id, {
+            await Client.findByIdAndUpdate(user.idClient._id, {
                 appliance: {
                     _id: applianceStored._id
                 }

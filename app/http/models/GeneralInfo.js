@@ -4,7 +4,7 @@ var now = new Date();
 var utc = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
 
 const generalInfoSchema = new Schema({
-    idClient: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
+    idClient: { type: Schema.Types.ObjectId, ref: 'Client' },
     civilStatus: String,
     rfcPerson: String,
     name: String,
@@ -13,7 +13,7 @@ const generalInfoSchema = new Schema({
     birthDate: String,
     ciec: String,
     phone: String,
-    address: [{ type: Schema.Types.ObjectId, ref: 'Address', autopopulate: true }],
+    address: { type: Schema.Types.ObjectId, ref: 'Address', autopopulate: true },
     mortgageCredit: Boolean,
     carCredit: String,
     creditCard: Boolean,

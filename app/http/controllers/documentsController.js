@@ -157,7 +157,7 @@ const documentsController = {
             let user = await User.findById(id);
             let documentStored = await Documents.create({
                 idClient: {
-                    _id: user.idClient[0]._id
+                    _id: user.idClient._id
                 }
             });
             var docs = await Documents.findById(documentStored._id);
@@ -199,76 +199,62 @@ const documentsController = {
 
             await Promise.all(UpdateFiles);
 
-            // if(user){
-            //     let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'documents', filesUploaded);
-
-            //     if(dealUpdated.error){
-            //         return response.json({
-            //             code: 500,
-            //             msg : "Algo salió mal tratando de guardar información | Hubspot: documents",
-            //             error: dealUpdated.error
-            //         });
-            //     }
-            // }
-            // else{
-            //     return response.json({
-            //         code: 500,
-            //         msg : "Algo salió mal tratando de guardar información | Hubspot: documents",
-            //         error: dealUpdated.error
-            //     });
-            // }
-
-            // let documentStored = await Documents.create({
-            //     idClient: {
-            //         _id: user.idClient[0]._id
-            //     }
-            // });
-
-            // let documents = await Documents.findByIdAndUpdate(documentStored._id, { $push : filesUploaded }, {multi: true, new: true });
-
             var statusValue = false;
 
-            if(user.idClient[0].type == 'PF'){
-
+            if(user.idClient.type == 'PF'){
                 if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
                     statusValue = true;
                 }
-
             }
 
-            if(user.idClient[0].type == 'PFAE'){
-
-                if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
-                    statusValue = true;
+            if(user.idClient.type == 'PFAE'){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
                 }
-
+                else{
+                    if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
             }
 
-            if(user.idClient[0].type == 'RIF'){
-
-                if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
-                    statusValue = true;
+            if(user.idClient.type == 'RIF'){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
                 }
-
+                else{
+                    if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
             }
 
-            if(user.idClient[0].type == 'PM'){
-
-                if(docs.constitutiveAct.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
-                    statusValue = true;
+            if(user.idClient.type == 'PM'){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                    if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
                 }
-
+                else{
+                    if(docs.constitutiveAct.length > 0 && docs.rfc.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
             }
 
             await Documents.findByIdAndUpdate(documentStored._id, {status: statusValue});
             
-            await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
+            await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
                 idDocuments : {
                     _id : documentStored._id
                 }
             });
 
-            await Client.findByIdAndUpdate(user.idClient[0]._id, {
+            await Client.findByIdAndUpdate(user.idClient._id, {
                 idDocuments: {
                     _id: documentStored._id
                 }
@@ -311,48 +297,21 @@ const documentsController = {
 
             const UploadFiles = Object.keys(files).map(async(key) => {
                 if(files[key].length){
-                    if(key.length > 25){
-                        // if(docs.oficialID.indexOf(key) >= 0){
-                        //     if(!filesReplace["oficialID"]){
-                        //         filesReplace["oficialID"] = [key];
-                        //     }
-                        //     else{
-                        //         let index = Object.keys(filesReplace["oficialID"])[Object.keys(filesReplace["oficialID"]).length - 1];
-                        //         filesReplace["oficialID"][parseInt(index) + 1] = key;
-                        //     }
-                        // }
-                        //filesReplace.push(key);
-                    }
-                    else{
-                        for await(let file of files[key]){
-                            let fileUrl = await fileManager.UploadFilesToS3(file);	
-                            if(!filesUploaded[key]){
-                                filesUploaded[key] = [fileUrl];
-                            }
-                            else{
-                                let index = Object.keys(filesUploaded[key])[Object.keys(filesUploaded[key]).length - 1];
-                                filesUploaded[key][parseInt(index) + 1] = fileUrl;
-                            }
+                    for await(let file of files[key]){
+                        let fileUrl = await fileManager.UploadFilesToS3(file);	
+                        if(!filesUploaded[key]){
+                            filesUploaded[key] = [fileUrl];
+                        }
+                        else{
+                            let index = Object.keys(filesUploaded[key])[Object.keys(filesUploaded[key]).length - 1];
+                            filesUploaded[key][parseInt(index) + 1] = fileUrl;
                         }
                     }
                 }
                 else{//console.log("map1")
-                    if(key.length > 25){//console.log("map1-reemplazo")
-                        //filesReplace.push(key);
-                        // if(docs.oficialID.indexOf(key) >= 0){
-                        //     if(!filesReplace["oficialID"]){
-                        //         filesReplace["oficialID"] = [key];
-                        //     }
-                        //     else{
-                        //         let index = Object.keys(filesReplace["oficialID"])[Object.keys(filesReplace["oficialID"]).length - 1];
-                        //         filesReplace["oficialID"][parseInt(index) + 1] = key;
-                        //     }
-                        // }
-                    }
-                    else{//console.log("map1-nuevo")
-                        let fileUrl = await fileManager.UploadFilesToS3(files[key]);
-                        filesUploaded[key] = fileUrl;
-                    }
+                    //console.log("map1-nuevo")
+                    let fileUrl = await fileManager.UploadFilesToS3(files[key]);
+                    filesUploaded[key] = fileUrl;
                 }
             });
 
@@ -425,14 +384,14 @@ const documentsController = {
 
             var statusValue = false;
 
-            if(user.idClient[0].type == 'PF'){
+            if(user.idClient.type == 'PF'){
                 if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
                     statusValue = true;
                 }
             }
 
-            if(user.idClient[0].type == 'PFAE'){
-                if(user.idClient[0].appliance[0].idComercialInfo[0].ciec != null){
+            if(user.idClient.type == 'PFAE'){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
                     if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
                         statusValue = true;
                     }
@@ -444,8 +403,8 @@ const documentsController = {
                 }
             }
 
-            if(user.idClient[0].type == 'RIF'){
-                if(user.idClient[0].appliance[0].idComercialInfo[0].ciec != null){
+            if(user.idClient.type == 'RIF'){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
                     if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
                         statusValue = true;
                     }
@@ -457,8 +416,8 @@ const documentsController = {
                 }
             }
 
-            if(user.idClient[0].type == 'PM'){
-                if(user.idClient[0].appliance[0].idComercialInfo[0].ciec != null){
+            if(user.idClient.type == 'PM'){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
                     if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
                         statusValue = true;
                     }

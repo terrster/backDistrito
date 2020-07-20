@@ -105,13 +105,13 @@ const comercialInfoController = {
 
             let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
 
-            await Appliance.findByIdAndUpdate(user.idClient[0].appliance[0]._id, {
+            await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
                 idComercialInfo : {
                     _id : comercialInfoStored._id
                 }
             });
 
-            await Client.findByIdAndUpdate(user.idClient[0]._id, {
+            await Client.findByIdAndUpdate(user.idClient._id, {
                 idComercialInfo: {
                     _id: comercialInfoStored._id
                 }
@@ -228,7 +228,7 @@ const comercialInfoController = {
                 zipCode
             };
 
-            await Address.findByIdAndUpdate(comercial.address[0]._id, addressParams);
+            await Address.findByIdAndUpdate(comercial.address._id, addressParams);
 
             let comercialInfoParams = {
                 comercialName,

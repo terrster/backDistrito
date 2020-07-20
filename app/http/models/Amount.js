@@ -4,7 +4,7 @@ var now = new Date();
 var utc = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
 
 const amountSchema = new Schema({
-  idClient: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
+  idClient: { type: Schema.Types.ObjectId, ref: 'Client' },
   howMuch: Number,
   whyNeed: String,
   whenNeed: String,

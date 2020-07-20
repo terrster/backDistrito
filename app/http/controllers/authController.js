@@ -42,7 +42,7 @@ const authController = {
 
             let userStored = await User.create(data);
 
-            let clientStored = await Client.create({ idUser: userStored._id});
+            let clientStored = await Client.create({ idUser: { _id: userStored._id }});
 
             let user = await User.findByIdAndUpdate(userStored._id, { 
                 idClient: {
