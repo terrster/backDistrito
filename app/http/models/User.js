@@ -7,7 +7,7 @@ var utc = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString(
 const userSchema = new Schema({
     idClient: { type: Schema.Types.ObjectId, ref: 'Client', autopopulate: true },
     name: String,
-    lastName: String,
+    lastname: String,
     access: { type:  String, default: 'USER' },
     email: { type: String, index: true, unique: true, required: true, uniqueCaseInsensitive: true },
     password: String,

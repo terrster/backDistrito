@@ -30,7 +30,7 @@ const deal = {
                         "name": "numeroderegistro"
                     },
                     {
-                        "value": request.name + " " + request.lastName,
+                        "value": request.name + " " + request.lastname,
                         "name": "nombre_comercial"
                     },
                     {
@@ -42,7 +42,7 @@ const deal = {
                         "name": "celular"
                     },
                     {
-                        "value": request.idDistrito + " " + request.name + " " + request.lastName,
+                        "value": request.idDistrito + " " + request.name + " " + request.lastname,
                         "name": "dealname"
                     },
                     {
@@ -658,7 +658,7 @@ const contact = {
                         "property": "firstname"
                     },
                     {
-                        "value": request.lastName,
+                        "value": request.lastname,
                         "property": "lastname"
                     },
                     {
@@ -710,7 +710,7 @@ const contact = {
                         "property": "firstname"
                     },
                     {
-                        "value": request.lastName,
+                        "value": request.lastname,
                         "property": "lastname"
                     }
                 ]
