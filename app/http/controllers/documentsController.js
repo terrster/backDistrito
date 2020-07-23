@@ -64,6 +64,7 @@ const getNameProperty = async(key) => {
                 'n9_1_4_id',
             ];
         case "proofAddress":
+        case "proofAddressMainFounders":
             return[
                 'n9_2_comp_domicilio',
                 'n9_2_1_comp_domicilio_2',
@@ -377,7 +378,7 @@ const documentsController = {
                 if(Array.isArray(filesUploaded[key])){console.log("map2-nuevo-multiple");
                     var i = index;
                     var hubspot = await hubspotController.deal.show(user.hubspotDealId);
-                    console.log(hubspot.properties);
+                    // console.log(hubspot.properties);
                     Object.keys(filesUploaded[key]).forEach(async(item) => {
                         //var docs = await Documents.findById(id);
                         var propNull = '';
