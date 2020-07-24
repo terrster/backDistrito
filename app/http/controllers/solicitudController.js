@@ -141,7 +141,7 @@ const solicitudController = {
 
         try{
             await pdf.create(content).toBuffer(function(error, buffer){
-                //response.header("Access-Control-Allow-Origin", "*");
+                response.header("Access-Control-Allow-Origin", "*");
                 response.header("Access-Control-Allow-Headers", "X-Requested-With");
                 response.header('content-type', 'application/pdf');
                 return response.send(buffer);
