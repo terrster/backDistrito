@@ -107,8 +107,6 @@ const solicitudController = {
                 <th style="border: 1px solid #dddddd; padding: 8px;">¿Es usted o tiene algún familiar políticamente expuesto?</th><td colspan="5" style="border: 1px solid #dddddd; padding: 8px;">No</td>
               </tr>
             </table>
-
-            <div style="page-break-before:always;"></div>
       
             <h2 style="margin-bottom: 15px; font-size: 19px; color: #302c64">Referencias</h2>
     
