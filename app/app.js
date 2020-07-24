@@ -10,6 +10,7 @@ const app = express();
 //Routing
 const webRoutes = require("../routes/web");
 const apiRoutes = require("../routes/api");
+const privateRoutes = require("../routes/private");
 
 //Middlewares
 app.use(bodyParser.urlencoded( {extended:false} ));
@@ -33,5 +34,6 @@ app.use((request, response, next) => {
 //Prefix or routes
 app.use(webRoutes);
 app.use('/api', apiRoutes);
+app.use('/private/api/', privateRoutes);
 
 module.exports = app;

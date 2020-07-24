@@ -31,7 +31,7 @@ router.use((request, response, next) => {
     } 
     else{
         response.send({ 
-            mensaje: 'Token no proveída.' 
+            mensaje: 'Token no proveído' 
         });
     }
  });

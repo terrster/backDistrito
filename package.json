@@ -24,6 +24,7 @@
     "express-fileupload": "^1.1.7-alpha.3",
     "express-group-routes": "^1.1.0",
     "fs": "0.0.1-security",
+    "html-pdf": "^2.2.0",
     "hubspot": "^2.3.9",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",

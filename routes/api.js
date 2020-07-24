@@ -33,6 +33,7 @@ route.use(async(request, response, next) => {
     next();
 });
 
+
 //User routes
 route.group('/user', (user) => {
     user.get('/:id', userController.show);
@@ -126,5 +127,5 @@ route.group("/finerio", (finerio) => {
     //Transactions
     finerio.get('/transactions/:id', finerioController.getTransactions);
 });
-    
+
 module.exports = route;
