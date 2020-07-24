@@ -31,7 +31,7 @@ route.use((request, response, next) => {
 
 //Solicitud routes
 route.group("/solicitud", (solicitud) => {
-    solicitud.get('/aspiria/:id', solicitudController.aspiria);
+    solicitud.get('/aspiria/:id?', solicitudController.aspiria);
 });
 
 module.exports = route;

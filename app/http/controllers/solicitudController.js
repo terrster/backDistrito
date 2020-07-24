@@ -8,6 +8,10 @@ const solicitudController = {
 
     aspiria: async(request, response) => {
 
+        if(!request.params.id){
+          return response.json("Deal Id no proveído");
+        }
+
         const hubspot = await hubspotController.deal.show(request.params.id);
 
         const content = `
