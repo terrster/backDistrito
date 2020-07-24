@@ -11,7 +11,7 @@ const solicitudController = {
         const hubspot = await hubspotController.deal.show(request.params.id);
 
         const content = `
-        <html>
+        <html style="zoom: 1;">
         <head></head>
         <body>
           <div>
