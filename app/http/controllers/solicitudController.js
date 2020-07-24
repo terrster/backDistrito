@@ -139,16 +139,16 @@ const solicitudController = {
       </html>
         `;
 
-        pdf.create(content).toBuffer(function(error, buffer){
+        try{
+            await pdf.create(content).toBuffer(function(error, buffer){
+                response.header('content-type', 'application/pdf');
+                return response.send(buffer);
+            });
 
-            if(error){
-                return response.json("");
-            }
-            response.header("Access-Control-Allow-Origin", "*");
-            response.header("Access-Control-Allow-Headers", "X-Requested-With");
-            response.header('content-type', 'application/pdf');
-            return response.send(buffer);
-        });
+        }
+        catch(error){
+            console.log(error);
+        }
     }
 }
 
