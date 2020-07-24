@@ -367,6 +367,35 @@ const deal = {
                             }
                         }
 
+                        if(request.proofAddressMainFounders){
+                            if(Array.isArray(request.proofAddressMainFounders)){
+                                if(request.proofAddressMainFounders[0]){
+                                    data.push({
+                                        "value": request.proofAddressMainFounders[0],
+                                        "name": "n9_2_comp_domicilio"
+                                    });
+                                }
+                                if(request.proofAddressMainFounders[1]){
+                                    data.push({
+                                        "value": request.proofAddressMainFounders[1],
+                                        "name": "n9_2_1_comp_domicilio_2"
+                                    });
+                                }
+                                if(request.proofAddressMainFounders[2]){
+                                    data.push({
+                                        "value": request.proofAddressMainFounders[2],
+                                        "name": "n9_2_2_comp_domicilio_3"
+                                    });
+                                }
+                            }
+                            else{
+                                data.push({
+                                    "value": request.proofAddressMainFounders,
+                                    "name": "n9_2_comp_domicilio"
+                                });
+                            }
+                        }
+
                         if(request.bankStatements){
                             if(Array.isArray(request.bankStatements)){
                                 if(request.bankStatements[0]){
