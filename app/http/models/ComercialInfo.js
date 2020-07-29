@@ -17,7 +17,8 @@ const comercialInfoSchema = new Schema({
   terminal: Boolean,
   warranty: Number,
   ciec: String,
-  status: { type: Boolean, default: false }
+  status: { type: Boolean, default: false },
+  idFinerio: String
 }, { collection: 'ComercialInfo' });
 
 comercialInfoSchema.plugin(require('mongoose-autopopulate'));
