@@ -9,16 +9,12 @@ require('dotenv').config({
 const templates = require("../../../public/email/templates");
 
 const service = nodemailer.createTransport({
-    name : process.env.MAIL_NAME,
-    host : process.env.MAIL_HOST,
-    port : parseInt(process.env.MAIL_PORT),
-    //ignoreTLS: (process.env.MAIL_IGNORE_TLS === 'true' ? true : false),
-    secure : (process.env.MAIL_SECURE === 'true' ? true : false),
-    tls : { rejectUnauthorized: (process.env.MAIL_REJECTUNAUTHORIZED === 'true' ? true : false) },
+    service: "Outlook365",
     auth: {
-      user: "",
-      pass: ""
-    }
+      user: "contacto@distritopyme.com",
+      pass: "Clientes2020"
+    },
+    secureConnection: false
 });
 
 const mailManager = {
@@ -27,9 +23,9 @@ const mailManager = {
         let { email, hash } = request;
         let url = `${process.env.LINK_PASSWORD}`+hash;
         let mailOptions = {
-            from: '',
+            from: 'Distrito Pyme <contacto@distritopyme.com>',
             to: email,
-            subject: 'Distrito Pyme: Recuperación de contraseña',
+            subject: 'Recuperación de contraseña',
             html: templates.reset_password(url)
         };
 
@@ -41,7 +37,7 @@ const mailManager = {
                 msg: "Correo de recuperación enviado exitosamente"
             }
         }
-        catch(error){
+        catch(error){console.log(error)
             return {
                 code: 500,
                 msg: "No se pudo enviar el correo de recuperación"
