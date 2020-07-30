@@ -34,6 +34,7 @@ const comercialInfoController = {
                 terminal,
                 warranty,
                 ciec,
+                idFinerio
             } = request.body;
 
             if(user){
@@ -100,7 +101,8 @@ const comercialInfoController = {
                 address: {
                     _id: addressStored._id
                 },
-                status : true
+                status : true,
+                idFinerio
             };
 
             let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
@@ -178,7 +180,8 @@ const comercialInfoController = {
                 facebook,
                 terminal,
                 ciec,
-                warranty
+                warranty,
+                idFinerio
             } = request.body;
 
             if(user){
@@ -241,7 +244,8 @@ const comercialInfoController = {
                 facebook,
                 terminal,
                 ciec,
-                warranty
+                warranty,
+                idFinerio
             };
 
             await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
