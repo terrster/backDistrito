@@ -6,6 +6,8 @@ const User = require("../models/User");
 const Address = require("../models/Address");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
+
+const finerioController = require("../controllers/finerioController");
 const Finerio = require("../models/Finerio");
 
 const comercialInfoController = {
@@ -163,13 +165,6 @@ const comercialInfoController = {
             let comercial = await ComercialInfo.findById(id);
             let user = await User.findById(idUser);
 
-            console.log(request.body);
-            return response.json({ 
-                code: 200,
-                msg: "Información comercial actualizada exitosamente",
-                user: user 
-            });
-
             let {
                 state,//info address
                 municipality,
@@ -189,7 +184,7 @@ const comercialInfoController = {
                 terminal,
                 ciec,
                 warranty,
-                idFinerio
+                banks,
             } = request.body;
 
             if(user){
@@ -257,6 +252,66 @@ const comercialInfoController = {
             };
 
             await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
+
+            if(!user.idClient.appliance[0].idFinerio){//Si no tiene idFinerio
+                let finerioAPI = await finerioController.storeCustomer(user.email);
+                let credentials = [];
+
+                for await(let bank of banks){
+                    let params = {
+                        customerId : finerioAPI.data.id,
+                        bankId : bank.id,
+                        username : bank.username,
+                        password : bank.password,
+                        securityCode : bank.securityCode ? bank.securityCode : null
+                    }
+
+                    let finerioCredentialAPI = await finerioController.storeCredential(params);
+
+                    credentials.push({
+                        id: finerioCredentialAPI.data.id,
+                        idBank : params.bankId,
+                        username : params.username
+                    });
+                }
+
+                let params = {
+                    idFinerio : finerioAPI.data.id,
+                    credentials : credentials
+                }
+
+                let finerio = await Finerio.create(params);
+                await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+                    idFinerio : {
+                        _id : finerio._id
+                    }
+                });
+            }
+            else{//Si tiene, crear o actualizar credenciales
+                let credentials = [];
+
+                for await(let bank of banks){
+                    let params = {
+                        customerId : user.idClient.appliance[0].idFinerio.idFinerio,
+                        idCredential : bank.idCredential,
+                        bankId : bank.id,
+                        username : bank.username,
+                        password : bank.password,
+                        securityCode : bank.securityCode ? bank.securityCode : null
+                    }
+
+                    await finerioController.updateCredential(params);
+                    
+                    credentials.push({
+                        id: params.idCredential,
+                        idBank : params.bankId,
+                        username : params.username
+                    });
+
+                }
+
+                await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
+            }
 
             user = await User.findById(idUser);
 

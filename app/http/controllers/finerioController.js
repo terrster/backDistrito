@@ -1075,11 +1075,11 @@ const finerioController = {
         }
     },
     //Customers
-    storeCustomer: async(request, response) => {
+    storeCustomer: async(email) => {
         try{
             let token = await finerioCredentials.getToken();
             let {data} = await axios.post('customers', {
-                name: request.body.name
+                name: email
             }, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -1087,13 +1087,19 @@ const finerioController = {
                 }
             });
 
-            return response.json({
+            // return response.json({
+            //     msg: "Finerio: Cliente creado correctamente.",
+            //     data
+            // });
+            return {
+                code: 200,
                 msg: "Finerio: Cliente creado correctamente.",
                 data
-            });
+            };
         }
         catch(error){
             var err = {
+                code: 500,
                 msg: "Algo salió mal tratando de registrar una credencial.",
                 error: error.response.data
             };
@@ -1106,11 +1112,13 @@ const finerioController = {
             
             if(error.response.status == 400 && error.response.data.errors[0].code === 'customer.create.name.exists'){
                 err = {
+                    code: 400,
                     msg: "Finerio: El identificador name ya ha sido registrado."
                 };
             }
    
-            return response.json(err);
+            //return response.json(err);
+            return err;
         }
     },
     getCustomers: async(request, response) => {
@@ -1229,16 +1237,17 @@ const finerioController = {
         }
     },
     //Credentials
-    storeCredential: async(request, response) => {
+    storeCredential: async(request) => {
         try{
-            let { customerId, bankId, username, password, securityCode } = request.body;
+            let { customerId, bankId, username, password, securityCode } = request;
 
             if(!customerId || !bankId || !username || !password){
                 let res = {
                     msg: "Finerio: Los campos id de cliente, id de institucion bancaria, usuario y contraseña son obligatorios."
                 };
 
-                return response.json(res);
+                //return response.json(res);
+                return res;
             }
 
             let usernameEncrypted = Encrypt(username);
@@ -1261,10 +1270,12 @@ const finerioController = {
             
             if(result.status == 201 && result.data.status == 'VALIDATE'){
                 let res = {
-                    msg: "Finerio: La credencial ha sido guardada correctamente, pendiente a validación."
+                    msg: "Finerio: La credencial ha sido guardada correctamente, pendiente a validación.",
+                    data: result.data
                 };
 
-                return response.json(res);
+                //return response.json(res);
+                return res;
             }
         }
         catch(error){
@@ -1279,7 +1290,8 @@ const finerioController = {
                 };
             }
 
-            return response.json(err);
+            //return response.json(err);
+            return err;
         }
     },
     getCredentials: async(request, response) => {//ID CUSTOMER
@@ -1336,16 +1348,17 @@ const finerioController = {
             return response.json(err);
         }
     },
-    updateCredential: async(request, response) => {//Funciona pero no actualiza, primero eliminar y volver a guardar la credencial
+    updateCredential: async(request) => {//Funciona pero no actualiza, primero eliminar y volver a guardar la credencial
         try{
-            let { customerId, bankId, username, password, securityCode } = request.body;
+            let { customerId, idCredential, bankId, username, password, securityCode } = request;
 
             if(!customerId || !bankId || !username || !password){
                 let res = {
                     msg: "Finerio: Los campos id de cliente, id de institucion bancaria, usuario y contraseña son obligatorios."
                 };
 
-                return response.json(res);
+                //return response.json(res);
+                return res;
             }
 
             let usernameEncrypted = Encrypt(username);
@@ -1353,7 +1366,7 @@ const finerioController = {
             let securityCodeEncrypted = securityCode ? Encrypt(securityCode) : null;
 
             let token = await finerioCredentials.getToken();
-            let result = await axios.put(`credentials/${request.params.id}`, {
+            let result = await axios.put(`credentials/${idCredential}`, {
                 'customerId': customerId,
                 'bankId': bankId,
                 'username': usernameEncrypted,
@@ -1371,7 +1384,8 @@ const finerioController = {
                     msg: "Finerio: La credencial ha sido actualizada correctamente, pendiente a validación."
                 };
 
-                return response.json(res);
+                //return response.json(res);
+                return res;
             }
         }
         catch(error){
@@ -1386,7 +1400,8 @@ const finerioController = {
                 };
             }
 
-            return response.json(err);
+            //return response.json(err);
+            return err;
         }
     },
     deleteCredential: async(request, response) => {
