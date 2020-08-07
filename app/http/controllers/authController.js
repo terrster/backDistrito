@@ -7,6 +7,7 @@ const path = require("path");
 const User = require("../models/User");
 const Client = require("../models/Client");
 const PasswordsResets = require("../models/PasswordsResets");
+const Finerio = require("../models/Finerio");
 
 const userController = require("../controllers/userController");
 const hubspotController = require("../controllers/hubspotController");

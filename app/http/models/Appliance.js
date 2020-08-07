@@ -9,6 +9,7 @@ const applianceSchema = new Schema({
   idAmount: { type: Schema.Types.ObjectId, ref: 'Amount', autopopulate: true },
   idGeneralInfo:  { type: Schema.Types.ObjectId, ref: 'GeneralInfo', autopopulate: true },
   idComercialInfo:  { type: Schema.Types.ObjectId, ref: 'ComercialInfo', autopopulate: true },
+  idFinerio: { type: Schema.Types.ObjectId, ref: 'Finerio', autopopulate: true  },
   registerDate: { type: Date, default: utc },
   proposals: [{ type: Schema.Types.ObjectId, ref: 'Proposal' }],
   reason: String,

@@ -6,6 +6,7 @@ const User = require("../models/User");
 const Address = require("../models/Address");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
+const Finerio = require("../models/Finerio");
 
 const comercialInfoController = {
 
@@ -161,6 +162,13 @@ const comercialInfoController = {
         try{
             let comercial = await ComercialInfo.findById(id);
             let user = await User.findById(idUser);
+
+            console.log(request.body);
+            return response.json({ 
+                code: 200,
+                msg: "Información comercial actualizada exitosamente",
+                user: user 
+            });
 
             let {
                 state,//info address
