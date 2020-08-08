@@ -37,7 +37,7 @@ const comercialInfoController = {
                 terminal,
                 warranty,
                 ciec,
-                idFinerio
+                banks
             } = request.body;
 
             if(user){
@@ -121,6 +121,42 @@ const comercialInfoController = {
                     _id: comercialInfoStored._id
                 }
             });
+
+            if(banks.length >= 0){
+
+                let finerioAPI = await finerioController.storeCustomer(user.email);
+                let credentials = [];
+
+                for await(let bank of banks){
+                    let params = {
+                        customerId : finerioAPI.data.id,
+                        bankId : bank.id,
+                        username : bank.username,
+                        password : bank.password,
+                        securityCode : bank.securityCode ? bank.securityCode : null
+                    }
+
+                    let finerioCredentialAPI = await finerioController.storeCredential(params);
+
+                    credentials.push({
+                        id: finerioCredentialAPI.data.id,
+                        idBank : params.bankId,
+                        username : params.username
+                    });
+                }
+
+                let params = {
+                    idFinerio : finerioAPI.data.id,
+                    credentials : credentials
+                }
+
+                let finerio = await Finerio.create(params);
+                await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+                    idFinerio : {
+                        _id : finerio._id
+                    }
+                });
+            }
 
             user = await User.findById(id);
 
