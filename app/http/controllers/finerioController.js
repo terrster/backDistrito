@@ -11,6 +11,9 @@ const finerio_publicKey = fs.readFileSync(path.resolve("config/finerio_public.ke
 const crypto = require('crypto');
 const moment = require("moment");
 
+const User = require("../models/User");
+const Finerio = require("../models/Finerio");
+
 function Encrypt(payload){
     let buffer = Buffer.from(payload, 'utf8');
     let encrypted = crypto.publicEncrypt({key:finerio_publicKey, padding : crypto.constants.RSA_PKCS1_PADDING}, buffer)
@@ -1278,7 +1281,7 @@ const finerioController = {
                 return res;
             }
         }
-        catch(error){
+        catch(error){ console.log(error)
             var err = {
                 msg: "Finerio: Algo salió mal tratando de registrar una credencial.",
                 error: error.response.data
@@ -1348,7 +1351,7 @@ const finerioController = {
             return response.json(err);
         }
     },
-    updateCredential: async(request) => {//Funciona pero no actualiza, primero eliminar y volver a guardar la credencial
+    updateCredential: async(request) => {
         try{
             let { customerId, idCredential, bankId, username, password, securityCode } = request;
 
@@ -1406,6 +1409,7 @@ const finerioController = {
     },
     deleteCredential: async(request, response) => {
         try{
+            let idUser = request.headers.tokenDecoded.data.id;
             let token = await finerioCredentials.getToken();
             let result = await axios.delete(`credentials/${request.params.id}`, {    
                 headers: {
@@ -1414,9 +1418,18 @@ const finerioController = {
                 }
             });
 
+            let user = await User.findById(idUser);
+            let credentials = user.idClient.appliance[0].idFinerio.credentials;
+            let index = credentials.findIndex(c => c.id === request.params.id);
+            const newCredentials = credentials.splice(index, index);
+
+            await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
+            user = await User.findById(idUser);
+
             if(result.status == 204){
                 return response.json({
-                    msg: "Finerio: Credencial eliminada correctamente."
+                    msg: "Finerio: Credencial eliminada correctamente.",
+                    user: user 
                 });
             }
         }

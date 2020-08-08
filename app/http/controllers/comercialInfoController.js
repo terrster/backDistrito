@@ -184,7 +184,7 @@ const comercialInfoController = {
                 terminal,
                 ciec,
                 warranty,
-                banks,
+                banks
             } = request.body;
 
             if(user){
@@ -247,70 +247,92 @@ const comercialInfoController = {
                 facebook,
                 terminal,
                 ciec,
-                warranty,
-                idFinerio
+                warranty
             };
 
             await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
 
-            if(!user.idClient.appliance[0].idFinerio){//Si no tiene idFinerio
-                let finerioAPI = await finerioController.storeCustomer(user.email);
-                let credentials = [];
+            if(banks.length >= 0){
 
-                for await(let bank of banks){
-                    let params = {
-                        customerId : finerioAPI.data.id,
-                        bankId : bank.id,
-                        username : bank.username,
-                        password : bank.password,
-                        securityCode : bank.securityCode ? bank.securityCode : null
+                if(!user.idClient.appliance[0].idFinerio){//Si no tiene idFinerio
+                    let finerioAPI = await finerioController.storeCustomer(user.email);
+                    let credentials = [];
+
+                    for await(let bank of banks){
+                        let params = {
+                            customerId : finerioAPI.data.id,
+                            bankId : bank.id,
+                            username : bank.username,
+                            password : bank.password,
+                            securityCode : bank.securityCode ? bank.securityCode : null
+                        }
+
+                        let finerioCredentialAPI = await finerioController.storeCredential(params);
+
+                        credentials.push({
+                            id: finerioCredentialAPI.data.id,
+                            idBank : params.bankId,
+                            username : params.username
+                        });
                     }
 
-                    let finerioCredentialAPI = await finerioController.storeCredential(params);
+                    let params = {
+                        idFinerio : finerioAPI.data.id,
+                        credentials : credentials
+                    }
 
-                    credentials.push({
-                        id: finerioCredentialAPI.data.id,
-                        idBank : params.bankId,
-                        username : params.username
+                    let finerio = await Finerio.create(params);
+                    await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+                        idFinerio : {
+                            _id : finerio._id
+                        }
                     });
                 }
+                else{//Si tiene, crear o actualizar credenciales
+                    let credentials = [];
 
-                let params = {
-                    idFinerio : finerioAPI.data.id,
-                    credentials : credentials
-                }
-
-                let finerio = await Finerio.create(params);
-                await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
-                    idFinerio : {
-                        _id : finerio._id
+                    for await(let bank of banks){
+                        
+                        if(bank.idCredential){ //console.log("Update")
+                            let params = {
+                                customerId : user.idClient.appliance[0].idFinerio.idFinerio,
+                                idCredential : bank.idCredential,
+                                bankId : bank.id,
+                                username : bank.username,
+                                password : bank.password,
+                                securityCode : bank.securityCode ? bank.securityCode : null
+                            }
+        
+                            await finerioController.updateCredential(params);
+                            
+                            credentials.push({
+                                id: params.idCredential,
+                                idBank : params.bankId,
+                                username : params.username
+                            });
+                        }
+                        else{
+                            let params = {
+                                customerId : user.idClient.appliance[0].idFinerio.idFinerio,
+                                bankId : bank.id,
+                                username : bank.username,
+                                password : bank.password,
+                                securityCode : bank.securityCode ? bank.securityCode : null
+                            }
+        
+                            let finerioCredentialAPI = await finerioController.storeCredential(params);
+                            console.log(finerioCredentialAPI)
+        
+                            credentials.push({
+                                id: finerioCredentialAPI.data.id,
+                                idBank : params.bankId,
+                                username : params.username
+                            });
+                        }
                     }
-                });
-            }
-            else{//Si tiene, crear o actualizar credenciales
-                let credentials = [];
 
-                for await(let bank of banks){
-                    let params = {
-                        customerId : user.idClient.appliance[0].idFinerio.idFinerio,
-                        idCredential : bank.idCredential,
-                        bankId : bank.id,
-                        username : bank.username,
-                        password : bank.password,
-                        securityCode : bank.securityCode ? bank.securityCode : null
-                    }
-
-                    await finerioController.updateCredential(params);
-                    
-                    credentials.push({
-                        id: params.idCredential,
-                        idBank : params.bankId,
-                        username : params.username
-                    });
-
+                    await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
                 }
-
-                await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
             }
 
             user = await User.findById(idUser);
@@ -322,7 +344,7 @@ const comercialInfoController = {
             });
 
         } 
-        catch(error){
+        catch(error){console.log(error)
             return response.json({
                 code: 500,
                 msg: "Algo salió mal tratando de actualizar la información comercial",
