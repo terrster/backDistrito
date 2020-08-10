@@ -11,7 +11,8 @@ let authorization = {
 let credentials = {
     username: 'distrito-pyme-production',
     password: 'YX7fxJ5swyKEr9c8W6gewdF2kjrGRdCtU73YeapGw4uJa3EYC5',
-    grant_type: 'password',
+    grant_type: 'refresh_token',
+    refresh_token: '68d59942-81bf-42a5-b486-4bb0e0e5989b'
 }
 
 const finerioCredentials = {
