@@ -11,8 +11,8 @@ let authorization = {
 let credentials = {
     username: 'distrito-pyme-production',
     password: 'YX7fxJ5swyKEr9c8W6gewdF2kjrGRdCtU73YeapGw4uJa3EYC5',
-    grant_type: 'refresh_token',
-    refresh_token: '68d59942-81bf-42a5-b486-4bb0e0e5989b'
+    grant_type: 'password',// password || refresh_token
+    refresh_token: ''
 }
 
 const finerioCredentials = {
@@ -32,7 +32,7 @@ const finerioCredentials = {
             return data.access_token;
         }
         catch(error){
-            console.log(error.response)
+            console.log(error.response.data)
             let response = {
                 msg: "Finerio: Algo salió mal tratando de obtener el token."
             };
