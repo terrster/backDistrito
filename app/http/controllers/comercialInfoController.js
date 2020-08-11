@@ -104,8 +104,7 @@ const comercialInfoController = {
                 address: {
                     _id: addressStored._id
                 },
-                status : true,
-                idFinerio
+                status : true
             };
 
             let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
@@ -122,7 +121,7 @@ const comercialInfoController = {
                 }
             });
 
-            if(banks.length >= 0){
+            if(banks.length > 0){
 
                 let finerioAPI = await finerioController.storeCustomer(user.email);
                 let credentials = [];

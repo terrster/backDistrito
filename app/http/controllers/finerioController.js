@@ -1119,7 +1119,7 @@ const finerioController = {
                     msg: "Finerio: El identificador name ya ha sido registrado."
                 };
             }
-   
+            console.log(err);
             //return response.json(err);
             return err;
         }
