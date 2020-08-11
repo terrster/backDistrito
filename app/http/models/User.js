@@ -18,6 +18,7 @@ const userSchema = new Schema({
     hubspotDealId: String,
     recoverPassHash: String,
     idDistrito: Number,
+    ipV4: String,
     createdAt: { type: Date, default: utc }
 }, { collection: 'User' });
 

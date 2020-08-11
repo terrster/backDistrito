@@ -46,9 +46,13 @@ const deal = {
                         "name": "dealname"
                     },
                     {
-                        "value" : process.env.DATE_HUB,
+                        "value": process.env.DATE_HUB,
                         "name": "dealstage" 
                     },
+                    {
+                        "value": request.ipV4,
+                        "name": "ip_del_solicitante"
+                    }
                 ]
             };
             
