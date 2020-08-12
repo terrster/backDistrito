@@ -39,6 +39,28 @@ var tokenManager = {
                 msg: 'Token no proveído' 
             }
         }
+    },
+    validate: async(token) => {
+        if(token){
+            let tokenResult = await jwt.verify(token, publicKey, options, (error, decoded) => {      
+                if(error){//Inválido
+                    return {
+                        code: 403 
+                    }    
+                }
+        
+                return {//Correcto
+                    code: 200
+                }   
+            });
+
+            return tokenResult;
+        } 
+        else{//No proveído
+            return { 
+                code: 404
+            }
+        }
     }
 }
 

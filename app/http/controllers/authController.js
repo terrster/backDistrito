@@ -15,6 +15,7 @@ const hubspotController = require("../controllers/hubspotController");
 const privateKey = fs.readFileSync(path.resolve("config/private.key"));
 const options = require("../../../config/jwt_options");
 const validationsManager = require("../services/validationsManager");
+const tokenManager = require("../services/tokenManager");
 const mailManager = require("../services/mailManager");
 
 const authController = {
@@ -23,9 +24,11 @@ const authController = {
         try{
             let data = request.body;
 
-            let userExist = await User.findOne({ email: data.email });
+            let userExist = await User.findOne({ email: data.email.toLowerCase() });
 
-            if(userExist){
+            let contactExist = await hubspotController.contact.getByEmail(data.email.toLowerCase());
+
+            if(userExist || contactExist){
                 return response.json({ 
                     code: 500,
                     msg: "El correo electrónico ya existe"
@@ -153,9 +156,15 @@ const authController = {
         }
     },
     validate_resetHash: async(request, response) => {
-        let hash = request.params.hash;
+        var hash = request.params.hash;
 
         try{
+            const isEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+            if(isEmail.test(hash)){//Si no es hash es el email del usuario
+                let user = await User.findOne({"email": hash});
+                hash = user.recoverPassHash;
+            }
+            
             let token = await tokenManager.validate(hash);
 
             if(token.code == 403 || token.code == 404){

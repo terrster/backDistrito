@@ -714,6 +714,18 @@ const contact = {
             return response;
         }
     },
+    getByEmail: async(email) => {
+        try{
+            const response = await axios.get('contacts/v1/contact/email/' + email + '/profile' + hapiKey);
+
+            if(response.status == 200){
+                return response.data;
+            }
+        }
+        catch(error){
+            return null;
+        }
+    },
     show: async(hubspotContactId) => {
         try{
             const {data} = await axios.get('contacts/v1/contact/vid/' + hubspotContactId + '/profile' + hapiKey);
