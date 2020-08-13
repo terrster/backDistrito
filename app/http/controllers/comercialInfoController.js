@@ -356,7 +356,6 @@ const comercialInfoController = {
                             }
         
                             let finerioCredentialAPI = await finerioController.storeCredential(params);
-                            console.log(finerioCredentialAPI)
         
                             credentials.push({
                                 id: finerioCredentialAPI.data.id,

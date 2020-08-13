@@ -226,7 +226,7 @@ const authController = {
                 });
             }
     
-            user = await User.findOneAndUpdate({ recoverPassHash: hash }, password, { new: true, autopopulate: false });
+            user = await User.findOneAndUpdate({ email: token.data.email }, {password}, { new: true, autopopulate: false });
     
             await PasswordsResets.create({
                 email: user.email,
