@@ -1598,6 +1598,52 @@ const finerioController = {
 
             return response.json(err);
         }
+    },
+    getAllTransactions: async(request, response) => {//ID User
+        let idUser = request.headers.tokenDecoded.data.id;
+
+        try{
+            let user = await User.findById(idUser);
+
+            let credentials = user.idClient.appliance[0].idFinerio.credentials;
+
+            let transactions = [];
+            let token = await finerioCredentials.getToken();
+
+            for await(let credential of credentials){
+                try{
+                    let {data} = await axios.get(`transactions?accountId=${credential.id}`, {    
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+        
+                    
+                    transactions.push({
+                        idCredential: credential.id,
+                        transactions: "Datos"
+                    });
+        
+                    //transactions.push({data});
+                }
+                catch(error){
+                    transactions.push({
+                        idCredential: credential.id,
+                        transactions: []
+                    });
+                }
+                
+            }
+
+            return response.json({
+                transactions
+            });
+
+        }
+        catch(error){
+            console.log(error);
+        }
     }
 };
 
