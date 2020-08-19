@@ -1604,15 +1604,34 @@ const finerioController = {
 
         try{
             let user = await User.findById(idUser);
-
-            let credentials = user.idClient.appliance[0].idFinerio.credentials;
-
-            let transactions = [];
             let token = await finerioCredentials.getToken();
 
+            let credentials = user.idClient.appliance[0].idFinerio.credentials;
+            let accounts = [];
             for await(let credential of credentials){
+
+                let accountsRsp = await axios.get(`accounts?credentialId=${credential.id}`, {    
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+
+                for await(let account of accountsRsp.data.data){
+                    if(account.type == 'Cheques'){
+                        account.crecentialId = credential.id;
+                        accounts.push(account);
+                    }
+                }
+
+            }
+
+            let transactions = [];
+
+            for await(let account of accounts){
                 try{
-                    let {data} = await axios.get(`transactions?accountId=${credential.id}`, {    
+                    let {data} = await axios.get(`transactions?accountId=${account.id}`, {    
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
@@ -1621,8 +1640,8 @@ const finerioController = {
         
                     
                     transactions.push({
-                        idCredential: credential.id,
-                        transactions: "Datos"
+                        idCredential: account.crecentialId,
+                        transactions: data.data
                     });
         
                     //transactions.push({data});
