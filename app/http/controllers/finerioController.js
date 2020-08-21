@@ -1742,6 +1742,8 @@ const finerioController = {
                 }    
             }
 
+            await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {transactions : transactions});
+
             return response.json({
                 data: transactions
             });
