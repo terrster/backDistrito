@@ -21,6 +21,78 @@ function Encrypt(payload){
     return encrypted.toString("base64");
 }   
 
+function readTransactions(transactions){//Formatting transactions
+    return new Promise(async(resolve, reject) => {
+    
+        let map = {};
+
+        function getCharge(type){
+            return type ? 'cargo' : 'deposito';
+        }
+
+        for await(const transaction of transactions){
+            var date = moment(transaction.date).format('DD/MM/YYYY'); 
+            var year = moment(transaction.date).format("YYYY");
+            var month = moment(transaction.date).format("M");
+            var typeCharge = getCharge(transaction.isCharge);
+
+            transaction.date = date;
+
+            if(Object.keys(map).length === 0){
+                map[year] = { 'data' : {[month] : {[typeCharge]: [transaction]} } };
+                map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
+            }
+            else{
+                if(map[year]){//Year exist
+                    if(map[year].data[month]){//Month exist in year
+                        if(Object.keys(map[year].data[month][typeCharge]).length === 0){
+                            map[year].data[month][typeCharge][0] = transaction;  
+                        }
+                        else{
+                            let index = Object.keys(map[year].data[month][typeCharge])[Object.keys(map[year].data[month][typeCharge]).length - 1];
+                            map[year].data[month][typeCharge][parseInt(index) + 1] = transaction;
+                        }
+                    }
+                    else{//Add month to year
+                        map[year].data[month] = { [typeCharge] : [transaction]};
+                        map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
+                    }
+                }
+                else{//Add year and month
+                    map[year] = { 'data' : {[month] : {[typeCharge]: [transaction]} } };
+                    map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
+                }
+            }
+        }
+
+        let currentYear = new Date().getFullYear(); 
+
+        function getLastTransaction(year){
+            let ilt_month = Object.keys(map[year].data)[Object.keys(map[year].data).length - 1];
+            let ilt_dep = Object.keys(map[year].data[ilt_month].deposito)[Object.keys(map[year].data[ilt_month].deposito).length - 1];
+            let ilt_car = Object.keys(map[year].data[ilt_month].cargo)[Object.keys(map[year].data[ilt_month].cargo).length - 1];
+           
+            let index = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].deposito[ilt_dep].id);
+            let index2 = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].cargo[ilt_car].id);
+
+            return index > index2 ? map[year].data[ilt_month].deposito[ilt_dep] : map[year].data[ilt_month].cargo[ilt_car];
+        }
+
+        map[currentYear]['last_transaction'] = getLastTransaction(currentYear);
+
+        if(map[currentYear - 1]){
+            map[currentYear - 1]['last_transaction'] = getLastTransaction(currentYear - 1);
+
+            if(map[currentYear - 2]){
+                map[currentYear - 2]['last_transaction'] = getLastTransaction(currentYear - 2);
+            }
+        }
+
+        resolve(map);
+    });
+    
+}
+
 const finerioController = {
     test: (request, response) => {
         let transactions = {
@@ -1521,73 +1593,10 @@ const finerioController = {
                 });
             }
 
-            let transactions = data;
-            let map = {};
-
-            function getCharge(type){
-                return type ? 'cargo' : 'deposito';
-            }
-
-            for(const transaction of transactions.data){
-                var date = moment(transaction.date).format('DD/MM/YYYY'); 
-                var year = moment(transaction.date).format("YYYY");
-                var month = moment(transaction.date).format("M");
-                var typeCharge = getCharge(transaction.isCharge);
-
-                transaction.date = date;
-
-                if(Object.keys(map).length === 0){
-                    map[year] = { 'data' : {[month] : {[typeCharge]: [transaction]} } };
-                    map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
-                }
-                else{
-                    if(map[year]){//Year exist
-                        if(map[year].data[month]){//Month exist in year
-                            if(Object.keys(map[year].data[month][typeCharge]).length === 0){
-                                map[year].data[month][typeCharge][0] = transaction;  
-                            }
-                            else{
-                                let index = Object.keys(map[year].data[month][typeCharge])[Object.keys(map[year].data[month][typeCharge]).length - 1];
-                                map[year].data[month][typeCharge][parseInt(index) + 1] = transaction;
-                            }
-                        }
-                        else{//Add month to year
-                            map[year].data[month] = { [typeCharge] : [transaction]};
-                            map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
-                        }
-                    }
-                    else{//Add year and month
-                        map[year] = { 'data' : {[month] : {[typeCharge]: [transaction]} } };
-                        map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
-                    }
-                }
-            }
-
-            let currentYear = new Date().getFullYear();
-
-            function getLastTransaction(year){
-                let ilt_month = Object.keys(map[year].data)[Object.keys(map[year].data).length - 1];
-                let ilt_dep = Object.keys(map[year].data[ilt_month].deposito)[Object.keys(map[year].data[ilt_month].deposito).length - 1];
-                let ilt_car = Object.keys(map[year].data[ilt_month].cargo)[Object.keys(map[year].data[ilt_month].cargo).length - 1];
-
-                let index = transactions.data.findIndex(transactions => transactions.id === map[year].data[ilt_month].deposito[ilt_dep].id);
-                let index2 = transactions.data.findIndex(transactions => transactions.id === map[year].data[ilt_month].cargo[ilt_car].id);
-
-                return index > index2 ? map[year].data[ilt_month].deposito[ilt_dep] : map[year].data[ilt_month].cargo[ilt_car];
-            }
-
-            map[currentYear]['last_transaction'] = getLastTransaction(currentYear);
-
-            if(map[currentYear - 1]){
-                map[currentYear - 1]['last_transaction'] = getLastTransaction(currentYear - 1);
-
-                if(map[currentYear - 2]){
-                    map[currentYear - 2]['last_transaction'] = getLastTransaction(currentYear - 2);
-                }
-            }
+            let transactions = await readTransactions(data.data);
 
             return response.json({
-                "transactions": map
+                "transactions": transactions
             });
         }
         catch(error){
@@ -1608,7 +1617,7 @@ const finerioController = {
 
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
             let accounts = [];
-            for await(let credential of credentials){
+            for await(let credential of credentials){//Se leen todas las credenciales del usuario
 
                 let accountsRsp = await axios.get(`accounts?credentialId=${credential.id}`, {    
                     headers: {
@@ -1617,48 +1626,125 @@ const finerioController = {
                     }
                 });
 
+                let banks =  await axios.get('banks', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                for await(let account of accountsRsp.data.data){
-                    if(account.type == 'Cheques'){
-                        account.crecentialId = credential.id;
+                for await(let account of accountsRsp.data.data){//De cada credencial se obtienen las cuentas
+                    if(account.type == 'Cheques'){//Se filtran las cuentas, sólo interesan las de 'Cheques'
+                        account.credentialId = credential.id;
+                        account.idBank = credential.idBank;
+
+                        let bank = banks.data.find(bank => bank.id == credential.idBank);
+
+                        account.bankName = bank.name;
+                        account.username = credential.username;
                         accounts.push(account);
                     }
                 }
-
             }
 
-            let transactions = [];
+            let transactions = {};
 
-            for await(let account of accounts){
+            for await(let account of accounts){//Se leen todas las cuentas de cada credencial del usuario
                 try{
-                    let {data} = await axios.get(`transactions?accountId=${account.id}`, {    
+                    let {data} = await axios.get(`transactions?accountId=${account.id}`, {//Se obtienen todas las transacciones de cada cuenta    
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         }
                     });
-        
-                    
-                    transactions.push({
-                        idCredential: account.crecentialId,
-                        transactions: data.data
-                    });
-        
-                    //transactions.push({data});
-                }
-                catch(error){
-                    transactions.push({
-                        idCredential: credential.id,
-                        transactions: []
-                    });
-                }
+
+                    let transactionsMapping = await readTransactions(data.data);
+
+                    if(Object.keys(transactions).length === 0){//Se guarda la credencial en la posición cero junto con la primer cuenta y sus transacciones
+                        transactions = [
+                            {
+                                idCredential: account.credentialId,
+                                idBank: account.idBank,
+                                bankName: account.bankName,
+                                username: account.username,
+                                accounts: [
+                                    {
+                                        idAccount: account.id,
+                                        name: account.name,
+                                        transactions: transactionsMapping
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                    else{//Se verifica si ya existe la credencial
+                        let indexCredential = transactions.findIndex(transactions => transactions.idCredential == account.credentialId);
+
+                        if(indexCredential != '-1'){//Si existe sólo se añade la cuenta a la propiedad accounts
+                            let indexAccount = parseInt(Object.keys(transactions[indexCredential].accounts).length);
                 
+                            transactions[indexCredential].accounts[indexAccount] = {    
+                                idAccount: account.id,
+                                name: account.name,
+                                transactions: transactionsMapping
+                            }
+                        }
+                        else{//Si no existe, se crea una nueva crecencial junto con la primer cuenta y sus transacciones
+                            let indexCredential = parseInt(Object.keys(transactions).length);
+
+                            transactions[indexCredential] = {
+                                idCredential: account.credentialId,
+                                idBank: account.idBank,
+                                bankName: account.bankName,
+                                username: account.username,
+                                accounts: [
+                                    {
+                                        idAccount: account.id,
+                                        name: account.name,
+                                        transactions: transactionsMapping
+                                    }     
+                                ]                           
+                            }
+                        }
+                    }
+                }
+                catch(error){//Si se ocasiona un error se guardará la credencial ya sea en el grupo donde pertenece o cómo nueva pero sin transacciones
+                    //console.log(error);
+                    
+                    let indexCredential = transactions.findIndex(transactions => transactions.idCredential == account.credentialId);
+
+                    if(indexCredential != '-1'){//Si existe sólo se añade la cuenta a la propiedad accounts transacciones vacias
+                        let indexAccount = parseInt(Object.keys(transactions[indexCredential].accounts).length);
+            
+                        transactions[indexCredential].accounts[indexAccount] = {    
+                            idAccount: account.id,
+                            name: account.name,
+                            transactions: []
+                        }
+                    }
+                    else{//Si no existe, se crea una nueva crecencial junto con la primer cuenta y sin transacciones
+                        let indexCredential = parseInt(Object.keys(transactions).length);
+
+                        transactions[indexCredential] = {
+                            idCredential: account.credentialId,
+                            idBank: account.idBank,
+                            bankName: account.bankName,
+                            username: account.username,
+                            accounts: [
+                                {
+                                    idAccount: account.id,
+                                    name: account.name,
+                                    transactions: []
+                                }     
+                            ]                           
+                        }
+                    }
+                }    
             }
 
             return response.json({
-                transactions
+                data: transactions
             });
-
         }
         catch(error){
             console.log(error);
