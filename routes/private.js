@@ -11,6 +11,7 @@ require("express-group-routes");
 const route = express.Router();
 
 const solicitudController = require("../app/http/controllers/solicitudController");
+const pdfController = require("../app//http/controllers/pdfController");
 
 route.use((request, response, next) => {
     if(!request.query.token){
@@ -32,6 +33,11 @@ route.use((request, response, next) => {
 //Solicitud routes
 route.group("/solicitud", (solicitud) => {
     solicitud.get('/aspiria/:id?', solicitudController.aspiria);
+});
+
+//Pdf routes
+route.group("/pdf", (pdf) => {
+    pdf.get('/user/transactions/:id?', pdfController.transactions);
 });
 
 module.exports = route;

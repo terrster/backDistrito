@@ -23,72 +23,81 @@ function Encrypt(payload){
 
 function readTransactions(transactions){//Formatting transactions
     return new Promise(async(resolve, reject) => {
-    
-        let map = {};
 
-        function getCharge(type){
-            return type ? 'cargo' : 'deposito';
-        }
+        if(Object.keys(transactions).length !== 0){
+            let map = {};
 
-        for await(const transaction of transactions){
-            var date = moment(transaction.date).format('DD/MM/YYYY'); 
-            var year = moment(transaction.date).format("YYYY");
-            var month = moment(transaction.date).format("M");
-            var typeCharge = getCharge(transaction.isCharge);
-
-            transaction.date = date;
-
-            if(Object.keys(map).length === 0){
-                map[year] = { 'data' : {[month] : {[typeCharge]: [transaction]} } };
-                map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
+            function getCharge(type){
+                return type ? 'cargo' : 'deposito';
             }
-            else{
-                if(map[year]){//Year exist
-                    if(map[year].data[month]){//Month exist in year
-                        if(Object.keys(map[year].data[month][typeCharge]).length === 0){
-                            map[year].data[month][typeCharge][0] = transaction;  
-                        }
-                        else{
-                            let index = Object.keys(map[year].data[month][typeCharge])[Object.keys(map[year].data[month][typeCharge]).length - 1];
-                            map[year].data[month][typeCharge][parseInt(index) + 1] = transaction;
-                        }
-                    }
-                    else{//Add month to year
-                        map[year].data[month] = { [typeCharge] : [transaction]};
-                        map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
-                    }
-                }
-                else{//Add year and month
+
+            for await(const transaction of transactions){
+                var date = moment(transaction.date).format('DD/MM/YYYY'); 
+                var year = moment(transaction.date).format("YYYY");
+                var month = moment(transaction.date).format("M");
+                var typeCharge = getCharge(transaction.isCharge);
+
+                transaction.date = date;
+
+                if(Object.keys(map).length === 0){
                     map[year] = { 'data' : {[month] : {[typeCharge]: [transaction]} } };
                     map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
                 }
+                else{
+                    if(map[year]){//Year exist
+                        if(map[year].data[month]){//Month exist in year
+                            if(Object.keys(map[year].data[month][typeCharge]).length === 0){
+                                map[year].data[month][typeCharge][0] = transaction;  
+                            }
+                            else{
+                                let index = Object.keys(map[year].data[month][typeCharge])[Object.keys(map[year].data[month][typeCharge]).length - 1];
+                                map[year].data[month][typeCharge][parseInt(index) + 1] = transaction;
+                            }
+                        }
+                        else{//Add month to year
+                            map[year].data[month] = { [typeCharge] : [transaction]};
+                            map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
+                        }
+                    }
+                    else{//Add year and month
+                        map[year] = { 'data' : {[month] : {[typeCharge]: [transaction]} } };
+                        map[year].data[month] = {...map[year].data[month], [getCharge(!transaction.isCharge)]: []};
+                    }
+                }
             }
-        }
 
-        let currentYear = new Date().getFullYear(); 
+            let currentYear = new Date().getFullYear(); 
 
-        function getLastTransaction(year){
-            let ilt_month = Object.keys(map[year].data)[Object.keys(map[year].data).length - 1];
-            let ilt_dep = Object.keys(map[year].data[ilt_month].deposito)[Object.keys(map[year].data[ilt_month].deposito).length - 1];
-            let ilt_car = Object.keys(map[year].data[ilt_month].cargo)[Object.keys(map[year].data[ilt_month].cargo).length - 1];
-           
-            let index = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].deposito[ilt_dep].id);
-            let index2 = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].cargo[ilt_car].id);
+            function getLastTransaction(year){
+                let ilt_month = Object.keys(map[year].data)[Object.keys(map[year].data).length - 1];
+                let ilt_dep = Object.keys(map[year].data[ilt_month].deposito)[Object.keys(map[year].data[ilt_month].deposito).length - 1];
+                let ilt_car = Object.keys(map[year].data[ilt_month].cargo)[Object.keys(map[year].data[ilt_month].cargo).length - 1];
+            
+                let index = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].deposito[ilt_dep].id);
+                let index2 = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].cargo[ilt_car].id);
 
-            return index > index2 ? map[year].data[ilt_month].deposito[ilt_dep] : map[year].data[ilt_month].cargo[ilt_car];
-        }
-
-        map[currentYear]['last_transaction'] = getLastTransaction(currentYear);
-
-        if(map[currentYear - 1]){
-            map[currentYear - 1]['last_transaction'] = getLastTransaction(currentYear - 1);
-
-            if(map[currentYear - 2]){
-                map[currentYear - 2]['last_transaction'] = getLastTransaction(currentYear - 2);
+                return index > index2 ? map[year].data[ilt_month].deposito[ilt_dep] : map[year].data[ilt_month].cargo[ilt_car];
             }
-        }
 
-        resolve(map);
+            if(transactions){
+
+                map[currentYear]['last_transaction'] = getLastTransaction(currentYear);
+
+                if(map[currentYear - 1]){
+                    map[currentYear - 1]['last_transaction'] = getLastTransaction(currentYear - 1);
+
+                    if(map[currentYear - 2]){
+                        map[currentYear - 2]['last_transaction'] = getLastTransaction(currentYear - 2);
+                    }
+                }
+
+            }
+
+            resolve(map);
+        }
+        else{
+            resolve({});
+        }
     });
     
 }
@@ -1709,10 +1718,14 @@ const finerioController = {
                     }
                 }
                 catch(error){//Si se ocasiona un error se guardará la credencial ya sea en el grupo donde pertenece o cómo nueva pero sin transacciones
-                    //console.log(error);
-                    
-                    let indexCredential = transactions.findIndex(transactions => transactions.idCredential == account.credentialId);
+                    console.log(error);
 
+                    let indexCredential = '-1';
+
+                    // if(!Object.keys(transactions).length === 0){
+                    //     indexCredential = transactions.findIndex(transactions => transactions.idCredential == account.credentialId);
+                    // }
+                    
                     if(indexCredential != '-1'){//Si existe sólo se añade la cuenta a la propiedad accounts transacciones vacias
                         let indexAccount = parseInt(Object.keys(transactions[indexCredential].accounts).length);
             
