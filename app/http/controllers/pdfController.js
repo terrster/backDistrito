@@ -2,7 +2,6 @@
 
 const pdf = require('html-pdf');
 const fs = require('fs');
-
 const User = require("../models/User");
 
 const pdfController = {
@@ -23,81 +22,70 @@ const pdfController = {
             //style="zoom: 0.60;"
 
             let desglose = "";
+            let count = 0;
 
             for(let credential of credentials){
                 
                 // let desglose_accounts = "";
+                if(count > 0){
+                    desglose += `
+                        <div style="page-break-after: always;"></div>
+                    `;
+                }
+
                 desglose += `
-                    <br><table style="font-size: 20px;">
-                        <tr>
-                            <th>Banco</th><td>${credential.bankName}</td>
-                            <th>Usuario/Cuenta/Clabe/No. tarjeta</th><td>${credential.username}</td>
-                        </tr>
-                    </table><br>
+                    <br>
+                        <table class="table-dp">
+                            <thead>
+                                <tr>
+                                    <th>Banco</th>
+                                    <th>Usuario/Cuenta/Clabe/No. tarjeta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${credential.bankName}</td>
+                                    <td>${credential.username}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    <br>
                 `;
 
                 for(let account of credential.accounts){
-                    // let desglose_transactions = "";
 
-                    desglose += `
-                        <table>
-                            <tr>
-                                <th>Nombre de cuenta</th><td>${account.name}</td>
-                            </tr>
-                        </table>
-                    `;
-                    
-                    Object.keys(account.transactions).map((year) => {
-                        //console.log(year) //Year
+                    if(Object.keys(account.transactions).length !== 0){
+
                         desglose += `
-                            <h4>Año ${year}</h4>
-                        `;
-                        Object.keys(account.transactions[year].data).map((month) => {
-                            //console.log(month) //Months
-                            desglose += `
-                                <h4>${months[month-1]}</h4>
-                            `;
-
-                            desglose += `
-                                <h4>Depositos</h4>
-                                <table id='transactions'>
-                                    <thead>
-                                        <tr>
-                                            <th width="530px">Descripción</th>
-                                            <th>Cantidad</th>
-                                            <th>Fecha</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                            `;
-
-                            if(Object.keys(account.transactions[year].data[month].deposito).length !== 0){
-
-                                Object.keys(account.transactions[year].data[month].deposito).map((key) => {
-                                    //console.log(account.transactions[year].data[month].deposito[key])
-                                    desglose += `
-                                        <tr>
-                                            <td>${account.transactions[year].data[month].deposito[key].description}</td>
-                                            <td>$${account.transactions[year].data[month].deposito[key].amount}</td>
-                                            <td>${account.transactions[year].data[month].deposito[key].date}</td>
-                                        </tr>
-                                    `;
-                                });
-                            }
-                            else{
-                                desglose += `
+                            <table class="table-dp" style="margin-top: 15px">
+                                <thead>
                                     <tr>
-                                        <td colspan="3" style="text-align: center">Sin movimientos</td>
+                                        <th>Nombre de cuenta</th>
                                     </tr>
-                                `;
-                            }
-
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>${account.name}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `;
+                    
+                        Object.keys(account.transactions).map((year) => {
+                            //console.log(year) //Year
                             desglose += `
-                                    </tbody>
-                                </table>
-                                <h4>Cargos</h4>
-                                <table id='transactions'>
-                                    <thead>
+                                <h4 style="text-align:right; padding-top:5px;">Año ${year}</h4>
+                            `;
+                            Object.keys(account.transactions[year].data).map((month) => {
+                                //console.log(month) //Months
+                                desglose += `
+                                    <h4 style="text-align:center; padding-top:7px;">${months[month-1]}</h4>
+                                `;
+
+                                desglose += `
+                                    <h4>Depositos</h4>
+                                    <table class='table-dp'>
+                                        <thead>
                                             <tr>
                                                 <th width="530px">Descripción</th>
                                                 <th>Cantidad</th>
@@ -105,68 +93,141 @@ const pdfController = {
                                             </tr>
                                         </thead>
                                         <tbody>
-                            `;
+                                `;
 
-                            if(Object.keys(account.transactions[year].data[month].cargo).length !== 0){
+                                if(Object.keys(account.transactions[year].data[month].deposito).length !== 0){
 
-                                Object.keys(account.transactions[year].data[month].cargo).map((key) => {
-                                    // console.log(account.transactions[year].data[month].cargo[key])
+                                    Object.keys(account.transactions[year].data[month].deposito).map((key) => {
+                                        //console.log(account.transactions[year].data[month].deposito[key])
+                                        desglose += `
+                                            <tr>
+                                                <td>${account.transactions[year].data[month].deposito[key].description}</td>
+                                                <td>$${new Intl.NumberFormat().format(account.transactions[year].data[month].deposito[key].amount)}</td>
+                                                <td>${account.transactions[year].data[month].deposito[key].date}</td>
+                                            </tr>
+                                        `;
+                                    });
+                                }
+                                else{
                                     desglose += `
                                         <tr>
-                                            <td>${account.transactions[year].data[month].cargo[key].description}</td>
-                                            <td>$${account.transactions[year].data[month].cargo[key].amount}</td>
-                                            <td>${account.transactions[year].data[month].cargo[key].date}</td>
+                                            <td colspan="3" style="text-align: center">Sin movimientos</td>
                                         </tr>
                                     `;
-                                });
+                                }
 
-                            }
-                            else{
                                 desglose += `
-                                    <tr>
-                                        <td colspan="3" style="text-align: center">Sin movimientos</td>
-                                    </tr>
+                                        </tbody>
+                                    </table>
+                                    <h4>Cargos</h4>
+                                    <table class='table-dp'>
+                                        <thead>
+                                                <tr>
+                                                    <th width="530px">Descripción</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Fecha</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
                                 `;
-                            }
 
-                            desglose += `
-                                    </tbody>
-                                </table>
-                            `;
+                                if(Object.keys(account.transactions[year].data[month].cargo).length !== 0){
+
+                                    Object.keys(account.transactions[year].data[month].cargo).map((key) => {
+                                        // console.log(account.transactions[year].data[month].cargo[key])
+                                        desglose += `
+                                            <tr>
+                                                <td>${account.transactions[year].data[month].cargo[key].description}</td>
+                                                <td>$${new Intl.NumberFormat().format(account.transactions[year].data[month].cargo[key].amount)}</td>
+                                                <td>${account.transactions[year].data[month].cargo[key].date}</td>
+                                            </tr>
+                                        `;
+                                    });
+
+                                }
+                                else{
+                                    desglose += `
+                                        <tr>
+                                            <td colspan="3" style="text-align: center">Sin movimientos</td>
+                                        </tr>
+                                    `;
+                                }
+
+                                desglose += `
+                                        </tbody>
+                                    </table>
+                                `;
+                            });
                         });
-                    });
+
+                    }
+                    else{
+                        desglose += `
+                            <table class="table-dp" style="margin-top: 15px">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre de cuenta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>${account.name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center">Sin transacciones que mostrar</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `;
+                    }
                 }
+                count++;
             }
 
             const content = `
                 <html>
-                    <head></head>
+                    <head>
+                        <link rel="stylesheet" src="../../../public/assets/pdf.css">
+                    </head>
                     <body>
-                        <h1>Desglose de transacciones</h1>
+                        <h1 class="title-dp">Desglose de transacciones</h1>
 
                         ${desglose}           
                         
                         <style>
-                            #transactions {
+                            body{
+                                font-family: 'Metropolis-Regular', sans-serif;
+                                padding:5px 0px 5px 0px;
+                            }
+
+                            .title-dp{
+                                color: #2A2E59;
+                            }
+
+                            .table-dp{
                                 font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
                                 border-collapse: collapse;
                                 width: 100%;
+                                page-break-inside: avoid;
                             }
                             
-                            #transactions td, #transactions th {
+                            .table-dp td, .table-dp th {
                                 border: 1px solid #ddd;
-                                padding: 8px;
+                                padding: 4px;
                             }
                             
-                            #transactions tr:nth-child(even){background-color: #f2f2f2;}
+                            .table-dp tr:nth-child(even){
+                                background-color: #f2f2f2;
+                            }
                             
-                            #transactions tr:hover {background-color: #ddd;}
+                            .table-dp tr:hover {
+                                background-color: #ddd;
+                            }
                             
-                            #transactions th {
-                                padding-top: 12px;
-                                padding-bottom: 12px;
+                            .table-dp th {
+                                
                                 text-align: left;
-                                background-color: #4CAF50;
+                                background-color: #2A2E59;
                                 color: white;
                             }
                         </style>
