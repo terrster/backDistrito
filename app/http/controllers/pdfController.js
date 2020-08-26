@@ -192,6 +192,21 @@ const pdfController = {
                     <body>
                         <h1 class="title-dp">Desglose de transacciones</h1>
 
+                        <table class="table-dp" style="margin-top: 15px">
+                            <thead>
+                                <tr>
+                                    <th>ID Distrito</th>
+                                    <th>Nombre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${user.idDistrito}</td>
+                                    <td>${user.name + ' ' + user.lastname}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
                         ${desglose}           
                         
                         <style>
