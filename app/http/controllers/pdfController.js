@@ -6,14 +6,14 @@ const User = require("../models/User");
 
 const pdfController = {
 
-    transactions: async(request, response) => {//ID User
+    transactions: async(request, response) => {//ID Distrito
         //let idUser = request.headers.tokenDecoded.data.id;
 
         if(!request.params.id){
-            return response.json("User Id no proveído");
+            return response.json("Id Distrito no proveído");
         }
         
-        let user = await User.findById(request.params.id);
+        let user = await User.findOne({idDistrito: request.params.id});
 
         let credentials = user.idClient.appliance[0].idFinerio.transactions;
         let months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -97,6 +97,8 @@ const pdfController = {
 
                                 if(Object.keys(account.transactions[year].data[month].deposito).length !== 0){
 
+                                    var tdepositos = 0;
+
                                     Object.keys(account.transactions[year].data[month].deposito).map((key) => {
                                         //console.log(account.transactions[year].data[month].deposito[key])
                                         desglose += `
@@ -106,19 +108,31 @@ const pdfController = {
                                                 <td>${account.transactions[year].data[month].deposito[key].date}</td>
                                             </tr>
                                         `;
+                                        tdepositos += account.transactions[year].data[month].deposito[key].amount;
                                     });
+
+                                    desglose += `
+                                        </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td>Total</td>
+                                                    <td colspan="2">$${new Intl.NumberFormat().format(tdepositos)}</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    `;
                                 }
                                 else{
                                     desglose += `
-                                        <tr>
-                                            <td colspan="3" style="text-align: center">Sin movimientos</td>
-                                        </tr>
+                                            <tr>
+                                                <td colspan="3" style="text-align: center">Sin movimientos</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     `;
                                 }
 
                                 desglose += `
-                                        </tbody>
-                                    </table>
                                     <h4>Cargos</h4>
                                     <table class='table-dp'>
                                         <thead>
@@ -133,6 +147,8 @@ const pdfController = {
 
                                 if(Object.keys(account.transactions[year].data[month].cargo).length !== 0){
 
+                                    var tcargos = 0;
+
                                     Object.keys(account.transactions[year].data[month].cargo).map((key) => {
                                         // console.log(account.transactions[year].data[month].cargo[key])
                                         desglose += `
@@ -142,23 +158,53 @@ const pdfController = {
                                                 <td>${account.transactions[year].data[month].cargo[key].date}</td>
                                             </tr>
                                         `;
+                                        tcargos += account.transactions[year].data[month].cargo[key].amount;
                                     });
-
+                                    desglose += `
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td>Total</td>
+                                                    <td colspan="2">$${new Intl.NumberFormat().format(tcargos)}</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    `;
                                 }
                                 else{
                                     desglose += `
-                                        <tr>
-                                            <td colspan="3" style="text-align: center">Sin movimientos</td>
-                                        </tr>
+                                            <tr>
+                                                <td colspan="3" style="text-align: center">Sin movimientos</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     `;
                                 }
-
-                                desglose += `
-                                        </tbody>
-                                    </table>
-                                `;
                             });
+
+                            desglose += `
+                                <h4>Última transacción del año</h4>
+
+                                <table class='table-dp'>
+                                    <thead>
+                                        <tr>
+                                            <th width="530px">Descripción</th>
+                                            <th>Cantidad</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>${account.transactions[year].last_transaction.description}</td>
+                                            <td>$${new Intl.NumberFormat().format(account.transactions[year].last_transaction.amount)}</td>
+                                            <td>${account.transactions[year].last_transaction.date}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div style="page-break-after: always;"></div>
+                            `;
                         });
+
 
                     }
                     else{
