@@ -231,7 +231,7 @@ const pdfController = {
             }
 
             const content = `
-                <html>
+                <html style="zoom: 0.60;">
                     <head>
                         <link rel="stylesheet" src="../../../public/assets/pdf.css">
                     </head>
