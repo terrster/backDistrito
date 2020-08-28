@@ -55,17 +55,43 @@ const deal = {
                     }
                 ]
             };
+
+            if(request.brokercode){
+                try{
+                    const response = await axios.get('owners/v2/owners/' + request.brokercode + hapiKey);
+        
+                    if(response.status == 200){
+                        dealParams.properties.push({
+                            "value": request.brokercode,
+                            "name": "hubspot_owner_id"
+                        });
+
+                        const {data} = await axios.post('deals/v1/deal' + hapiKey, dealParams);
+                        return data;
+                    }
+                }
+                catch(error){
+                    let response = {
+                        code: 403,
+                        msg: "El codígo broker no existe"
+                    };
+        
+                    return response;
+                }
+            }
+            else{
+                const {data} = await axios.post('deals/v1/deal' + hapiKey, dealParams);
+                return data;
+            }
             
-            const {data} = await axios.post('deals/v1/deal' + hapiKey, dealParams);
-            return data;
         }
         catch(error){
             let response = {
+                code: 500,
                 msg: "Hubspot: Algo salió mal tratando de crear un deal",
                 error: error
             };
 
-            //console.log(response);
             return response;
         }
     },

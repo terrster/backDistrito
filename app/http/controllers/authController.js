@@ -42,6 +42,11 @@ const authController = {
             data.hubspotContactId = contactStored.vid;
 
             let dealStored = await hubspotController.deal.store(data);
+
+            if(dealStored.code == 403){
+                return response.json(dealStored);
+            }
+
             data.hubspotDealId = dealStored.dealId;
 
             let userStored = await User.create(data);
