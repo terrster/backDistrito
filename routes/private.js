@@ -11,6 +11,7 @@ require("express-group-routes");
 const route = express.Router();
 
 const solicitudController = require("../app/http/controllers/solicitudController");
+const finerioController = require("../app//http/controllers/finerioController");
 const pdfController = require("../app//http/controllers/pdfController");
 
 route.use((request, response, next) => {
@@ -33,6 +34,11 @@ route.use((request, response, next) => {
 //Solicitud routes
 route.group("/solicitud", (solicitud) => {
     solicitud.get('/aspiria/:id?', solicitudController.aspiria);
+});
+
+//Finerio routes - Open banking
+route.group("/finerio", (finerio) => {
+    finerio.get('/user/transactions/:id?', finerioController.getAllTransactions);
 });
 
 //Pdf routes

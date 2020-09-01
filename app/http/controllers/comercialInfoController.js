@@ -149,6 +149,19 @@ const comercialInfoController = {
                     credentials : credentials
                 }
 
+                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', { 
+                    value: finerioAPI.data.id,
+                    name: 'id_finerio'
+                });
+
+                if(dealUpdated.error){
+                    return response.json({
+                        code: 500,
+                        msg : "Algo salió mal tratando de guardar información | Hubspot: id_finerio",
+                        error: dealUpdated.error
+                    });
+                }
+
                 let finerio = await Finerio.create(params);
                 await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
                     idFinerio : {
@@ -291,6 +304,20 @@ const comercialInfoController = {
 
                 if(!user.idClient.appliance[0].idFinerio){//Si no tiene idFinerio
                     let finerioAPI = await finerioController.storeCustomer(user.email);
+
+                    let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', { 
+                        value: finerioAPI.data.id,
+                        name: 'id_finerio'
+                    });
+    
+                    if(dealUpdated.error){
+                        return response.json({
+                            code: 500,
+                            msg : "Algo salió mal tratando de guardar información | Hubspot: id_finerio",
+                            error: dealUpdated.error
+                        });
+                    }
+
                     let credentials = [];
 
                     for await(let bank of banks){

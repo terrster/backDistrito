@@ -126,7 +126,6 @@ route.group("/finerio", (finerio) => {
 
     //Transactions
     finerio.get('/transactions/:id', finerioController.getTransactions);
-    finerio.get('/user/transactions', finerioController.getAllTransactions);
 });
 
 module.exports = route;

@@ -1618,10 +1618,14 @@ const finerioController = {
         }
     },
     getAllTransactions: async(request, response) => {//ID User
-        let idUser = request.headers.tokenDecoded.data.id;
+        let idDistrito = request.params.id;
+
+        if(!idDistrito){
+            return response.json("Id Distrito no proveído");
+        }
 
         try{
-            let user = await User.findById(idUser);
+            let user = await User.findOne({"idDistrito": idDistrito});
             let token = await finerioCredentials.getToken();
 
             let credentials = user.idClient.appliance[0].idFinerio.credentials;

@@ -115,6 +115,15 @@ const deal = {
 
             function getParams(stage){
                 switch(stage){
+                    case 'single_field':
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.value,
+                                    "name": request.name
+                                }
+                            ]
+                        }
                     case 'type'://tipo de negocio                        
                         return {
                             "properties": [
@@ -681,7 +690,7 @@ const deal = {
                             ]
                         }
                 }
-            }
+            }console.log(dealParams)
             const {data} = await axios.put('deals/v1/deal/' + hubspotDealId + hapiKey, dealParams);
             return data;
         }
