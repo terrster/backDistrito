@@ -7,13 +7,13 @@ const User = require("../models/User");
 const pdfController = {
 
     transactions: async(request, response) => {//ID Distrito
-        //let idUser = request.headers.tokenDecoded.data.id;
+        let id_Distrito = request.params.id;
 
         if(!request.params.id){
             return response.json("Id Distrito no proveído");
         }
         
-        let user = await User.findOne({idDistrito: request.params.id});
+        let user = await User.findOne({idDistrito: id_Distrito});
 
         let credentials = user.idClient.appliance[0].idFinerio.transactions;
         let months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -183,24 +183,7 @@ const pdfController = {
                             });
 
                             desglose += `
-                                <h4>Última transacción del año</h4>
-
-                                <table class='table-dp'>
-                                    <thead>
-                                        <tr>
-                                            <th width="530px">Descripción</th>
-                                            <th>Cantidad</th>
-                                            <th>Fecha</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>${account.transactions[year].last_transaction.description}</td>
-                                            <td>$${new Intl.NumberFormat().format(account.transactions[year].last_transaction.amount)}</td>
-                                            <td>${account.transactions[year].last_transaction.date}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                
                                 <div style="page-break-after: always;"></div>
                             `;
                         });
