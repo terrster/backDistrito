@@ -79,19 +79,19 @@ function readTransactions(transactions){//Formatting transactions
                 return index > index2 ? map[year].data[ilt_month].deposito[ilt_dep] : map[year].data[ilt_month].cargo[ilt_car];
             }
 
-            if(transactions){
+            // if(transactions){
 
-                map[currentYear]['last_transaction'] = getLastTransaction(currentYear);
+            //     map[currentYear]['last_transaction'] = getLastTransaction(currentYear);
 
-                if(map[currentYear - 1]){
-                    map[currentYear - 1]['last_transaction'] = getLastTransaction(currentYear - 1);
+            //     if(map[currentYear - 1]){
+            //         map[currentYear - 1]['last_transaction'] = getLastTransaction(currentYear - 1);
 
-                    if(map[currentYear - 2]){
-                        map[currentYear - 2]['last_transaction'] = getLastTransaction(currentYear - 2);
-                    }
-                }
+            //         if(map[currentYear - 2]){
+            //             map[currentYear - 2]['last_transaction'] = getLastTransaction(currentYear - 2);
+            //         }
+            //     }
 
-            }
+            // }
 
             resolve(map);
         }
