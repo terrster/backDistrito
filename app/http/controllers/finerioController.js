@@ -1603,7 +1603,7 @@ const finerioController = {
                 };
             }
 
-            return responese.json(err);
+            return response.json(err);
         }
     },
     //Transactions
@@ -1790,6 +1790,18 @@ const finerioController = {
         catch(error){
             console.log(error);
         }
+    },
+    getAccountDetails: async(request, response) => {
+        let token = await finerioCredentials.getToken();
+
+        let accountRsp = await axios.get(`accounts/${request.body.id}/details`, {    
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log(accountRsp);
     }
 };
 

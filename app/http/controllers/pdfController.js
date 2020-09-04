@@ -238,14 +238,14 @@ const pdfController = {
                     </head>
                     <body>
                         <h1 class="title-dp">Desglose de transacciones</h1>
-                        <h3>Movimientos obtenidos con tecnología Open Banking. Esta información se obtuvo 
+                        <h3>Movimientos obtenidos por Distrito Pyme con tecnología Open Banking. Esta información se obtuvo 
                         conectándonos directamente a los servidores del banco correspondiente con los accesos 
                         proporcionados por el solicitante de crédito.</h3>
 
                         <table class="table-dp" style="margin-top: 15px">
                             <thead>
                                 <tr>
-                                    <th>ID Distrito</th>
+                                    <th>ID Distrito Pyme</th>
                                     <th>Nombre</th>
                                 </tr>
                             </thead>
