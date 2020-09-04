@@ -183,7 +183,25 @@ const pdfController = {
                             });
 
                             desglose += `
-                                
+                                <h4>Última transacción del año</h4>
+
+                                <table class='table-dp'>
+                                    <thead>
+                                        <tr>
+                                            <th width="530px">Descripción</th>
+                                            <th>Cantidad</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>${account.transactions[year].last_transaction.description}</td>
+                                            <td>$${new Intl.NumberFormat().format(account.transactions[year].last_transaction.amount)}</td>
+                                            <td>${account.transactions[year].last_transaction.date}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
                                 <div style="page-break-after: always;"></div>
                             `;
                         });
@@ -220,6 +238,9 @@ const pdfController = {
                     </head>
                     <body>
                         <h1 class="title-dp">Desglose de transacciones</h1>
+                        <h3>Movimientos obtenidos con tecnología Open Banking. Esta información se obtuvo 
+                        conectándonos directamente a los servidores del banco correspondiente con los accesos 
+                        proporcionados por el solicitante de crédito.</h3>
 
                         <table class="table-dp" style="margin-top: 15px">
                             <thead>

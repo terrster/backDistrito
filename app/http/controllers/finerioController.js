@@ -72,26 +72,48 @@ function readTransactions(transactions){//Formatting transactions
                 let ilt_month = Object.keys(map[year].data)[Object.keys(map[year].data).length - 1];
                 let ilt_dep = Object.keys(map[year].data[ilt_month].deposito)[Object.keys(map[year].data[ilt_month].deposito).length - 1];
                 let ilt_car = Object.keys(map[year].data[ilt_month].cargo)[Object.keys(map[year].data[ilt_month].cargo).length - 1];
-            
-                let index = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].deposito[ilt_dep].id);
-                let index2 = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].cargo[ilt_car].id);
+     
+                let index = '';//Deposito
+                let index2 = '';//Cargo
 
-                return index > index2 ? map[year].data[ilt_month].deposito[ilt_dep] : map[year].data[ilt_month].cargo[ilt_car];
+                if(Object.keys(map[year].data[ilt_month].deposito).length > 0){
+                    index = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].deposito[ilt_dep].id);
+                }
+
+                if(Object.keys(map[year].data[ilt_month].cargo).length > 0){
+                    index2 = transactions.findIndex(transactions => transactions.id === map[year].data[ilt_month].cargo[ilt_car].id);
+                }
+
+                if(index != '' && index2 != ''){
+                    return map[year].data[ilt_month].deposito[ilt_dep].id > map[year].data[ilt_month].cargo[ilt_car].id ? map[year].data[ilt_month].deposito[ilt_dep] : map[year].data[ilt_month].cargo[ilt_car];
+                }
+                else if(index != ''){
+                    return map[year].data[ilt_month].deposito[ilt_dep];
+                }
+                else if(index2 != ''){
+                    return map[year].data[ilt_month].cargo[ilt_car];
+                }
+                else{
+                    return [];
+                }
             }
 
-            // if(transactions){
+            if(transactions){
 
-            //     map[currentYear]['last_transaction'] = getLastTransaction(currentYear);
+                map[currentYear]['last_transaction'] = getLastTransaction(currentYear);
 
-            //     if(map[currentYear - 1]){
-            //         map[currentYear - 1]['last_transaction'] = getLastTransaction(currentYear - 1);
+                if(map[currentYear - 1]){
+                    map[currentYear - 1]['last_transaction'] = getLastTransaction(currentYear - 1);
 
-            //         if(map[currentYear - 2]){
-            //             map[currentYear - 2]['last_transaction'] = getLastTransaction(currentYear - 2);
-            //         }
-            //     }
+                    if(map[currentYear - 2]){
+                        map[currentYear - 2]['last_transaction'] = getLastTransaction(currentYear - 2);
+                    }
+                }
 
-            // }
+            }
+            else{
+                map[currentYear]['last_transaction'] = [];
+            }
 
             resolve(map);
         }
