@@ -95,10 +95,10 @@ const deal = {
             return response;
         }
     },
-    show: async(hubspotDealId) => {
+    show: async(request, response) => {
         try{
-            const {data} = await axios.get('deals/v1/deal/' + hubspotDealId + hapiKey);
-            return data;
+            const {data} = await axios.get('deals/v1/deal/' + request.params.id + hapiKey);
+            return response.json(data);
         }
         catch(error){
             let response = {
@@ -690,7 +690,7 @@ const deal = {
                             ]
                         }
                 }
-            }console.log(dealParams)
+            }
             const {data} = await axios.put('deals/v1/deal/' + hubspotDealId + hapiKey, dealParams);
             return data;
         }
