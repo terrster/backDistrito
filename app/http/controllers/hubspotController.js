@@ -197,9 +197,13 @@ const deal = {
                                     "value": request.facebook,
                                     "name": "n3_12_facebook"
                                 },
-                                {//exporta a EU, antes TPV
+                                {
                                     "value": format.YES_NO_QUESTION[request.terminal],
                                     "name": "n3_13_tpv"
+                                },
+                                {
+                                    "value": format.YES_NO_QUESTION[request.exportation],
+                                    "name": "n3_17_exportacion"
                                 },
                                 {
                                     "value": format.WARRANTY[request.warranty],

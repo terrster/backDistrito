@@ -35,6 +35,7 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
+                exportation,
                 warranty,
                 ciec,
                 banks
@@ -58,6 +59,7 @@ const comercialInfoController = {
                     webSite,
                     facebook,
                     terminal,
+                    exportation,
                     ciec,
                     warranty
                 });
@@ -99,6 +101,7 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
+                exportation,
                 ciec,
                 warranty,
                 address: {
@@ -230,6 +233,7 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
+                exportation,
                 ciec,
                 warranty,
                 banks
@@ -253,6 +257,7 @@ const comercialInfoController = {
                     webSite,
                     facebook,
                     terminal,
+                    exportation,
                     ciec,
                     warranty
                 });
@@ -294,6 +299,7 @@ const comercialInfoController = {
                 webSite,
                 facebook,
                 terminal,
+                exportation,
                 ciec,
                 warranty
             };
