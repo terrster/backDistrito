@@ -15,7 +15,9 @@ const documentsSchema = new Schema({
     facturacion: Array,
     others: Array,
     cventerprise:Array,
-    proofAddressMainFounders: Array
+    proofAddressMainFounders: Array,
+    collectionReportSaleTerminals: Array,
+    localContractLease: Array
 }, { collection: 'Documents' });
   
 var collectionName = 'Documents';

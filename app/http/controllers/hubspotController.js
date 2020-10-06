@@ -678,6 +678,20 @@ const deal = {
                             }
                         }
 
+                        if(request.collectionReportSaleTerminals){
+                            data.push({
+                                "value": request.collectionReportSaleTerminals,
+                                "name": "n9_94_reporte_de_cobranza_tpv"
+                            });
+                        }
+
+                        if(request.localContractLease){
+                            data.push({
+                                "value": request.localContractLease,
+                                "name": "n9_95_contrato_de_arrendamiento_tpv"
+                            });
+                        }
+
                         let params = {
                             "properties": data
                         };

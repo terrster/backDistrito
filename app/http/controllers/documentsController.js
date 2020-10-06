@@ -114,6 +114,10 @@ const getNameProperty = async(key) => {
                 'n9_8_2_otros_3',
                 'n9_8_3_otros_4',
             ];
+        case "collectionReportSaleTerminals":
+            return['n9_94_reporte_de_cobranza_tpv'];
+        case "localContractLease":
+            return['n9_95_contrato_de_arrendamiento_tpv'];
     }
 }
 
@@ -203,14 +207,26 @@ const documentsController = {
             var statusValue = false;
 
             if(user.idClient.type == 'PF'){
-                if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
-                    statusValue = true;
+                if(user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else{
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
                 }
             }
 
             if(user.idClient.type == 'PFAE'){
-                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
                     if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
                         statusValue = true;
                     }
                 }
@@ -222,8 +238,13 @@ const documentsController = {
             }
 
             if(user.idClient.type == 'RIF'){
-                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
                     if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
                         statusValue = true;
                     }
                 }
@@ -235,8 +256,13 @@ const documentsController = {
             }
 
             if(user.idClient.type == 'PM'){
-                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
                     if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
                         statusValue = true;
                     }
                 }
@@ -558,14 +584,26 @@ const documentsController = {
             var statusValue = false;
 
             if(user.idClient.type == 'PF'){
-                if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
-                    statusValue = true;
+                if(user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else{
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
                 }
             }
 
             if(user.idClient.type == 'PFAE'){
-                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
                     if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
                         statusValue = true;
                     }
                 }
@@ -577,8 +615,13 @@ const documentsController = {
             }
 
             if(user.idClient.type == 'RIF'){
-                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
                     if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
                         statusValue = true;
                     }
                 }
@@ -590,8 +633,13 @@ const documentsController = {
             }
 
             if(user.idClient.type == 'PM'){
-                if(user.idClient.appliance[0].idComercialInfo.ciec != null){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
                     if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
                         statusValue = true;
                     }
                 }
