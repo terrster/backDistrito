@@ -96,9 +96,25 @@ const deal = {
         }
     },
     show: async(request, response) => {
+        let id;
+        let type_response = '';
+        
+        if(request.hasOwnProperty('params')){
+            id = request.params.id;
+            type_response = 'web';
+        }
+        else{
+            id = request;
+        }
+
         try{
-            const {data} = await axios.get('deals/v1/deal/' + request.params.id + hapiKey);
-            return response.json(data);
+            const {data} = await axios.get('deals/v1/deal/' + id + hapiKey);
+            if(type_response == 'web'){
+                return response.json(data);
+            }
+            else{
+                return data;
+            }
         }
         catch(error){
             let response = {

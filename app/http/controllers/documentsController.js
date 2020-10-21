@@ -688,7 +688,7 @@ const documentsController = {
 
             let property = await getNameProperty(data.name);
             var propName = '';
-
+            
             for(let i = 0; i<property.length; i++){
                 if(hubspot.properties[property[i]].value == data.url){
                     propName = hubspot.properties[property[i]].versions[0].name;
