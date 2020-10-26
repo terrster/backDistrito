@@ -1345,7 +1345,7 @@ const finerioController = {
     //Credentials
     storeCredential: async(request) => {
         try{
-            let { customerId, bankId, username, password, securityCode } = request;
+            let { customerId, bankId, username, password, securityCode, automaticFetching } = request;
 
             if(!customerId || !bankId || !username || !password){
                 let res = {
@@ -1359,6 +1359,7 @@ const finerioController = {
             let usernameEncrypted = Encrypt(username);
             let passwordEncrypted = Encrypt(password);
             let securityCodeEncrypted = securityCode ? Encrypt(securityCode) : null;
+            let automaticFetchingOption = automaticFetching ? automaticFetching : false;
 
             let token = await finerioCredentials.getToken();
             let result = await axios.post('credentials', {
@@ -1366,7 +1367,8 @@ const finerioController = {
                 'bankId': bankId,
                 'username': usernameEncrypted,
                 'password': passwordEncrypted,
-                'securityCode': securityCodeEncrypted
+                'securityCode': securityCodeEncrypted,
+                'automaticFetching' : automaticFetchingOption
             }, {    
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -1456,7 +1458,7 @@ const finerioController = {
     },
     updateCredential: async(request) => {
         try{
-            let { customerId, idCredential, bankId, username, password, securityCode } = request;
+            let { customerId, idCredential, bankId, username, password, securityCode, automaticFetching } = request;
 
             if(!customerId || !bankId || !username || !password){
                 let res = {
@@ -1470,6 +1472,7 @@ const finerioController = {
             let usernameEncrypted = Encrypt(username);
             let passwordEncrypted = Encrypt(password);
             let securityCodeEncrypted = securityCode ? Encrypt(securityCode) : null;
+            let automaticFetchingOption = automaticFetching ? automaticFetching : false;
 
             let token = await finerioCredentials.getToken();
             let result = await axios.put(`credentials/${idCredential}`, {
@@ -1477,7 +1480,8 @@ const finerioController = {
                 'bankId': bankId,
                 'username': usernameEncrypted,
                 'password': passwordEncrypted,
-                'securityCode': securityCodeEncrypted
+                'securityCode': securityCodeEncrypted,
+                'automaticFetching' : automaticFetchingOption
             }, {    
                 headers: {
                     'Authorization': `Bearer ${token}`,
