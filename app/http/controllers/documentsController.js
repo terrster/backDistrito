@@ -273,12 +273,6 @@ const documentsController = {
                 }
             }
 
-            if(user.idClient.appliance[0].idComercialInfo.terminal){
-                if(docs.collectionReportSaleTerminals.length == 0 && docs.localContractLease.length == 0){
-                    statusValue = false;
-                }
-            }
-
             await Documents.findByIdAndUpdate(documentStored._id, {status: statusValue});
             
             await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
@@ -653,12 +647,6 @@ const documentsController = {
                     if(docs.constitutiveAct.length > 0 && docs.rfc.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
                         statusValue = true;
                     }
-                }
-            }
-
-            if(user.idClient.appliance[0].idComercialInfo.terminal){
-                if(docs.collectionReportSaleTerminals.length == 0 && docs.localContractLease.length == 0){
-                    statusValue = false;
                 }
             }
 
