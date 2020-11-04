@@ -12,7 +12,8 @@ const route = express.Router();
 
 const solicitudController = require("../app/http/controllers/solicitudController");
 const finerioController = require("../app//http/controllers/finerioController");
-const pdfController = require("../app//http/controllers/pdfController");
+const pdfController = require("../app/http/controllers/pdfController");
+const circuloCreditoController = require("../app/http/controllers/circuloCreditoController");
 
 route.use((request, response, next) => {
     if(!request.query.token){
@@ -44,6 +45,11 @@ route.group("/finerio", (finerio) => {
 //Pdf routes
 route.group("/pdf", (pdf) => {
     pdf.get('/user/transactions/:id?', pdfController.transactions);
+});
+
+//Finerio routes - Open banking
+route.group("/impmx", (impmx) => {
+    impmx.get('/alta/:id', circuloCreditoController.alta);
 });
 
 module.exports = route;
