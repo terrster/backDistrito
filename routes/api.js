@@ -101,8 +101,6 @@ route.group("/documents", (documents) => {
 
 //Finerio routes - Open banking
 route.group("/finerio", (finerio) => {
-    finerio.get('/test', finerioController.test);
-
     //Banks
     finerio.get('/banks', finerioController.getBanks);
     finerio.get('/bank/:id/fields', finerioController.getBank);
@@ -127,6 +125,9 @@ route.group("/finerio", (finerio) => {
 
     //Transactions
     finerio.get('/transactions/:id', finerioController.getTransactions);
+
+    //Callback
+    finerio.all('/callback', finerioController.callback);
 });
 
 module.exports = route;
