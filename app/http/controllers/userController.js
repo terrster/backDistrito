@@ -1,6 +1,8 @@
 'user strict'
 
+const { response } = require("express");
 const User = require("../models/User");
+const mailManager = require("../services/mailManager");
 
 const userController = {
 
@@ -56,6 +58,34 @@ const userController = {
             });
         }
     },
+    reactivate: async(request, response) => {
+        let id = request.headers.tokenDecoded.data.id;
+
+        try{
+            let user = await User.findById(id);
+
+            let data = {
+                idDistrito: user.idDistrito,
+                nombre: user.name + " " + user.lastname,
+                telefono: user.phone,
+                email: user.email
+            }
+
+            await mailManager.reactivate(data);
+
+            return response.json({ 
+                code: 200,
+                msg: "Correo de reactivación enviado correctamente!"
+            });
+        } 
+        catch(error){
+            return response.json({
+                code: 500,
+                msg: "Algo salió mal tratando de obtener un usuario",
+                error: error
+            });
+        }
+    }
 
 }
 

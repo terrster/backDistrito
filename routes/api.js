@@ -38,6 +38,7 @@ route.use(async(request, response, next) => {
 route.group('/user', (user) => {
     user.get('/:id', userController.show);
     user.put('/:id', userController.update);
+    user.post('/reactivate', userController.reactivate);
 });
 
 //Deal routes
