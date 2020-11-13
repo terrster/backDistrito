@@ -125,9 +125,6 @@ route.group("/finerio", (finerio) => {
 
     //Transactions
     finerio.get('/transactions/:id', finerioController.getTransactions);
-
-    //Callback
-    finerio.all('/callback', finerioController.callback);
 });
 
 module.exports = route;

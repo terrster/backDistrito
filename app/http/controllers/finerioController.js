@@ -815,12 +815,20 @@ const finerioController = {
     callback: async(request, response) => {
         let data = request.body;
 
-        await FinerioCallback.create({data: data});
+        if(parseInt(Object.keys(data).length)){
+            await FinerioCallback.create({data: data});
 
-        return response.json({
-            status: 200,
-            msg: "Callback recibido exitosamente"
-        });
+            return response.json({
+                status: 200,
+                msg: "Callback recibido exitosamente"
+            });
+        }
+        else{
+            return response.json({
+                status: 500,
+                msg: "No se recibió nada en el callback"
+            });
+        }
     }
 };
 
