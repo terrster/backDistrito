@@ -123,6 +123,7 @@ const UploadFilesToS3 = async(file) => {
 }
 
 module.exports = {
+    uploadFileS3,
     UploadFilesToS3,
     deleteFromServer
 };

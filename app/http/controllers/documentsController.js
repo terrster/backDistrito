@@ -7,48 +7,54 @@ const Documents = require("../models/Documents");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
 
+const path = require("path");
+const fs = require('fs');
+
 const getDocsMethod = (type) => {
     let docFiles = [];
     switch (type) {
       case "PF":
-        docFiles = ["oficialID", "proofAddress", "bankStatements", "others"];
+        docFiles = [
+            "oficialID",
+            "proofAddress",
+            "bankStatements",
+            "others"
+        ];
         break;
       case "PFAE":
         docFiles = [
-          "oficialID",
-          "rfc",
-          "proofAddress",
-          "bankStatements",
-          "lastDeclarations",
-          "acomplishOpinion",
-          "others",
+            "oficialID",
+            "rfc",
+            "proofAddress",
+            "bankStatements",
+            "lastDeclarations",
+            "acomplishOpinion",
+            "others",
         ];
         break;
       case "RIF":
         docFiles = [
-          "oficialID",
-          "rfc",
-          "proofAddress",
-          "bankStatements",
-          "lastDeclarations",
-          "acomplishOpinion",
-          "others",
+            "oficialID",
+            "rfc",
+            "proofAddress",
+            "bankStatements",
+            "lastDeclarations",
+            "acomplishOpinion",
+            "others",
         ];
         break;
       case "PM":
         docFiles = [
-          "constitutiveAct",
-          "rfc",
-          "proofAddress",
-          "financialStatements",
-          "bankStatements",
-          "lastDeclarations",
-          "oficialID",
-          "proofAddressMainFounders",
-          "others",
+            "constitutiveAct",
+            "rfc",
+            "proofAddress",
+            "financialStatements",
+            "bankStatements",
+            "lastDeclarations",
+            "oficialID",
+            "proofAddressMainFounders",
+            "others",
         ];
-        break;
-      default:
         break;
     }
     return docFiles;
@@ -57,7 +63,7 @@ const getDocsMethod = (type) => {
 const getNameProperty = async(key) => {
     switch(key){
         case "oficialID":
-            return[
+            return [
                 'n9_1_id',
                 'n9_1_2_id',
                 'n9_1_3_id',
@@ -65,13 +71,13 @@ const getNameProperty = async(key) => {
             ];
         case "proofAddress":
         case "proofAddressMainFounders":
-            return[
+            return [
                 'n9_2_comp_domicilio',
                 'n9_2_1_comp_domicilio_2',
                 'n9_2_2_comp_domicilio_3',
             ];
         case "bankStatements":
-            return[
+            return [
                 'n9_3_estados_de_cuenta',
                 'n9_3_1_estados_de_cuenta',
                 'n9_3_2_estados_de_cuenta',
@@ -86,20 +92,20 @@ const getNameProperty = async(key) => {
                 'n9_3_11_estados_de_cuenta',
           ];
         case "rfc":
-            return['n9_4_rfc'];
+            return ['n9_4_rfc'];
         case "lastDeclarations":
-            return[
+            return [
                 'n9_5_declaraci_n',
                 'n9_5_1_declaraci_n',
                 'n9_5_2_declaraci_n',
                 'n9_5_3_declaraci_n',
             ];
         case "acomplishOpinion":
-            return['n9_6_opini_n_de_cumplimiento'];
+            return ['n9_6_opini_n_de_cumplimiento'];
         case "constitutiveAct":
-            return['n9_9_acta_constitutiva'];
+            return ['n9_9_acta_constitutiva'];
         case "financialStatements":
-            return[
+            return [
                 'n9_93_1_eeff',
                 'n9_93_1_1_eeff',
                 'n9_93_2_eeff',
@@ -115,9 +121,9 @@ const getNameProperty = async(key) => {
                 'n9_8_3_otros_4',
             ];
         case "collectionReportSaleTerminals":
-            return['n9_94_reporte_de_cobranza_tpv'];
+            return ['n9_94_reporte_de_cobranza_tpv'];
         case "localContractLease":
-            return['n9_95_contrato_de_arrendamiento_tpv'];
+            return ['n9_95_contrato_de_arrendamiento_tpv'];
     }
 }
 
@@ -135,31 +141,120 @@ const documentsController = {
             });
         }
 
-        try{console.log("store")
-            var filesUploaded = {};
-            const UploadFiles = Object.keys(files).map(async(key) => {
-                if(files[key].length){
-                    for await(let file of files[key]){
-                        let fileUrl = await fileManager.UploadFilesToS3(file);	
-                        if(!filesUploaded[key]){
-                            filesUploaded[key] = [fileUrl];
+        var filesUploadedServer = {};
+        Object.keys(files).map((key) => {
+            if(files[key].length > 1){
+                Object.keys(files[key]).map((index) => {
+                    let newName = `${new Date().getTime()}-${files[key][index].name}`;
+                    let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${newName}`);
+                    files[key][index].mv(filePath);
+
+                    if(!filesUploadedServer[key]){
+                        filesUploadedServer[key] = [{
+                            name: newName,
+                            base64: files[key][index].data,
+                            content: files[key][index].mimetype
+                        }];
+                    }
+                    else{
+                        let index = Object.keys(filesUploadedServer[key])[Object.keys(filesUploadedServer[key]).length - 1];
+                        filesUploadedServer[key][parseInt(index) + 1] = {
+                            name: newName,
+                            base64: files[key][index].data,
+                            content: files[key][index].mimetype
+                        };
+                    }
+                });
+            }
+            else{
+                let newName = `${new Date().getTime()}-${files[key].name}`;
+                let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${newName}`);
+                files[key].mv(filePath);
+
+                filesUploadedServer[key] = [{
+                    name: newName,
+                    base64: files[key].data,
+                    content: files[key].mimetype
+                }];
+            }
+        });
+
+        try {
+            var filesUploadedS3 = {};
+            const UploadFilesToS3 = Object.keys(filesUploadedServer).map(async(key) => {
+                if(filesUploadedServer[key].length > 1){
+                    let filesUploadedS3Multiple = {};
+                    const UploadFilesToS3Multiple = Object.keys(filesUploadedServer[key]).map(async(index) => {
+                        let url = await fileManager.uploadFileS3(filesUploadedServer[key][index].name, filesUploadedServer[key][index].base64, filesUploadedServer[key][index].content);
+
+                        if(!filesUploadedS3Multiple[key]){
+                            filesUploadedS3Multiple[key] = [url];
                         }
                         else{
-                            let index = Object.keys(filesUploaded[key])[Object.keys(filesUploaded[key]).length - 1];
-                            filesUploaded[key][parseInt(index) + 1] = fileUrl;
+                            let index = Object.keys(filesUploadedS3Multiple[key])[Object.keys(filesUploadedS3Multiple[key]).length - 1];
+                            filesUploadedS3Multiple[key][parseInt(index) + 1] = url;                        
                         }
-                    }
+                    });
+
+                    await Promise.all(UploadFilesToS3Multiple);
+                    filesUploadedS3 = {...filesUploadedS3, ...filesUploadedS3Multiple};
                 }
                 else{
-                    let fileUrl = await fileManager.UploadFilesToS3(files[key]);
-                    filesUploaded[key] = [fileUrl];
+                   let url = await fileManager.uploadFileS3(filesUploadedServer[key][0].name, filesUploadedServer[key][0].base64, filesUploadedServer[key][0].content);
+                   filesUploadedS3[key] = [url];
                 }
             });
 
-            await Promise.all(UploadFiles);
-            fileManager.deleteFromServer();
+            await Promise.all(UploadFilesToS3);
+
+            Object.keys(filesUploadedServer).map((key) => {
+                if(filesUploadedServer[key].length > 1){
+                    Object.keys(filesUploadedServer[key]).map((index) => {
+                        let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${filesUploadedServer[key][index].name}`);
+                        fs.unlinkSync(filePath);
+                    });
+                }
+                else{
+                    let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${filesUploadedServer[key][0].name}`);
+                    fs.unlinkSync(filePath);
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+
+        //console.log(filesUploadedServer);
+
+        try{console.log("store")
+            var filesUploaded = filesUploadedS3;
+            //var filesUploaded = {};
+            // const UploadFiles = Object.keys(files).map(async(key) => {
+            //     if(files[key].length){
+            //         for await(let file of files[key]){
+            //             let fileUrl = await fileManager.UploadFilesToS3(file);	
+            //             if(!filesUploaded[key]){
+            //                 filesUploaded[key] = [fileUrl];
+            //             }
+            //             else{
+            //                 let index = Object.keys(filesUploaded[key])[Object.keys(filesUploaded[key]).length - 1];
+            //                 filesUploaded[key][parseInt(index) + 1] = fileUrl;
+            //             }
+            //         }
+            //     }
+            //     else{
+            //         let fileUrl = await fileManager.UploadFilesToS3(files[key]);
+            //         filesUploaded[key] = [fileUrl];
+            //     }
+            // });
+
+            // await Promise.all(UploadFiles);
+            //fileManager.deleteFromServer();
 
             let user = await User.findById(id);
+            // return response.json({
+            //     code: 200,
+            //     user: user
+            // });
             let documentStored = await Documents.create({
                 idClient: {
                     _id: user.idClient._id
@@ -321,58 +416,141 @@ const documentsController = {
             var user = await User.findById(idUser);
             var docs = await Documents.findById(id);
 
-            var filesUploaded = {};
+            var filesUploadedServer = {};
+            Object.keys(files).map((key) => {
+                if(files[key].length > 1){
+                    Object.keys(files[key]).map((index) => {
+                        let newName = `${new Date().getTime()}-${files[key][index].name}`;
+                        let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${newName}`);
+                        files[key][index].mv(filePath);
 
-            const UploadFiles = Object.keys(files).map(async(key) => {
-                if(files[key].length){
-                    if(key.length > 25){
-                        // if(docs.oficialID.indexOf(key) >= 0){
-                        //     if(!filesReplace["oficialID"]){
-                        //         filesReplace["oficialID"] = [key];
-                        //     }
-                        //     else{
-                        //         let index = Object.keys(filesReplace["oficialID"])[Object.keys(filesReplace["oficialID"]).length - 1];
-                        //         filesReplace["oficialID"][parseInt(index) + 1] = key;
-                        //     }
-                        // }
-                        //filesReplace.push(key);
-                    }
-                    else{
-                        for await(let file of files[key]){
-                            let fileUrl = await fileManager.UploadFilesToS3(file);	
-                            if(!filesUploaded[key]){
-                                filesUploaded[key] = [fileUrl];
-                            }
-                            else{
-                                let index = Object.keys(filesUploaded[key])[Object.keys(filesUploaded[key]).length - 1];
-                                filesUploaded[key][parseInt(index) + 1] = fileUrl;
-                            }
+                        if(!filesUploadedServer[key]){
+                            filesUploadedServer[key] = [{
+                                name: newName,
+                                base64: files[key][index].data,
+                                content: files[key][index].mimetype
+                            }];
                         }
-                    }
+                        else{
+                            let index = Object.keys(filesUploadedServer[key])[Object.keys(filesUploadedServer[key]).length - 1];
+                            filesUploadedServer[key][parseInt(index) + 1] = {
+                                name: newName,
+                                base64: files[key][index].data,
+                                content: files[key][index].mimetype
+                            };
+                        }
+                    });
                 }
-                else{//console.log("map1")
-                    if(key.length > 25){//console.log("map1-reemplazo")
-                        //filesReplace.push(key);
-                        // if(docs.oficialID.indexOf(key) >= 0){
-                        //     if(!filesReplace["oficialID"]){
-                        //         filesReplace["oficialID"] = [key];
-                        //     }
-                        //     else{
-                        //         let index = Object.keys(filesReplace["oficialID"])[Object.keys(filesReplace["oficialID"]).length - 1];
-                        //         filesReplace["oficialID"][parseInt(index) + 1] = key;
-                        //     }
-                        // }
-                    }
-                    else{//console.log("map1-nuevo")
-                        let fileUrl = await fileManager.UploadFilesToS3(files[key]);
-                        filesUploaded[key] = fileUrl;
-                    }
+                else{
+                    let newName = `${new Date().getTime()}-${files[key].name}`;
+                    let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${newName}`);
+                    files[key].mv(filePath);
+
+                    filesUploadedServer[key] = [{
+                        name: newName,
+                        base64: files[key].data,
+                        content: files[key].mimetype
+                    }];
                 }
             });
 
-            await Promise.all(UploadFiles);
+            try {
+                var filesUploadedS3 = {};
+                const UploadFilesToS3 = Object.keys(filesUploadedServer).map(async(key) => {
+                    if(filesUploadedServer[key].length > 1){
+                        let filesUploadedS3Multiple = {};
+                        const UploadFilesToS3Multiple = Object.keys(filesUploadedServer[key]).map(async(index) => {
+                            let url = await fileManager.uploadFileS3(filesUploadedServer[key][index].name, filesUploadedServer[key][index].base64, filesUploadedServer[key][index].content);
 
-            fileManager.deleteFromServer();
+                            if(!filesUploadedS3Multiple[key]){
+                                filesUploadedS3Multiple[key] = [url];
+                            }
+                            else{
+                                let index = Object.keys(filesUploadedS3Multiple[key])[Object.keys(filesUploadedS3Multiple[key]).length - 1];
+                                filesUploadedS3Multiple[key][parseInt(index) + 1] = url;                        
+                            }
+                        });
+
+                        await Promise.all(UploadFilesToS3Multiple);
+                        filesUploadedS3 = {...filesUploadedS3, ...filesUploadedS3Multiple};
+                    }
+                    else{
+                    let url = await fileManager.uploadFileS3(filesUploadedServer[key][0].name, filesUploadedServer[key][0].base64, filesUploadedServer[key][0].content);
+                    filesUploadedS3[key] = [url];
+                    }
+                });
+
+                await Promise.all(UploadFilesToS3);
+
+                Object.keys(filesUploadedServer).map((key) => {
+                    if(filesUploadedServer[key].length > 1){
+                        Object.keys(filesUploadedServer[key]).map((index) => {
+                            let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${filesUploadedServer[key][index].name}`);
+                            fs.unlinkSync(filePath);
+                        });
+                    }
+                    else{
+                        let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${filesUploadedServer[key][0].name}`);
+                        fs.unlinkSync(filePath);
+                    }
+                });
+            } catch (error) {
+                console.log(error);
+            }
+
+            var filesUploaded = filesUploadedS3;
+            //var filesUploaded = {};
+
+            // const UploadFiles = Object.keys(files).map(async(key) => {
+            //     if(files[key].length){
+            //         if(key.length > 25){
+            //             // if(docs.oficialID.indexOf(key) >= 0){
+            //             //     if(!filesReplace["oficialID"]){
+            //             //         filesReplace["oficialID"] = [key];
+            //             //     }
+            //             //     else{
+            //             //         let index = Object.keys(filesReplace["oficialID"])[Object.keys(filesReplace["oficialID"]).length - 1];
+            //             //         filesReplace["oficialID"][parseInt(index) + 1] = key;
+            //             //     }
+            //             // }
+            //             //filesReplace.push(key);
+            //         }
+            //         else{
+            //             for await(let file of files[key]){
+            //                 let fileUrl = await fileManager.UploadFilesToS3(file);	
+            //                 if(!filesUploaded[key]){
+            //                     filesUploaded[key] = [fileUrl];
+            //                 }
+            //                 else{
+            //                     let index = Object.keys(filesUploaded[key])[Object.keys(filesUploaded[key]).length - 1];
+            //                     filesUploaded[key][parseInt(index) + 1] = fileUrl;
+            //                 }
+            //             }
+            //         }
+            //     }
+            //     else{//console.log("map1")
+            //         if(key.length > 25){//console.log("map1-reemplazo")
+            //             //filesReplace.push(key);
+            //             // if(docs.oficialID.indexOf(key) >= 0){
+            //             //     if(!filesReplace["oficialID"]){
+            //             //         filesReplace["oficialID"] = [key];
+            //             //     }
+            //             //     else{
+            //             //         let index = Object.keys(filesReplace["oficialID"])[Object.keys(filesReplace["oficialID"]).length - 1];
+            //             //         filesReplace["oficialID"][parseInt(index) + 1] = key;
+            //             //     }
+            //             // }
+            //         }
+            //         else{//console.log("map1-nuevo")
+            //             let fileUrl = await fileManager.UploadFilesToS3(files[key]);
+            //             filesUploaded[key] = fileUrl;
+            //         }
+            //     }
+            // });
+
+            // await Promise.all(UploadFiles);
+
+            //fileManager.deleteFromServer();
 
             console.log(filesUploaded);
             console.log("============");
