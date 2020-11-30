@@ -21,7 +21,7 @@ app.use(fileUpload());
 app.use((request, response, next) => {
     const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com,', 'https://api-v2.finerio.mx'];
     const origin = request.headers.origin;console.log(request.headers);console.log(origin);
-    if(allowedOrigins.includes(origin)){
+    if(allowedOrigins.indexOf(origin) != -1){
         console.log('Is allowed')
         response.setTHeader('Access-Control-Allow-Origin', origin);
     }
