@@ -20,28 +20,18 @@ app.use(fileUpload());
 //CORS
 app.use((request, response, next) => {
     const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com,', 'https://api-v2.finerio.mx'];
-    const origin = request.headers.origin;console.log(request.headers);console.log(origin);
+    const origin = request.headers.origin;
     
-    // if(allowedOrigins.indexOf(origin) >= 0){
-    //     console.log('Is allowed')
-    //     response.setTHeader('Access-Control-Allow-Origin', origin);
-    // }
-    // else if(process.env.APP_ENV == 'local'){console.log('Allowed locally')
-    // }
-    // else{console.log('Not allowed')
-    //     let site = (origin != undefined ? origin : request.headers.host);
-    //     return response.json({
-    //         status: 403,
-    //         msg: `The site ${site} does not have permission. Only specific domains are allowed to access it.`
-    //     });
-    // }
     response.setHeader('Access-Control-Allow-Origin', '*');
     response.header('Access-Control-Allow-Headers', '*');
     // response.header('Access-Control-Allow-Headers', 'token, Authorization, X-API-KEY, Origin, X-Requested-With, User-Agent, Content-Type, Accept, Access-Control-Allow-Request-Method');
     response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
 
-    if(allowedOrigins.includes(origin)){
+    if((process.env.APP_ENV == 'dev' || process.env.APP_ENV == 'production') && allowedOrigins.includes(origin)){
+        next();
+    }
+    else if(process.env.APP_ENV == 'local'){
         next();
     }
     else{
