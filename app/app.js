@@ -15,22 +15,31 @@ const privateRoutes = require("../routes/private");
 //Middlewares
 app.use(bodyParser.urlencoded( {extended:false} ));
 app.use(bodyParser.json());
-// app.use(fileUpload({
-//     limits: { fileSize: 100000 * 1024 * 1024 },
-//     useTempFiles : true,
-//     tempFileDir : './public/tmpFiles/'
-// }));
 app.use(fileUpload());
 
 //CORS
 app.use((request, response, next) => {
-    response.header('Access-Control-Allow-Origin', '*');
-    response.header('Access-Control-Allow-Headers', 'token, Authorization, X-API-KEY, Origin, X-Requested-With, User-Agent, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com,', 'https://api-v2.finerio.mx'];
+    const origin = request.headers.origin;
+    if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
+        response.header('Access-Control-Allow-Origin', origin);
+    }
+    else if(process.env.APP_ENV === 'local'){
+        response.header('Access-Control-Allow-Origin', '*');
+    }
+    else{
+        let site = (origin != undefined ? origin : request.headers.host);
+        return response.json({
+            status: 403,
+            msg: `The site ${site} does not have permission. Only specific domains are allowed to access it.`
+        });
+    }
+    response.header('Access-Control-Allow-Headers', '*');
+    // response.header('Access-Control-Allow-Headers', 'token, Authorization, X-API-KEY, Origin, X-Requested-With, User-Agent, Content-Type, Accept, Access-Control-Allow-Request-Method');
     response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
     next();
 });
-
 
 //Prefix or routes
 app.use(webRoutes);
