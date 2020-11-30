@@ -25,10 +25,10 @@ app.use((request, response, next) => {
         console.log('Is allowed')
         response.setTHeader('Access-Control-Allow-Origin', origin);
     }
-    else if(process.env.APP_ENV === 'local'){
-        response.header('Access-Control-Allow-Origin', '*');
+    else if(process.env.APP_ENV === 'local'){console.log('Allowed locally')
+        response.setHeader('Access-Control-Allow-Origin', '*');
     }
-    else{
+    else{console.log('Not allowed')
         let site = (origin != undefined ? origin : request.headers.host);
         return response.json({
             status: 403,
