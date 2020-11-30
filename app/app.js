@@ -20,7 +20,7 @@ app.use(fileUpload());
 //CORS
 app.use((request, response, next) => {
     const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com,', 'https://api-v2.finerio.mx'];
-    const origin = request.headers.origin;
+    const origin = request.headers.origin;console.log(request.headers)
     if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
         response.header('Access-Control-Allow-Origin', origin);
     }
