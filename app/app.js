@@ -28,7 +28,7 @@ app.use((request, response, next) => {
     response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
 
-    if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
+    if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.indexOf(origin) >=0 ){
         console.log(origin, process.env.APP_ENV);next();
     }
     else if(process.env.APP_ENV === 'local'){
