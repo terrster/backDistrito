@@ -35,6 +35,7 @@ app.use((request, response, next) => {
         next();
     }
     else{
+        console.log(request.headers)
         let site = (origin != undefined ? origin : request.headers.host);
         return response.json({
             status: 403,
