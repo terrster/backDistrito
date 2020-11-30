@@ -13,6 +13,7 @@ const path = require("path");
 //Controllers
 const authController = require("../app/http/controllers/authController");
 const finerioController = require("../app/http/controllers/finerioController");
+const impulsoMxController = require("../app/http/controllers/impulsoMxController");
 
 route.get("/", (request, response) => {
     response.status(200).sendFile(path.resolve("public/index.html"));
@@ -26,5 +27,7 @@ route.post("/reset_password/:hash", authController.reset_password);
 
 //Callback
 route.all('/finerio/callback', finerioController.callback);
+
+route.post("/impmx/getSecurityCode", impulsoMxController.getSecurityCode);
 
 module.exports = route;
