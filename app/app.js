@@ -28,13 +28,14 @@ app.use((request, response, next) => {
     response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
 
-    if((process.env.APP_ENV == 'dev' || process.env.APP_ENV == 'production') && allowedOrigins.includes(origin)){
-        next();
+    if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
+        console.log(origin, process.env.APP_ENV);next();
     }
-    else if(process.env.APP_ENV == 'local'){
-        next();
+    else if(process.env.APP_ENV === 'local'){
+        console.log(process.env.APP_ENV);next();
     }
     else{
+        console.log('no allowed')
         let site = (origin != undefined ? origin : request.headers.host);
         return response.json({
             status: 403,
