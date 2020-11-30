@@ -21,11 +21,11 @@ app.use(fileUpload());
 app.use((request, response, next) => {
     const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com,', 'https://api-v2.finerio.mx'];
     const origin = request.headers.origin;console.log(request.headers);console.log(origin);
-    if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
+    if(allowedOrigins.includes(origin)){
         console.log('Is allowed')
         response.setTHeader('Access-Control-Allow-Origin', origin);
     }
-    else if(process.env.APP_ENV === 'local'){console.log('Allowed locally')
+    else if(process.env.APP_ENV == 'local'){console.log('Allowed locally')
         response.setHeader('Access-Control-Allow-Origin', '*');
     }
     else{console.log('Not allowed')
