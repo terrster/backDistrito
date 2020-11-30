@@ -35,7 +35,7 @@ app.use((request, response, next) => {
         console.log(process.env.APP_ENV);next();
     }
     else{
-        console.log('no allowed',process.env.APP_ENV,allowedOrigins.indexOf(origin))
+        console.log('no allowed',process.env.APP_ENV,allowedOrigins.indexOf(origin), origin, request.headers)
         let site = (origin != undefined ? origin : request.headers.host);
         return response.json({
             status: 403,
