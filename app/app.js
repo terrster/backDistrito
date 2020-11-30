@@ -19,7 +19,7 @@ app.use(fileUpload());
 
 //CORS
 app.use((request, response, next) => {
-    const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com,', 'https://api-v2.finerio.mx'];
+    const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com', 'https://api-v2.finerio.mx'];
     const origin = request.headers.origin;
     
     response.header('Access-Control-Allow-Origin', '*');
