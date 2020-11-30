@@ -9,7 +9,7 @@ const impulsoMxController = {
 
         try{
             await axios.post('https://api.smsmasivos.com.mx/sms/send', {
-                message: 'Hola! Bienvenido a ImpulsoMx. Tu codigo de autenticacion es: ' + securityCode,
+                message: 'Hola! Te damos la bienvenida a ImpulsoMx. Tu codigo de autenticacion es: ' + securityCode,
                 numbers: req.number,
                 country_code: '52'
             }, {
