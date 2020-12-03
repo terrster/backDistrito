@@ -28,6 +28,9 @@ route.post("/reset_password/:hash", authController.reset_password);
 //Callback
 route.all('/finerio/callback', finerioController.callback);
 
+route.get("/impmx/getDealData/:id", impulsoMxController.show);
 route.post("/impmx/getSecurityCode", impulsoMxController.getSecurityCode);
+route.post("/impmx/store", impulsoMxController.store);
+route.put("/impmx/update", impulsoMxController.update);
 
 module.exports = route;

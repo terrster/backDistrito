@@ -73,7 +73,37 @@ const mailManager = {
                 msg: "No se pudo enviar el correo de reactivación"
             }
         }
-    } 
+    },
+    notify: async(request) => {
+
+        let recipients = [
+            'mayrarocha@distritopyme.com', 
+            'javieruribe@impmx.com', 
+            'roayala@distritopyme.com'
+        ];
+
+        let mailOptions = {
+            from: 'Distrito Pyme <contacto@distritopyme.com>',
+            to: recipients,
+            subject: request.subject,
+            html: templates.notify(request.message)
+        };
+
+        try{
+            await service.sendMail(mailOptions);
+            
+            return {
+                code: 200,
+                msg: "Correo de reactivación enviado correctamente!"
+            }
+        }
+        catch(error){console.log(error)
+            return {
+                code: 500,
+                msg: "No se pudo enviar el correo de reactivación"
+            }
+        }
+    }  
 }
 
 module.exports = mailManager;
