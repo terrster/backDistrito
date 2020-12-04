@@ -35,11 +35,16 @@ app.use((request, response, next) => {
         next();
     }
     else{
-        console.log(request.headers);
-        return response.json({
-            status: 403,
-            msg: `You don´t have permissions. Only specific domains are allowed to access it.`
-        });
+        if(request.headers.host == '172.69.62.58' && request.headers['x-forwarded-for'] == '3.21.17.42'){//Cloudflare - Finerio
+            next();
+        }
+        else{
+            console.log(request.headers);
+            return response.json({
+                status: 403,
+                msg: `You don´t have permissions. Only specific domains are allowed to access it.`
+            });
+        }
     }
 });
 
