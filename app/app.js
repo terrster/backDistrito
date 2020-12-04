@@ -35,7 +35,7 @@ app.use((request, response, next) => {
         next();
     }
     else{
-        if(request.headers.host == '172.69.62.58' && request.headers['x-forwarded-for'] == '3.21.17.42'){//Cloudflare - Finerio
+        if(request.headers['x-forwarded-for'] == '3.21.17.42'){//Finerio
             next();
         }
         else{
