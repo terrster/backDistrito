@@ -42,6 +42,7 @@ app.use((request, response, next) => {
     //         msg: `The site ${site} does not have permission. Only specific domains are allowed to access it.`
     //     });
     // }
+    next();
 });
 
 //Prefix or routes
