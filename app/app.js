@@ -28,21 +28,18 @@ app.use((request, response, next) => {
     response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
 
-    // if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
-    //     next();
-    // }
-    // else if(process.env.APP_ENV === 'local'){
-    //     next();
-    // }
-    // else{
-    //     console.log(request.headers)
-    //     let site = (origin != undefined ? origin : request.headers.host);
-    //     return response.json({
-    //         status: 403,
-    //         msg: `The site ${site} does not have permission. Only specific domains are allowed to access it.`
-    //     });
-    // }
-    next();
+    if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
+        next();
+    }
+    else if(process.env.APP_ENV === 'local'){
+        next();
+    }
+    else{
+        return response.json({
+            status: 403,
+            msg: `You don´t have permissions. Only specific domains are allowed to access it.`
+        });
+    }
 });
 
 //Prefix or routes
