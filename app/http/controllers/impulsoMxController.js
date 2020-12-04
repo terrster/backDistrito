@@ -137,7 +137,7 @@ const impulsoMxController = {
                 message: 'El deal no existe.'
             });
         }
-        else if(hubspot.status == 200){
+        else if(hubspot.status == 200){//console.log(hubspot.data.properties.n4_5_fecha_de_nacimiento);
             let dealEncrypt = await jwt.sign(hubspot.data.properties, 'impmx2020');
 
             return response.json({ 

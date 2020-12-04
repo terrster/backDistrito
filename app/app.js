@@ -38,7 +38,8 @@ app.use((request, response, next) => {
         /*
             In some cases Cloudflare will block some ip directions even if the domains were added 
             in the const called allowed origins. In order to manage this issues is necessary enter 
-            to Cloudflare/Firewall and in the general information you will find the blocked ip directions. 
+            to Cloudflare/Firewall and in the general information you will find the blocked ip directions.
+            Then you need to add the ip in tools section in the part of access rules of ip. 
         */
         /*
             Finerio: 3.21.17.42
