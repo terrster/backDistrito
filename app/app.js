@@ -35,11 +35,20 @@ app.use((request, response, next) => {
         next();
     }
     else{
-        if(request.headers['x-forwarded-for'] == '3.21.17.42'){//Finerio
+        /*
+            In some cases Cloudflare will block some ip directions even if the domains were added 
+            in the const called allowed origins. In order to manage this issues is necessary enter 
+            to Cloudflare/Firewall and in the general information you will find the blocked ip directions. 
+        */
+        /*
+            Finerio: 3.21.17.42
+        */
+        const allowedIPS = ['3.21.17.42'];
+
+        if(allowedIPS.includes(request.headers['x-forwarded-for'])){
             next();
         }
         else{
-            console.log(request.headers);
             return response.json({
                 status: 403,
                 msg: `You don´t have permissions. Only specific domains are allowed to access it.`
