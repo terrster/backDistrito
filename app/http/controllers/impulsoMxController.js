@@ -6,6 +6,7 @@ const mailManager = require("../services/mailManager");
 require('dotenv').config({
     path: `.env.${process.env.NODE_ENV}`
 });
+const format = require("../services/formatManager");
 const jwt = require("jsonwebtoken");
 
 // #Hubspot - ImpulsoMx
@@ -35,7 +36,7 @@ const storeContact = async(request) => {
         let contactParams = {
             "properties": [
                 {
-                    "value": request.email,
+                    "value": request.email.toLowerCase(),
                     "property": "email"
                 },
                 {
@@ -86,34 +87,205 @@ const storeDeal = async(request) => {
                 ],
             },
             "properties": [
+                //Información del negocio
                 {
-                    "value": request.name + " " + request.lastname,
+                    "value": hubspotImpMx.prefix + " - " + request.personal.name.trim() + " " + request.personal.lastname.trim(),
+                    "name": "dealname"
+                },
+                //1. Registro
+                {
+                    "value": request.personal.name.trim() + " " + request.personal.lastname.trim(),
                     "name": "nombre_comercial"
                 },
                 {
-                    "value": request.email,
+                    "value": request.business.email.toLowerCase(),
                     "name": "email"
                 },
                 {
-                    "value": request.phone,
+                    "value": request.business.whatsApp,
                     "name": "celular"
                 },
+                //2. Monto
                 {
-                    "value": hubspotImpMx.prefix + " - " + request.name + " " + request.lastname,
-                    "name": "dealname"
+                    "value": format.PERSON_TYPE[request.business.taxRegime],
+                    "name": "tipo_de_persona"
+                },
+                {
+                    "value": request.business.howMuch,
+                    "name": "amount"
+                },
+                {
+                    "value": request.business.anualSales,
+                    "name": "n2_5_ventas_anuales"
+                },
+                //3. Comercial
+                {
+                    "value": request.business.businessName.trim(),
+                    "name": "n3_nombre_comercial"
+                },
+                {
+                    "value": request.business.whatsApp,
+                    "name": "telefono"
+                },
+                //4. Generales
+                {
+                    "value": request.personal.name.trim(),
+                    "name": "n4_1_nombre"
+                },
+                {
+                    "value": request.personal.lastname.trim(),
+                    "name": "n4_2_apellido_paterno"
+                },
+                {
+                    "value": request.personal.secondLastName.trim(),
+                    "name": "n4_3_apellido_materno"
+                },
+                {
+                    "value": request.personal.birthDate,
+                    "name": "n4_5_fecha_de_nacimiento"
+                },
+                {
+                    "value": request.personal.street.trim(),
+                    "name": "n4_6_calle"
+                },
+                {
+                    "value": request.personal.number.trim(),
+                    "name": "n4_7_num_ext"
+                },
+                {
+                    "value": request.personal.zipCode,
+                    "name": "n4_9_c_p_"
+                },
+                {
+                    "value": request.personal.suburb,
+                    "name": "n4_91_colonia"
+                },
+                {
+                    "value": request.personal.state,
+                    "name": "estado_de_la_rep_de_la_persona"
+                },
+                {
+                    "value": request.personal.city,
+                    "name": "municipio_de_la_persona"
+                },
+                {
+                    "value": request.business.whatsApp,
+                    "name": "n4_92_tel_fono"
                 },
                 {
                     "value": hubspotImpMx.dealstage,
                     "name": "dealstage" 
-                },
-                // {
-                //     "value": request.ipV4,
-                //     "name": "ip_del_solicitante"
-                // }
+                }
             ]
         };
 
         const {data} = await axios.post(hubspotImpMx.baseURL + 'deals/v1/deal' + hubspotImpMx.hapiKey, dealParams);
+        return data;
+    }
+    catch(error){
+        let response = {
+            code: 500,
+            msg: "Hubspot: Algo salió mal tratando de crear un deal",
+            error: error
+        };
+
+        return response;
+    }
+}
+
+const updateDeal = async(request) => { 
+    try{
+        let dealParams = {
+            "properties": [
+                //Información del negocio
+                {
+                    "value": hubspotImpMx.prefix + " - " + request.personal.name.trim() + " " + request.personal.lastname.trim(),
+                    "name": "dealname"
+                },
+                //1. Registro
+                {
+                    "value": request.personal.name.trim() + " " + request.personal.lastname.trim(),
+                    "name": "nombre_comercial"
+                },
+                {
+                    "value": request.business.email.toLowerCase(),
+                    "name": "email"
+                },
+                {
+                    "value": request.business.whatsApp,
+                    "name": "celular"
+                },
+                //2. Monto
+                {
+                    "value": format.PERSON_TYPE[request.business.taxRegime],
+                    "name": "tipo_de_persona"
+                },
+                {
+                    "value": request.business.howMuch,
+                    "name": "amount"
+                },
+                {
+                    "value": request.business.anualSales,
+                    "name": "n2_5_ventas_anuales"
+                },
+                //3. Comercial
+                {
+                    "value": request.business.businessName.trim(),
+                    "name": "n3_nombre_comercial"
+                },
+                {
+                    "value": request.business.whatsApp,
+                    "name": "telefono"
+                },
+                //4. Generales
+                {
+                    "value": request.personal.name.trim(),
+                    "name": "n4_1_nombre"
+                },
+                {
+                    "value": request.personal.lastname.trim(),
+                    "name": "n4_2_apellido_paterno"
+                },
+                {
+                    "value": request.personal.secondLastName.trim(),
+                    "name": "n4_3_apellido_materno"
+                },
+                {
+                    "value": request.personal.birthDate,
+                    "name": "n4_5_fecha_de_nacimiento"
+                },
+                {
+                    "value": request.personal.street.trim(),
+                    "name": "n4_6_calle"
+                },
+                {
+                    "value": request.personal.number.trim(),
+                    "name": "n4_7_num_ext"
+                },
+                {
+                    "value": request.personal.zipCode,
+                    "name": "n4_9_c_p_"
+                },
+                {
+                    "value": request.personal.suburb,
+                    "name": "n4_91_colonia"
+                },
+                {
+                    "value": request.personal.state,
+                    "name": "estado_de_la_rep_de_la_persona"
+                },
+                {
+                    "value": request.personal.city,
+                    "name": "municipio_de_la_persona"
+                },
+                {
+                    "value": request.business.whatsApp,
+                    "name": "n4_92_tel_fono"
+                }
+            ]
+        };
+
+        const {data} = await axios.put(hubspotImpMx.baseURL + 'deals/v1/deal/' + request.hubspotDealId + hubspotImpMx.hapiKey, dealParams);
         return data;
     }
     catch(error){
@@ -137,7 +309,7 @@ const impulsoMxController = {
                 message: 'El deal no existe.'
             });
         }
-        else if(hubspot.status == 200){//console.log(hubspot.data.properties.n4_5_fecha_de_nacimiento);
+        else if(hubspot.status == 200){
             let dealEncrypt = await jwt.sign(hubspot.data.properties, 'impmx2020');
 
             return response.json({ 
@@ -157,31 +329,31 @@ const impulsoMxController = {
         let securityCode = Math.floor(100000 + Math.random() * 900000);
 
         try{
-            // await axios.post('https://api.smsmasivos.com.mx/sms/send', {
-            //     message: 'Hola. Te damos la bienvenida a ImpulsoMx. Tu codigo de autenticacion es: ' + securityCode,
-            //     numbers: process.env.APP_ENV == 'local' ? '5522483811' : req.number,
-            //     country_code: '52'
-            // }, {
-            //     headers: {
-            //         'apikey' : 'b73f03ab8fdc7b6ecd1e215e8ad1a583c35e9d94'
-            //     }
-            // }).then(response => {
-            //     if(response.data.success == false && response.data.code == 'sms_07'){
-            //         let data = {
-            //             subject: 'ImpulsoMx - SMSMASIVOS',
-            //             message: 'Créditos insuficientes. Actualmente cuentas con 0 créditos.',
-            //         }
+            await axios.post('https://api.smsmasivos.com.mx/sms/send', {
+                message: 'Hola. Te damos la bienvenida a ImpulsoMx. Tu codigo de autenticacion es: ' + securityCode,
+                numbers: process.env.APP_ENV == 'local' ? '5522483811' : req.number,
+                country_code: '52'
+            }, {
+                headers: {
+                    'apikey' : 'b73f03ab8fdc7b6ecd1e215e8ad1a583c35e9d94'
+                }
+            }).then(response => {
+                if(response.data.success == false && response.data.code == 'sms_07'){
+                    let data = {
+                        subject: 'ImpulsoMx - SMSMASIVOS',
+                        message: 'Créditos insuficientes. Actualmente cuentas con 0 créditos.',
+                    }
 
-            //         const Notify = async(data) => {
-            //             await mailManager.notify(data);
-            //         }
+                    const Notify = async(data) => {
+                        await mailManager.notify(data);
+                    }
 
-            //         Notify(data);
-            //     }
-            //     else if(response.data.success == false && response.data.code == 'sms_03'){
-            //         console.log(response.data);
-            //     }
-            // });
+                    Notify(data);
+                }
+                else if(response.data.success == false && response.data.code == 'sms_03'){
+                    console.log(response.data);
+                }
+            });
             
             let securityCodeEncrypt = await jwt.sign({code: securityCode}, 'impmx2020');
 
@@ -201,37 +373,41 @@ const impulsoMxController = {
     store: async(request, response) => {
         let data = request.body;
 
-        // let contactExist = await getContactByEmail(data.email.toLowerCase());
+        let contactExist = await getContactByEmail(data.business.email.toLowerCase());
 
-        // if(contactExist){
-        //     return response.json({ 
-        //         code: 500,
-        //         msg: "El correo electrónico ya existe"
-        //     });
-        // }
+        if(contactExist){
+            return response.json({ 
+                code: 500,
+                msg: "El correo electrónico ya existe"
+            });
+        }
 
-        // let contactStored = await storeContact(data);
-        // data.hubspotContactId = contactStored.vid;
+        let contactStored = await storeContact(data);
+        data.hubspotContactId = contactStored.vid;
 
-        // let dealStored = await storeDeal(data);
+        let dealStored = await storeDeal(data);
 
-        // if(dealStored.code == 403){
-        //     return response.json(dealStored);
-        // }
+        if(dealStored.code == 403){
+            return response.json(dealStored);
+        }
 
         return response.json({ 
             code: 200, 
-            msg: "Deal registrado exitosamente",
-            data
+            msg: "Deal registrado exitosamente"
         });
     },
     update: async(request, response) => {
         let data = request.body;
 
+        let dealUpdated = await updateDeal(data);
+
+        if(dealUpdated.code == 403){
+            return response.json(dealUpdated);
+        }
+
         return response.json({ 
             code: 200, 
-            msg: "Deal actualizado exitosamente",
-            data
+            msg: "Deal actualizado exitosamente"
         });
     }
 };
