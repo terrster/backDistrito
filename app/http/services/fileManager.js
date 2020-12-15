@@ -8,67 +8,47 @@ require('dotenv').config({
 const S3 = require('../services/s3/buckets');
 const uploadDir = "../../../public/tmpFiles/";
 
-const moveFile = async(file) => {
-    return new Promise((resolve, reject) => {
-        let filePath = path.resolve(__dirname, uploadDir + file.name);
-        const callback = (error, success) => {
-            if(error){
-                console.log("Something went wrong trying to upload the files to the server");
-            }
-            resolve(filePath);
-            };
-            file.mv(filePath, callback);
-    });
-};
+const uploadToServer = (files) => {
+    let filesUploadedToServer = {};
 
-const getContentType = async(file) => {
-    try{
-        let rc = 'application/octet-stream';
-        const fn = file.name.toLowerCase();
-        if (fn.indexOf('.pdf') >= 0) rc = 'application/pdf';
-        else if (fn.indexOf('.zip') >= 0) rc = 'application/zip';
-        else if (fn.indexOf('.png') >= 0) rc = 'image/png';
-        else if (fn.indexOf('.jpg') >= 0 || fn.indexOf('.jpeg') >= 0) rc = 'image/jpg';
-        else if (fn.indexOf('.tiff') >= 0 || fn.indexOf('.tif') >= 0) rc = 'image/tiff';
+    Object.keys(files).map((key) => {
+        if(files[key].length > 1){
+            Object.keys(files[key]).map((index) => {
+                let newName = `${new Date().getTime()}-${files[key][index].name}`;
+                let filePath = path.resolve(__dirname, uploadDir + newName);
+                files[key][index].mv(filePath);
 
-        return rc;
-
-    }
-    catch(error){
-        console.log("Something went wrong trying to get the content types");
-    }
-};
-
-const getBase64 = async(filePath) => {
-    const bitmap = fs.readFileSync(filePath);
-    return Buffer.from(bitmap, 'base64');
-};
-
-const setNewName = async(file) => {
-    try{
-        return `${new Date().getTime()}-${file.name}`;
-    }
-    catch(error){
-        console.log("Something went wrong trying to set the new files names");
-    }
-};
-
-const uploadFile = async(fileName, fileBase64, contentType) => {
-    try{
-        return new Promise(async(resolve, reject) => {
-            let result = await uploadFileS3(fileName, fileBase64, contentType);
-            const callback = (error, success) => {
-                if(error){
-                    console.log("Something went wrong trying to upload the files to S3");
+                if(!filesUploadedToServer[key]){
+                    filesUploadedToServer[key] = [{
+                        name: newName,
+                        base64: files[key][index].data,
+                        content: files[key][index].mimetype
+                    }];
                 }
-                resolve(result);
-            };
-            callback();
-        });
-    }
-    catch(error){
-        console.log(error);
-    }
+                else{
+                    let index = Object.keys(filesUploadedToServer[key])[Object.keys(filesUploadedToServer[key]).length - 1];
+                    filesUploadedToServer[key][parseInt(index) + 1] = {
+                        name: newName,
+                        base64: files[key][index].data,
+                        content: files[key][index].mimetype
+                    };
+                }
+            });
+        }
+        else{
+            let newName = `${new Date().getTime()}-${files[key].name}`;
+            let filePath = path.resolve(__dirname, uploadDir + newName);
+            files[key].mv(filePath);
+
+            filesUploadedToServer[key] = [{
+                name: newName,
+                base64: files[key].data,
+                content: files[key].mimetype
+            }];
+        }
+    });
+
+    return filesUploadedToServer;
 };
 
 const uploadFileS3 = async(name, base64, contentType) => {
@@ -86,44 +66,58 @@ const uploadFileS3 = async(name, base64, contentType) => {
       }
       bucket.upload(params, callback);
     });
-}
+};
 
-const deleteFromServer = async() => {
-    try{
-        fs.readdir(path.resolve(__dirname, uploadDir), (error, files) => {
-            if(error) throw error;
-            
-            for(const file of files) {
-                fs.unlink(path.join(path.resolve(__dirname, uploadDir), file), error => {
-                    if (error) throw error;
-                });
-            }
-        });
-    }
-    catch(error){
-        console.log("Something went wrong trying to delete the files from the server");
-    }
-}
+const uploadToS3 = async(filesUploadedToServer) => {
+    let filesUploadedToS3 = {};
 
-const UploadFilesToS3 = async(file) => {
-    return new Promise(async(resolve, reject) => {
-        try{
-            const filePath = await moveFile(file);
-            const contentType = await getContentType(file);
-            const fileBase64 = await getBase64(filePath);
-            const fileName = await setNewName(file);
-            const url = await uploadFile(fileName, fileBase64, contentType);
-            
-            resolve(url);
+    const uploadFilesToS3 = Object.keys(filesUploadedToServer).map(async(key) => {
+        if(filesUploadedToServer[key].length > 1){
+            let filesUploadedToS3Multiple = {};
+
+            const uploadFilesToS3Multiple = Object.keys(filesUploadedToServer[key]).map(async(index) => {
+                let url = await uploadFileS3(filesUploadedToServer[key][index].name, filesUploadedToServer[key][index].base64, filesUploadedToServer[key][index].content);
+
+                if(!filesUploadedToS3Multiple[key]){
+                    filesUploadedToS3Multiple[key] = [url];
+                }
+                else{
+                    let index = Object.keys(filesUploadedToS3Multiple[key])[Object.keys(filesUploadedToS3Multiple[key]).length - 1];
+                    filesUploadedToS3Multiple[key][parseInt(index) + 1] = url;                        
+                }
+            });
+
+            await Promise.all(uploadFilesToS3Multiple);
+            filesUploadedToS3 = {...filesUploadedToS3, ...filesUploadedToS3Multiple};
         }
-        catch(error){
-            console.log("Something went wrong trying to upload files");
+        else{
+            let url = await uploadFileS3(filesUploadedToServer[key][0].name, filesUploadedToServer[key][0].base64, filesUploadedToServer[key][0].content);
+            filesUploadedToS3[key] = [url];
         }
     });
-}
+
+    await Promise.all(uploadFilesToS3);
+
+    return filesUploadedToS3;
+};
+
+const deleteFromServer = (filesUploadedToServer) => {
+    Object.keys(filesUploadedToServer).map((key) => {
+        if(filesUploadedToServer[key].length > 1){
+            Object.keys(filesUploadedToServer[key]).map((index) => {
+                let filePath = path.resolve(__dirname, uploadDir + filesUploadedToServer[key][index].name);
+                fs.unlinkSync(filePath);
+            });
+        }
+        else{
+            let filePath = path.resolve(__dirname, uploadDir + filesUploadedToServer[key][0].name);
+            fs.unlinkSync(filePath);
+        }
+    });
+};
 
 module.exports = {
-    uploadFileS3,
-    UploadFilesToS3,
+    uploadToServer,
+    uploadToS3,
     deleteFromServer
 };

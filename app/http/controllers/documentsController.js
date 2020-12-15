@@ -5,62 +5,8 @@ const fileManager = require('../services/fileManager');
 const User = require("../models/User");
 const Documents = require("../models/Documents");
 const Appliance = require("../models/Appliance");
-const Client = require("../models/Client");
 
-const path = require("path");
-const fs = require('fs');
-
-const getDocsMethod = (type) => {
-    let docFiles = [];
-    switch (type) {
-      case "PF":
-        docFiles = [
-            "oficialID",
-            "proofAddress",
-            "bankStatements",
-            "others"
-        ];
-        break;
-      case "PFAE":
-        docFiles = [
-            "oficialID",
-            "rfc",
-            "proofAddress",
-            "bankStatements",
-            "lastDeclarations",
-            "acomplishOpinion",
-            "others",
-        ];
-        break;
-      case "RIF":
-        docFiles = [
-            "oficialID",
-            "rfc",
-            "proofAddress",
-            "bankStatements",
-            "lastDeclarations",
-            "acomplishOpinion",
-            "others",
-        ];
-        break;
-      case "PM":
-        docFiles = [
-            "constitutiveAct",
-            "rfc",
-            "proofAddress",
-            "financialStatements",
-            "bankStatements",
-            "lastDeclarations",
-            "oficialID",
-            "proofAddressMainFounders",
-            "others",
-        ];
-        break;
-    }
-    return docFiles;
-  };
-
-const getNameProperty = async(key) => {
+const getNameProperty = (key) => {
     switch(key){
         case "oficialID":
             return [
@@ -92,7 +38,9 @@ const getNameProperty = async(key) => {
                 'n9_3_11_estados_de_cuenta',
           ];
         case "rfc":
-            return ['n9_4_rfc'];
+            return [
+                'n9_4_rfc'
+            ];
         case "lastDeclarations":
             return [
                 'n9_5_declaraci_n',
@@ -101,9 +49,13 @@ const getNameProperty = async(key) => {
                 'n9_5_3_declaraci_n',
             ];
         case "acomplishOpinion":
-            return ['n9_6_opini_n_de_cumplimiento'];
+            return [
+                'n9_6_opini_n_de_cumplimiento'
+            ];
         case "constitutiveAct":
-            return ['n9_9_acta_constitutiva'];
+            return [
+                'n9_9_acta_constitutiva'
+            ];
         case "financialStatements":
             return [
                 'n9_93_1_eeff',
@@ -121,85 +73,165 @@ const getNameProperty = async(key) => {
                 'n9_8_3_otros_4',
             ];
         case "collectionReportSaleTerminals":
-            return ['n9_94_reporte_de_cobranza_tpv'];
+            return [
+                'n9_94_reporte_de_cobranza_tpv'
+            ];
         case "localContractLease":
-            return ['n9_95_contrato_de_arrendamiento_tpv'];
+            return [
+                'n9_95_contrato_de_arrendamiento_tpv'
+            ];
     }
-}
+};
 
-const missingFiles = async(user, docs) => {
-    let statusValue = false;
+const updateHubspotMongoFiles = async(id, hubspotDealId, filesUploaded) => {
+    let docs = await Documents.findById(id);
+    let {properties} = await hubspotController.deal.show(hubspotDealId);
 
-    if(user.idClient.type == 'PF'){
-        if(user.idClient.appliance[0].idComercialInfo.terminal == true){
-            if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
-                statusValue = true;
-            }
-        }
-        else{
-            if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
-                statusValue = true;
-            }
-        }
-    }
+    const updateFiles = Object.keys(filesUploaded).map(async(key) => {
+        let hs_property_names = getNameProperty(key);
 
-    if(user.idClient.type == 'PFAE' || user.idClient.type == 'RIF'){
-        if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
-            if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
-                statusValue = true;
+        Object.keys(filesUploaded[key]).map(async(file) => {
+            let emptyPropertyFound = {
+                name: '',
+                position: ''
+            };
+            
+            for(let i = 0; i <= (docs[key].length - 1); i++){
+                if(properties[hs_property_names[i]].value == ''){
+                    emptyPropertyFound.name = hs_property_names[i];
+                    emptyPropertyFound.position = i;
+                    break;
+                }
             }
-        }
-        else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
-            if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
-                statusValue = true;
-            }
-        }
-        else{
-            if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
-                statusValue = true;
-            }
-        }
-    }
 
-    // if(user.idClient.type == 'RIF'){
-    //     if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
-    //         if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
-    //             statusValue = true;
-    //         }
-    //     }
-    //     else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
-    //         if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
-    //             statusValue = true;
-    //         }
-    //     }
-    //     else{
-    //         if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
-    //             statusValue = true;
-    //         }
-    //     }
-    // }
+            if(emptyPropertyFound.name != '' && emptyPropertyFound.position != ''){
+                let params = {
+                    name: emptyPropertyFound.name,
+                    value: filesUploaded[key][file]
+                };
 
-    if(user.idClient.type == 'PM'){
-        if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
-            if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
-                statusValue = true;
-            }
-        }
-        else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
-            if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
-                statusValue = true;
-            }
-        }
-        else{
-            if(docs.constitutiveAct.length > 0 && docs.rfc.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
-                statusValue = true;
-            }
-        }
-    }
+                hubspotController.deal.update(hubspotDealId, 'documents-update', params);
 
-    console.log("Resultado de missing files: " + statusValue);
-    return statusValue;
-}
+                if(properties.hasOwnProperty(params.name)){
+                    properties[params.name].value = params.value;
+                }
+                else{
+                    properties = {
+                        [params.name] : {
+                            "value" : params.value
+                        }
+                    }
+                }
+
+                docs[key].splice(emptyPropertyFound.position, 0, params.value);
+                docs = await Documents.findByIdAndUpdate(id, {[key]: docs[key]}, {multi: true, new: true });
+            
+                //console.log(properties[params.name], docs[key]);
+            }
+            else{
+                let params = {
+                    name: hs_property_names[docs[key].length],
+                    value: filesUploaded[key][file]
+                };
+
+                hubspotController.deal.update(hubspotDealId, 'documents-update', params);
+
+                properties = {
+                    [params.name] : {
+                        "value" : params.value
+                    }
+                }
+
+                docs[key].push(params.value);                     
+                docs = await Documents.findByIdAndUpdate(id, {[key]: docs[key]}, {multi: true, new: true });         
+                
+                //console.log(properties[params.name], docs[key]);
+            }
+        });
+    });
+
+    await Promise.all(updateFiles);
+};
+
+const missingFiles = async(user, idDocs) => {
+    return new Promise((resolve) => {
+        setTimeout(async() => {
+            let docs = await Documents.findById(idDocs);
+            let statusValue = false;
+
+            if(user.idClient.type == 'PF'){
+                if(user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else{
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+            }
+
+            if(user.idClient.type == 'PFAE' || user.idClient.type == 'RIF'){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else{
+                    if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+            }
+
+            // if(user.idClient.type == 'RIF'){
+            //     if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
+            //         if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0){
+            //             statusValue = true;
+            //         }
+            //     }
+            //     else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+            //         if(docs.oficialID.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
+            //             statusValue = true;
+            //         }
+            //     }
+            //     else{
+            //         if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
+            //             statusValue = true;
+            //         }
+            //     }
+            // }
+
+            if(user.idClient.type == 'PM'){
+                if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == false){
+                    if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else if(user.idClient.appliance[0].idComercialInfo.ciec != null && user.idClient.appliance[0].idComercialInfo.terminal == true){
+                    if(docs.constitutiveAct.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0 && docs.collectionReportSaleTerminals.length > 0 && docs.localContractLease.length > 0){
+                        statusValue = true;
+                    }
+                }
+                else{
+                    if(docs.constitutiveAct.length > 0 && docs.rfc.length > 0 && docs.financialStatements.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.oficialID.length > 0 && docs.proofAddressMainFounders.length > 0 && docs.others.length > 0){
+                        statusValue = true;
+                    }
+                }
+            }
+
+            //console.log(`Resultado de missing files para ${user.idClient.type}: ` + statusValue);
+            resolve(statusValue);
+        }, 1500);
+    });
+
+};
 
 const documentsController = {
 
@@ -215,153 +247,29 @@ const documentsController = {
             });
         }
 
-        var filesUploadedServer = {};
-        Object.keys(files).map((key) => {
-            if(files[key].length > 1){
-                Object.keys(files[key]).map((index) => {
-                    let newName = `${new Date().getTime()}-${files[key][index].name}`;
-                    let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${newName}`);
-                    files[key][index].mv(filePath);
-
-                    if(!filesUploadedServer[key]){
-                        filesUploadedServer[key] = [{
-                            name: newName,
-                            base64: files[key][index].data,
-                            content: files[key][index].mimetype
-                        }];
-                    }
-                    else{
-                        let index = Object.keys(filesUploadedServer[key])[Object.keys(filesUploadedServer[key]).length - 1];
-                        filesUploadedServer[key][parseInt(index) + 1] = {
-                            name: newName,
-                            base64: files[key][index].data,
-                            content: files[key][index].mimetype
-                        };
-                    }
-                });
-            }
-            else{
-                let newName = `${new Date().getTime()}-${files[key].name}`;
-                let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${newName}`);
-                files[key].mv(filePath);
-
-                filesUploadedServer[key] = [{
-                    name: newName,
-                    base64: files[key].data,
-                    content: files[key].mimetype
-                }];
-            }
-        });
-
-        try {
-            var filesUploadedS3 = {};
-            const UploadFilesToS3 = Object.keys(filesUploadedServer).map(async(key) => {
-                if(filesUploadedServer[key].length > 1){
-                    let filesUploadedS3Multiple = {};
-                    const UploadFilesToS3Multiple = Object.keys(filesUploadedServer[key]).map(async(index) => {
-                        let url = await fileManager.uploadFileS3(filesUploadedServer[key][index].name, filesUploadedServer[key][index].base64, filesUploadedServer[key][index].content);
-
-                        if(!filesUploadedS3Multiple[key]){
-                            filesUploadedS3Multiple[key] = [url];
-                        }
-                        else{
-                            let index = Object.keys(filesUploadedS3Multiple[key])[Object.keys(filesUploadedS3Multiple[key]).length - 1];
-                            filesUploadedS3Multiple[key][parseInt(index) + 1] = url;                        
-                        }
-                    });
-
-                    await Promise.all(UploadFilesToS3Multiple);
-                    filesUploadedS3 = {...filesUploadedS3, ...filesUploadedS3Multiple};
-                }
-                else{
-                   let url = await fileManager.uploadFileS3(filesUploadedServer[key][0].name, filesUploadedServer[key][0].base64, filesUploadedServer[key][0].content);
-                   filesUploadedS3[key] = [url];
-                }
-            });
-
-            await Promise.all(UploadFilesToS3);
-
-            Object.keys(filesUploadedServer).map((key) => {
-                if(filesUploadedServer[key].length > 1){
-                    Object.keys(filesUploadedServer[key]).map((index) => {
-                        let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${filesUploadedServer[key][index].name}`);
-                        fs.unlinkSync(filePath);
-                    });
-                }
-                else{
-                    let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${filesUploadedServer[key][0].name}`);
-                    fs.unlinkSync(filePath);
-                }
-            });
-        } catch (error) {
-            console.log(error);
-        }
-
-        try{//console.log("store")
-            var filesUploaded = filesUploadedS3;
-
+        try{
             let user = await User.findById(id);
-  
+            let filesUploadedToServer = fileManager.uploadToServer(files);
+            var filesUploadedToS3 = await fileManager.uploadToS3(filesUploadedToServer);
+            await fileManager.deleteFromServer(filesUploadedToServer);         
+
             let documentStored = await Documents.create({
                 idClient: {
                     _id: user.idClient._id
                 }
             });
-            var docs = await Documents.findById(documentStored._id);
 
-            const UpdateFiles = Object.keys(filesUploaded).map(async(key) => {//console.log(key);
-                var index = docs[key].length;//console.log(index);
-                let property = await getNameProperty(key);//console.log(property);
-
-                if(Array.isArray(filesUploaded[key])){//console.log("map2-nuevo-multiple");
-                    var i = index;
-                    Object.keys(filesUploaded[key]).forEach(async(item) => {
-                        if(property[i] != null){
-                            let params = {
-                                name: property[i],
-                                value: filesUploaded[key][item]
-                            }
-                            //console.log("multiple");
-                            //console.log(params);
-                            //console.log(i);
-                            hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                            i++;
-                            docs = await Documents.findByIdAndUpdate(documentStored._id, {$push: {[key]: filesUploaded[key][item] } }, { new: true });
-                        }
-                    });
-                }
-                else{//console.log("map2-nuevo-unico");
-                    if(property[index] != null){
-                        let params = {
-                            name: property[index],
-                            value: filesUploaded[key]
-                        }
-                        //console.log("unico");
-                        //console.log(params);
-                        hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                        docs = await Documents.findByIdAndUpdate(documentStored._id, {$push: {[key]: filesUploaded[key] } }, { new: true });
-                    }
-                }
-            });
-
-            await Promise.all(UpdateFiles);
-
-            let docsNew = await Documents.findById(documentStored._id);
-            let statusValue = await missingFiles(user, docsNew);
-
-            await Documents.findByIdAndUpdate(documentStored._id, {status: statusValue});
-            
             await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
                 idDocuments : {
                     _id : documentStored._id
                 }
             });
 
-            await Client.findByIdAndUpdate(user.idClient._id, {
-                idDocuments: {
-                    _id: documentStored._id
-                }
-            });
+            await updateHubspotMongoFiles(documentStored._id, user.hubspotDealId, filesUploadedToS3);
+
+            let statusValue = await missingFiles(user, documentStored._id);
+
+            await Documents.findByIdAndUpdate(documentStored._id, {status: statusValue});
 
             user = await User.findById(id);
 
@@ -370,9 +278,9 @@ const documentsController = {
                 msg: 'Documento(s) cargado(s) exitosamente',
                 user: user
             });
+
         }
-        catch(error){
-            //console.log(error)
+        catch(error){console.log(error);
             return response.json({
                 code: 500,
                 msg: "Algo salió mal tratando de cargar documentos",
@@ -380,7 +288,7 @@ const documentsController = {
             });
         }
     },
-    update: async(request, response) => {//console.log("update")
+    update: async(request, response) => {
         let id = request.params.id;//id Documents
         let idUser = request.headers.tokenDecoded.data.id;
 
@@ -394,190 +302,18 @@ const documentsController = {
         }
 
         try{
-            var user = await User.findById(idUser);
-            var docs = await Documents.findById(id);
+            let user = await User.findById(idUser);
+            let filesUploadedToServer = fileManager.uploadToServer(files);
+            var filesUploadedToS3 = await fileManager.uploadToS3(filesUploadedToServer);
+            await fileManager.deleteFromServer(filesUploadedToServer);      
 
-            var filesUploadedServer = {};
-            Object.keys(files).map((key) => {
-                if(files[key].length > 1){
-                    Object.keys(files[key]).map((index) => {
-                        let newName = `${new Date().getTime()}-${files[key][index].name}`;
-                        let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${newName}`);
-                        files[key][index].mv(filePath);
+            await updateHubspotMongoFiles(id, user.hubspotDealId, filesUploadedToS3);
 
-                        if(!filesUploadedServer[key]){
-                            filesUploadedServer[key] = [{
-                                name: newName,
-                                base64: files[key][index].data,
-                                content: files[key][index].mimetype
-                            }];
-                        }
-                        else{
-                            let index = Object.keys(filesUploadedServer[key])[Object.keys(filesUploadedServer[key]).length - 1];
-                            filesUploadedServer[key][parseInt(index) + 1] = {
-                                name: newName,
-                                base64: files[key][index].data,
-                                content: files[key][index].mimetype
-                            };
-                        }
-                    });
-                }
-                else{
-                    let newName = `${new Date().getTime()}-${files[key].name}`;
-                    let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${newName}`);
-                    files[key].mv(filePath);
-
-                    filesUploadedServer[key] = [{
-                        name: newName,
-                        base64: files[key].data,
-                        content: files[key].mimetype
-                    }];
-                }
-            });
-
-            try {
-                var filesUploadedS3 = {};
-                const UploadFilesToS3 = Object.keys(filesUploadedServer).map(async(key) => {
-                    if(filesUploadedServer[key].length > 1){
-                        let filesUploadedS3Multiple = {};
-                        const UploadFilesToS3Multiple = Object.keys(filesUploadedServer[key]).map(async(index) => {
-                            let url = await fileManager.uploadFileS3(filesUploadedServer[key][index].name, filesUploadedServer[key][index].base64, filesUploadedServer[key][index].content);
-
-                            if(!filesUploadedS3Multiple[key]){
-                                filesUploadedS3Multiple[key] = [url];
-                            }
-                            else{
-                                let index = Object.keys(filesUploadedS3Multiple[key])[Object.keys(filesUploadedS3Multiple[key]).length - 1];
-                                filesUploadedS3Multiple[key][parseInt(index) + 1] = url;                        
-                            }
-                        });
-
-                        await Promise.all(UploadFilesToS3Multiple);
-                        filesUploadedS3 = {...filesUploadedS3, ...filesUploadedS3Multiple};
-                    }
-                    else{
-                    let url = await fileManager.uploadFileS3(filesUploadedServer[key][0].name, filesUploadedServer[key][0].base64, filesUploadedServer[key][0].content);
-                    filesUploadedS3[key] = [url];
-                    }
-                });
-
-                await Promise.all(UploadFilesToS3);
-
-                Object.keys(filesUploadedServer).map((key) => {
-                    if(filesUploadedServer[key].length > 1){
-                        Object.keys(filesUploadedServer[key]).map((index) => {
-                            let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${filesUploadedServer[key][index].name}`);
-                            fs.unlinkSync(filePath);
-                        });
-                    }
-                    else{
-                        let filePath = path.resolve(__dirname, '../../../public/tmpFiles/' + `${filesUploadedServer[key][0].name}`);
-                        fs.unlinkSync(filePath);
-                    }
-                });
-            } catch (error) {
-                console.log(error);
-            }
-
-            var filesUploaded = filesUploadedS3;
-
-            // console.log(filesUploaded);
-            // console.log("============");
-
-            const UpdateFiles = Object.keys(filesUploaded).map(async(key) => {
-
-                var hubspot = await hubspotController.deal.show(user.hubspotDealId);
-                var index = docs[key].length;console.log(index);
-                let property = await getNameProperty(key);
-
-                var propNull = '';
-                var propPos = '';
-                for(let i = 0; i<index; i++){
-                    if(hubspot.properties[property[i]].value == ''){
-                        propNull = hubspot.properties[property[i]].versions[0].name;
-                        propPos = i;
-                        break;
-                    }
-                }
-
-                if(Array.isArray(filesUploaded[key])){//console.log("map2-nuevo-multiple");
-                    var i = index;
-                    var hubspot = await hubspotController.deal.show(user.hubspotDealId);
-                    Object.keys(filesUploaded[key]).forEach(async(item) => {
-                        var propNull = '';
-                        var propPos = '';
-                        for(let f = 0; f<property.length; f++){
-                            //console.log(property[f]);
-                            //console.log(hubspot.properties[property[f]]);
-                            if(hubspot.properties[property[f]]){
-                                if(hubspot.properties[property[f]].value == ''){
-                                    propNull = hubspot.properties[property[f]].versions[0].name;
-                                    //console.log(propNull);
-                                    propPos = f;
-                                    //console.log(propPos);
-                                    break;
-                                }
-                            }
-                            else{
-                                propNull = property[f];
-                                //console.log(propNull);
-                                propPos = f;
-                                //console.log(propPos);
-                                break;
-                            }
-                        }
-
-                        //console.log("multiple");
-
-                        if(propNull != '' && propPos >= 0){//console.log("splice")
-                            let params = {
-                                name: propNull,
-                                value: filesUploaded[key][item]
-                            }
-                            //console.log(params);
-                            hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-
-                            if(hubspot.properties[params.name]){
-                                hubspot.properties[params.name].value = params.value;
-                            }
-                            else{
-                                hubspot.properties = {
-                                    [params.name] : {"value" : params.value}
-                                }
-                            }
- 
-                            await docs[key].splice(propPos, 0, filesUploaded[key][item]);
-                            docs = await Documents.findByIdAndUpdate(id, {[key]: docs[key]}, {multi: true, new: true });
-                        }
-                    });
-                }
-                else{//console.log("map2-nuevo-unico");
-                    if(property[index] != null){
-                        let params = {
-                            name: propNull != '' ? propNull : property[index],
-                            value: filesUploaded[key]
-                        }
-                        //console.log("unico");
-                        //console.log(params);
-                        hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
-                        if(propNull != '' && propPos >= 0){//console.log("splice")
-                            docs[key].splice(propPos, 0, filesUploaded[key]);
-                            docs = await Documents.findByIdAndUpdate(id, {[key]: docs[key]}, { new: true });
-                        }
-                        else{//console.log("push")
-                            docs = await Documents.findByIdAndUpdate(id, {$push: {[key]: filesUploaded[key] } }, { new: true });
-                        }
-                    }
-                }
-            });
-
-            await Promise.all(UpdateFiles);
-
-            let docsNew = await Documents.findById(id);
-            let statusValue = await missingFiles(user, docsNew);
+            let statusValue = await missingFiles(user, id);
 
             await Documents.findByIdAndUpdate(id, {status: statusValue});
-            var user = await User.findById(idUser);
+
+            user = await User.findById(idUser);
 
             return response.json({
                 code: 200,
@@ -585,7 +321,7 @@ const documentsController = {
                 user: user
             });
         }
-        catch(error){
+        catch(error){console.log(error);
             return response.json({
                 code: 500,
                 msg: "Algo salió mal tratando de cargar documentos",
@@ -597,7 +333,7 @@ const documentsController = {
         let id = request.params.id;//id de documents
         let idUser = request.headers.tokenDecoded.data.id;
         
-        let data = request.body;console.log(data)
+        let data = request.body;
 
         if(data.name == '' && data.url == ''){
             return response.json({
@@ -636,15 +372,15 @@ const documentsController = {
             let statusValue = await missingFiles(user, docsNew);
 
             await Documents.findByIdAndUpdate(id, {status: statusValue});
+
+            user = await User.findById(idUser);
+
+            return response.json({
+                code: 200,
+                msg: 'Documento eliminado exitosamente',
+                user: user
+            });
         }
-
-        user = await User.findById(idUser);
-
-        return response.json({
-            code: 200,
-            msg: 'Documento eliminado exitosamente',
-            user: user
-        });
     }
     
 }
