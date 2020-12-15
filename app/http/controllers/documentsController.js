@@ -368,9 +368,7 @@ const documentsController = {
             await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
             await Documents.findByIdAndUpdate(id, {$pull: {[data.name]: docs[data.name][index] } });
 
-            let docsNew = await Documents.findById(id);
-            let statusValue = await missingFiles(user, docsNew);
-
+            let statusValue = await missingFiles(user, id);
             await Documents.findByIdAndUpdate(id, {status: statusValue});
 
             user = await User.findById(idUser);
