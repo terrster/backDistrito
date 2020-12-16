@@ -24,11 +24,13 @@ const authController = {
         try{
             let data = request.body;
 
-            let userExist = await User.findOne({ email: data.email.toLowerCase() });
+            let userExist = await User.findOne({ email: data.email });
+            let contactExist = await hubspotController.contact.getByEmail(data.email);
 
-            let contactExist = await hubspotController.contact.getByEmail(data.email.toLowerCase());
+            let userExistMin = await User.findOne({ email: data.email.toLowerCase() });
+            let contactExistMin = await hubspotController.contact.getByEmail(data.email.toLowerCase());
 
-            if(userExist || contactExist){
+            if(userExist || contactExist || userExistMin || contactExistMin){
                 return response.json({ 
                     code: 500,
                     msg: "El correo electrónico ya existe"
@@ -125,14 +127,17 @@ const authController = {
         }
 
         try{
-            let user = await User.findOne({ email: email }, {}, { autopopulate: false });
+            let userNormal = await User.findOne({ email: email }, {}, { autopopulate: false });
+            let userMin = await User.findOne({ email: email.toLowerCase() }, {}, { autopopulate: false });
 
-            if(!user){
+            if(!userNormal && !userMin){
                 return response.status(200).json({ 
                     code: 500,
                     msg: "Correo electrónico incorrecto" 
                 });
             }
+
+            let user = (userNormal ? userNormal : userMin);
 
             const payload = {
                 email : user.email

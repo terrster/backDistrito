@@ -34,7 +34,7 @@ const deal = {
                         "name": "nombre_comercial"
                     },
                     {
-                        "value": request.email,
+                        "value": request.email.toLowerCase(),
                         "name": "email"
                     },
                     {
@@ -748,7 +748,7 @@ const contact = {
             let contactParams = {
                 "properties": [
                     {
-                        "value": request.email,
+                        "value": request.email.toLowerCase(),
                         "property": "email"
                     },
                     {
