@@ -12,6 +12,7 @@ const path = require("path");
 
 //Controllers
 const authController = require("../app/http/controllers/authController");
+const counterController = require("../app/http/controllers/counterController");
 const finerioController = require("../app/http/controllers/finerioController");
 const impulsoMxController = require("../app/http/controllers/impulsoMxController");
 
@@ -24,6 +25,10 @@ route.post('/login', authController.login);
 route.post("/forgot_password", authController.forgotten_password);
 route.get("/validate_resetHash/:hash", authController.validate_resetHash);
 route.post("/reset_password/:hash", authController.reset_password);
+
+//Contador
+route.post("/counter/:type", counterController.add);
+route.get("/counter", counterController.total);
 
 //Callback
 route.all('/finerio/callback', finerioController.callback);
