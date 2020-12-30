@@ -97,10 +97,12 @@ const updateHubspotMongoFiles = async(id, hubspotDealId, filesUploaded) => {
             };
             
             for(let i = 0; i <= (docs[key].length - 1); i++){
-                if(properties[hs_property_names[i]].value == ''){
-                    emptyPropertyFound.name = hs_property_names[i];
-                    emptyPropertyFound.position = i;
-                    break;
+                if(properties.hasOwnProperty(hs_property_names[i])){
+                    if(properties[hs_property_names[i]].value == ''){
+                        emptyPropertyFound.name = hs_property_names[i];
+                        emptyPropertyFound.position = i;
+                        break;
+                    }
                 }
             }
 
