@@ -252,8 +252,7 @@ const documentsController = {
         try{
             let user = await User.findById(id);
             let filesUploadedToServer = fileManager.uploadToServer(files);
-            var filesUploadedToS3 = await fileManager.uploadToS3(filesUploadedToServer);
-            await fileManager.deleteFromServer(filesUploadedToServer);         
+            let filesUploadedToS3 = await fileManager.uploadToS3(filesUploadedToServer);
 
             let documentStored = await Documents.create({
                 idClient: {
@@ -274,6 +273,8 @@ const documentsController = {
             await Documents.findByIdAndUpdate(documentStored._id, {status: statusValue});
 
             user = await User.findById(id);
+
+            //await fileManager.deleteFromServer(filesUploadedToServer);         
 
             return response.json({
                 code: 200,
@@ -306,8 +307,7 @@ const documentsController = {
         try{
             let user = await User.findById(idUser);
             let filesUploadedToServer = fileManager.uploadToServer(files);
-            var filesUploadedToS3 = await fileManager.uploadToS3(filesUploadedToServer);
-            await fileManager.deleteFromServer(filesUploadedToServer);      
+            let filesUploadedToS3 = await fileManager.uploadToS3(filesUploadedToServer);
 
             await updateHubspotMongoFiles(id, user.hubspotDealId, filesUploadedToS3);
 
@@ -316,6 +316,8 @@ const documentsController = {
             await Documents.findByIdAndUpdate(id, {status: statusValue});
 
             user = await User.findById(idUser);
+
+            //await fileManager.deleteFromServer(filesUploadedToServer);      
 
             return response.json({
                 code: 200,
