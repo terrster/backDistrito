@@ -274,7 +274,7 @@ const documentsController = {
 
             user = await User.findById(id);
 
-            //await fileManager.deleteFromServer(filesUploadedToServer);         
+            await fileManager.deleteFromServer(filesUploadedToServer);         
 
             return response.json({
                 code: 200,
@@ -317,7 +317,7 @@ const documentsController = {
 
             user = await User.findById(idUser);
 
-            //await fileManager.deleteFromServer(filesUploadedToServer);      
+            await fileManager.deleteFromServer(filesUploadedToServer);     
 
             return response.json({
                 code: 200,

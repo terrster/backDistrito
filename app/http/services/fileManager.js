@@ -106,12 +106,24 @@ const deleteFromServer = (filesUploadedToServer) => {
         if(filesUploadedToServer[key].length > 1){
             Object.keys(filesUploadedToServer[key]).map((index) => {
                 let filePath = path.resolve(__dirname, uploadDir + filesUploadedToServer[key][index].name);
-                fs.unlinkSync(filePath);
+                try{
+                    fs.unlinkSync(filePath);
+                } 
+                catch(error){
+                    /*Error is being ignored because it does not affect the process*/
+                    // console.log(error);
+                }
             });
         }
         else{
             let filePath = path.resolve(__dirname, uploadDir + filesUploadedToServer[key][0].name);
-            fs.unlinkSync(filePath);
+            try{
+                fs.unlinkSync(filePath);
+            } 
+            catch(error){
+                /*Error is being ignored because it does not affect the process*/
+                // console.log(error);
+            }
         }
     });
 };
