@@ -7,6 +7,7 @@ const generalInfoSchema = new Schema({
     idClient: { type: Schema.Types.ObjectId, ref: 'Client' },
     civilStatus: String,
     rfcPerson: String,
+    bankAccount: Number,
     name: String,
     secondLastname: String,
     lastname: String,

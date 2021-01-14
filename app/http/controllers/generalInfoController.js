@@ -37,6 +37,7 @@ const generalInfoController = {
                 secondLastname,
                 civilStatus,
                 rfcPerson,
+                bankAccount, //Except PM
                 phone,
                 mortgageCredit,
                 carCredit,
@@ -66,6 +67,7 @@ const generalInfoController = {
                     secondLastname,
                     civilStatus,
                     rfcPerson,
+                    bankAccount, //Except PM
                     phone,
                     mortgageCredit,
                     carCredit,
@@ -123,6 +125,7 @@ const generalInfoController = {
                 secondLastname,
                 civilStatus,
                 rfcPerson,
+                bankAccount, //Except PM
                 phone,
                 mortgageCredit,
                 carCredit,
@@ -226,6 +229,7 @@ const generalInfoController = {
                 secondLastname,
                 civilStatus,
                 rfcPerson,
+                bankAccount, //Except PM
                 phone,
                 mortgageCredit,
                 carCredit,
@@ -255,6 +259,7 @@ const generalInfoController = {
                     secondLastname,
                     civilStatus,
                     rfcPerson,
+                    bankAccount, //Except PM
                     phone,
                     mortgageCredit,
                     carCredit,
@@ -312,6 +317,7 @@ const generalInfoController = {
                 secondLastname,
                 civilStatus,
                 rfcPerson,
+                bankAccount, //Except PM
                 phone,
                 mortgageCredit,
                 carCredit,

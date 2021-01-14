@@ -147,12 +147,13 @@ const finerioController = {
             return response.json(banks);
         }
         catch(error){
-            let err = {
-                msg: "Finerio: Algo salió mal tratando de obtener los bancos.",
-                error: error.response.data.errors
-            };
+            console.log(error);
+            // let err = {
+            //     msg: "Finerio: Algo salió mal tratando de obtener los bancos.",
+            //     error: error.response.data.errors
+            // };
 
-            return response.json(err);
+            // return response.json(err);
         };
     },
     getBank: async(request, response) => {

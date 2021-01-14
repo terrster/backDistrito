@@ -202,6 +202,18 @@ const deal = {
                                     "name": "n3_rfc"
                                 },
                                 {
+                                    "value": request.employeesNumber,
+                                    "name": "n3_18_numero_de_empleados"
+                                },
+                                {
+                                    "value": format.YES_NO_QUESTION[request.bankAccount],
+                                    "name": "n3_19_cuenta_bancaria_pm"
+                                },
+                                {
+                                    "value": format.YES_NO_QUESTION[request.paymentsMoreThan30],
+                                    "name": "n3_20_clientes_pagan_a_mas_de_30_dias"
+                                },
+                                {
                                     "value": request.phone,
                                     "name": "telefono"
                                 },
@@ -285,6 +297,10 @@ const deal = {
                                 {
                                     "value": request.rfcPerson,
                                     "name": "n3_15_rfc_pm"
+                                },
+                                {
+                                    "value": format.YES_NO_QUESTION[request.bankAccount],
+                                    "name": "n4_10_cuenta_bancaria"
                                 },
                                 {
                                     "value": request.phone,

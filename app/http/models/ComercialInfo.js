@@ -8,6 +8,9 @@ const comercialInfoSchema = new Schema({
   businessName: String,
   gyre: String,
   rfc: String,
+  employeesNumber: String,
+  bankAccount: Number,//Only PM
+  paymentsMoreThan30: Boolean,//Except PF
   specific:String,
   phone: String ,
   address: { type: Schema.Types.ObjectId, ref: 'Address', autopopulate: true },

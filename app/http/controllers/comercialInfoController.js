@@ -30,6 +30,9 @@ const comercialInfoController = {
                 businessName,
                 gyre,
                 rfc,
+                employeesNumber,
+                bankAccount, //Only PM
+                paymentsMoreThan30,
                 specific,
                 phone,
                 webSite,
@@ -54,6 +57,9 @@ const comercialInfoController = {
                     businessName,
                     gyre,
                     rfc,
+                    employeesNumber,
+                    bankAccount, //Only PM
+                    paymentsMoreThan30,
                     specific,
                     phone,
                     webSite,
@@ -96,6 +102,9 @@ const comercialInfoController = {
                 businessName,
                 gyre,
                 rfc,
+                employeesNumber,
+                bankAccount, //Only PM
+                paymentsMoreThan30,
                 specific,
                 phone,
                 webSite,
@@ -228,6 +237,9 @@ const comercialInfoController = {
                 businessName,
                 gyre,
                 rfc,
+                employeesNumber,
+                bankAccount, //Only PM
+                paymentsMoreThan30,
                 specific,
                 phone,
                 webSite,
@@ -252,6 +264,9 @@ const comercialInfoController = {
                     businessName,
                     gyre,
                     rfc,
+                    employeesNumber,
+                    bankAccount, //Only PM
+                    paymentsMoreThan30,
                     specific,
                     phone,
                     webSite,
@@ -294,6 +309,9 @@ const comercialInfoController = {
                 businessName,
                 gyre,
                 rfc,
+                employeesNumber,
+                bankAccount, //Only PM
+                paymentsMoreThan30,
                 specific,
                 phone,
                 webSite,
