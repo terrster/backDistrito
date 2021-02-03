@@ -42,11 +42,11 @@ const deal = {
                         "name": "celular"
                     },
                     {
-                        "value": request.idDistrito + " " + request.name + " " + request.lastname,
+                        "value": request.prefix ? request.prefix + request.idDistrito + " " + request.name + " " + request.lastname : request.idDistrito + " " + request.name + " " + request.lastname,
                         "name": "dealname"
                     },
                     {
-                        "value": process.env.DATE_HUB,
+                        "value": request.dealstage || process.env.DATE_HUB,
                         "name": "dealstage" 
                     },
                     {
