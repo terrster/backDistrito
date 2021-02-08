@@ -26,6 +26,7 @@ const addressController = require("../app/http/controllers/addressController");
 const referenceController = require("../app/http/controllers/referenceController");
 const documentsController = require("../app/http/controllers/documentsController");
 const finerioController = require("../app//http/controllers/finerioController");
+const openBankingController = require("../app//http/controllers/openBankingController");
 
 route.use(verifyToken);
 route.use(async(request, response, next) => {
@@ -99,7 +100,7 @@ route.group("/documents", (documents) => {
     documents.delete('/:id', documentsController.delete);
 });
 
-//Finerio routes - Open banking
+//Finerio routes
 route.group("/finerio", (finerio) => {
     //Banks
     finerio.get('/banks', finerioController.getBanks);
@@ -113,7 +114,7 @@ route.group("/finerio", (finerio) => {
     finerio.delete('/customers/:id', finerioController.deleteCustomer);
 
     //Credentials
-    finerio.post('/credentials', finerioController.storeCredential);
+    // finerio.post('/credentials', finerioController.storeCredential);
     finerio.get('/credentials/customer/:id', finerioController.getCredentials);
     finerio.get('/credentials/:id', finerioController.getCredential);
     finerio.put('/credentials/:id', finerioController.updateCredential);
@@ -125,6 +126,13 @@ route.group("/finerio", (finerio) => {
 
     //Transactions
     finerio.get('/transactions/:id', finerioController.getTransactions);
+});
+
+//Open banking
+route.group("/open-banking", (credentials) => {
+    credentials.post('/store', openBankingController.store);
+    credentials.post('/storeToken', openBankingController.storeToken);
+    credentials.delete('/delete', openBankingController.storeToken);
 });
 
 module.exports = route;
