@@ -588,20 +588,29 @@ const finerioController = {
             }
         }
         catch(error){
-            var err = {
+            let err = {
+                code: 500,
                 msg: "Finerio: Algo salió mal tratando de eliminar una credencial."
             };
 
             if(error.response.status == 404 && error.response.data.errors[0].code == 'credential.not.found'){
                 err = {
+                    code: 404,
                     msg: "Finerio: La credencial no ha sido encontrada.",
                 }
-            }console.log(err);
+            }
 
-            return response.json({
-                code:500,
-                msg: "Finerio: Algo salió mal tratando de eliminar una credencial."
-            });
+            let index = credentials.findIndex(c => c.id === idCredential);console.log("deleteCredential", index);
+            const newCredentials = credentials.splice(index, 1);console.log("deleteCredential", newCredentials);
+            await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
+            user = await User.findById(idUser);
+
+            if(controller){
+                return err;
+            }
+            else{
+                return response.json(err);
+            }
         }
     },
     provideToken: async(request) => {
