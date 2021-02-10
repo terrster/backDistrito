@@ -63,6 +63,7 @@ const openBankingController = {
 
             banks = Object.keys(banks).filter(b=> banks[b].validate === false);
 
+            console.log(banks);
             Object.keys(banks).map(async(key) => {
                 // if(!banks[key].validate){
                     let params = {
