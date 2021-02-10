@@ -554,6 +554,12 @@ const finerioController = {
             let idCredential = request.idCredential || request.params.id;
             let controller = request.controller || false;
 
+            console.log({
+                idUser,
+                idCredential,
+                controller
+            });
+
             let token = await finerioCredentials.getToken();
             let result = await axios.delete(`credentials/${idCredential}`, {    
                 headers: {
