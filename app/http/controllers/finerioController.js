@@ -892,7 +892,7 @@ const finerioController = {
             if(data.stage == 'interactive'){
                 await FinerioCallback.create({data: data});
                 
-                let user = glogal.io.getUser(data.customerId);
+                let user = global.io.getUser(data.customerId);
 
                 if(user){
                     global.io.emitToSocket(user.socketId, 'askForToken', data);
@@ -923,7 +923,7 @@ const finerioController = {
 
             await FinerioCallback.create({data: data});
                 
-            let userFound = glogal.io.getUser(data.customerId);
+            let userFound = global.io.getUser(data.customerId);
 
             let user = await User.findById(userFound.idU);
             data.user = user;
@@ -951,7 +951,7 @@ const finerioController = {
 
             await FinerioCallback.create({data: data});
 
-            let user = glogal.io.getUser(data.customerId);
+            let user = global.io.getUser(data.customerId);
 
             if(user){
                 global.io.emitToSocket(user.socketId, 'notifyFailure', data);
