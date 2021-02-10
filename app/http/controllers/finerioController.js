@@ -587,17 +587,16 @@ const finerioController = {
                 }
             }
         }
-        catch(error){console.log(error);
+        catch(error){
             var err = {
-                msg: "Finerio: Algo salió mal tratando de eliminar una credencial.",
-                error: error.response.data.errors
+                msg: "Finerio: Algo salió mal tratando de eliminar una credencial."
             };
 
             if(error.response.status == 404 && error.response.data.errors[0].code == 'credential.not.found'){
                 err = {
                     msg: "Finerio: La credencial no ha sido encontrada.",
                 }
-            }
+            }console.log(err);
 
             return response.json({
                 code:500,
