@@ -110,8 +110,6 @@ const openBankingController = {
     storeToken: async(request, response) => {
         let params = request.body;
         let result = await finerioController.provideToken(params);
-
-        console.log(result);
         
         if(result.status == 202){
             return response.json({

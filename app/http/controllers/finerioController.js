@@ -554,12 +554,6 @@ const finerioController = {
             let idCredential = request.idCredential || request.params.id;
             let controller = request.controller || false;
 
-            console.log({
-                idUser,
-                idCredential,
-                controller
-            });
-
             let token = await finerioCredentials.getToken();
             let result = await axios.delete(`credentials/${idCredential}`, {    
                 headers: {
@@ -570,11 +564,12 @@ const finerioController = {
 
             let user = await User.findById(idUser);
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
-            let index = credentials.findIndex(c => c.id === idCredential);console.log(index);
-            const newCredentials = credentials.splice(index, 1);console.log(newCredentials);
+            let index = credentials.findIndex(c => c.id === idCredential);console.log("deleteCredential", index);
+            const newCredentials = credentials.splice(index, 1);console.log("deleteCredential", newCredentials);
             await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
             user = await User.findById(idUser);
-            console.log(user.idClient.appliance[0].idFinerio);
+
+            console.log("deleteCredential", user.idClient.appliance[0].idFinerio);
 
             if(result.status == 204){
                 if(controller){
