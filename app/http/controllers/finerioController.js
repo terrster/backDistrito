@@ -571,7 +571,7 @@ const finerioController = {
             let user = await User.findById(idUser);
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
             let index = credentials.findIndex(c => c.id === idCredential);
-            const newCredentials = credentials.splice(index, index);
+            const newCredentials = credentials.splice(index, 1);
             await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
             user = await User.findById(idUser);
 

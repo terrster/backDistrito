@@ -75,7 +75,9 @@ const openBankingController = {
                         });
 
                         let index = credentials.findIndex(credential => credential.username == params.username);
-                        credentials.splice(index, index);
+                        credentials.splice(index, 1);
+                        console.log(credentials);
+
                     }
                     
                     let finerioCredentialAPI = await finerioController.storeCredential(params);
@@ -104,9 +106,6 @@ const openBankingController = {
                 msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios'
             });
         }
-    },
-    delete: async(request, response) => {
-
     },
     storeToken: async(request, response) => {
         let params = request.body;
