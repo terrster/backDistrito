@@ -75,7 +75,7 @@ const openBankingController = {
                         });
 
                         let index = credentials.findIndex(credential => credential.username == params.username);
-                        credentials.splice(index, 0);
+                        credentials.splice(index, (index > 0 ? 1 : 0));
                         console.log(credentials);
 
                     }

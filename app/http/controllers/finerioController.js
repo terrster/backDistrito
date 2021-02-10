@@ -565,12 +565,10 @@ const finerioController = {
                 }
             });
 
-            let index = credentials.findIndex(c => c.id === idCredential);console.log("deleteCredential", index);
-            const newCredentials = credentials.splice(index, 0);console.log("deleteCredential", newCredentials);
+            let index = credentials.findIndex(c => c.id === idCredential);
+            const newCredentials = credentials.splice(index, (index > 0 ? 1 : 0));
             await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
             user = await User.findById(idUser);
-
-            console.log("deleteCredential", user.idClient.appliance[0].idFinerio);
 
             if(result.status == 204){
                 if(controller){
@@ -601,8 +599,8 @@ const finerioController = {
                 }
             }
 
-            let index = credentials.findIndex(c => c.id === idCredential);console.log("deleteCredential", index);
-            const newCredentials = credentials.splice(index, 0);console.log("deleteCredential", newCredentials);
+            let index = credentials.findIndex(c => c.id === idCredential);;
+            const newCredentials = credentials.splice(index, (index > 0 ? 1 : 0));
             await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
             user = await User.findById(idUser);
 
@@ -626,12 +624,6 @@ const finerioController = {
                 'Content-Type': 'application/json'
             }
         });
-
-        // request.app.get("io").emit('askForTokenResult', result);
-
-        // setTimeout(() => {
-        //     request.app.get("io").emit('askForTokenResult', result);
-        // }, 5000);
 
         return result;
     },
