@@ -88,7 +88,7 @@ const openBankingController = {
 
                     await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
 
-                    return response.json({
+                    response.json({
                         code: 200,
                         msg: 'Credencial guardada correctamente',
                         idCredential: finerioCredentialAPI.id
