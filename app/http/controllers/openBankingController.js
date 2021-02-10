@@ -20,8 +20,7 @@ const bankInformation = {
 const openBankingController = {
     store: async(request, response) =>{
         let idUser = request.headers.tokenDecoded.data.id;
-        let banks = request.body;console.log(banks);
-
+        let banks = request.body;
         try{
             let user = await User.findById(idUser);
             let idFinerio = null;
@@ -64,6 +63,8 @@ const openBankingController = {
                         password: banks[key].values.password,
                         securityCode: banks[key].values.securityCode
                     };
+
+                    console.log(params);
                     
                     let credential = credentials.find(credential => credential.username == params.username);
 
@@ -88,20 +89,27 @@ const openBankingController = {
 
                     await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
 
-                    response.json({
+                    console.log({
                         code: 200,
                         msg: 'Credencial guardada correctamente',
                         idCredential: finerioCredentialAPI.id
                     });
 
-                    return;
-                }
-                else{
-                    response.json({
-                        code: 204,
-                        msg: 'No hay nuevas credenciales que guardar'
+                    return response.json({
+                        code: 200,
+                        msg: 'Credencial guardada correctamente',
+                        idCredential: finerioCredentialAPI.id
                     });
                 }
+                console.log({
+                    code: 204,
+                    msg: 'No hay nuevas credenciales que guardar'
+                });
+                response.json({
+                    code: 204,
+                    msg: 'No hay nuevas credenciales que guardar'
+                });
+    
             });
         } 
         catch(error){
