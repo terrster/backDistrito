@@ -552,7 +552,7 @@ const finerioController = {
         var idUser = request.idUser || request.headers.tokenDecoded.data.id;
         var idCredential = request.idCredential || request.params.id;
         var controller = request.controller || false;
-        
+
         var user = await User.findById(idUser);
         var credentials = user.idClient.appliance[0].idFinerio.credentials;
 
@@ -566,7 +566,7 @@ const finerioController = {
             });
 
             let index = credentials.findIndex(c => c.id === idCredential);console.log("deleteCredential", index);
-            const newCredentials = credentials.splice(index, 1);console.log("deleteCredential", newCredentials);
+            const newCredentials = credentials.splice(index, 0);console.log("deleteCredential", newCredentials);
             await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
             user = await User.findById(idUser);
 
@@ -602,7 +602,7 @@ const finerioController = {
             }
 
             let index = credentials.findIndex(c => c.id === idCredential);console.log("deleteCredential", index);
-            const newCredentials = credentials.splice(index, 1);console.log("deleteCredential", newCredentials);
+            const newCredentials = credentials.splice(index, 0);console.log("deleteCredential", newCredentials);
             await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
             user = await User.findById(idUser);
 
