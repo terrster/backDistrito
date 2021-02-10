@@ -889,33 +889,36 @@ const finerioController = {
         let data = request.body;
 
         if(parseInt(Object.keys(data).length)){
-            // if(data.stage == 'interactive'){
-            //     // await FinerioCallback.create({data: data});
-            //     let user = glogal.io.getUser(data.customerId);
+            if(data.stage == 'interactive'){
+                await FinerioCallback.create({data: data});
+                
+                let user = glogal.io.getUser(data.customerId);
 
-            //     if(user){
-            //         global.io.emitToSocket(user.socketId, 'askForToken', data);
-            //     }
+                if(user){
+                    global.io.emitToSocket(user.socketId, 'askForToken', data);
+                }
 
-            //     return response.json({
-            //         status: 200,
-            //         msg: "Callback con stage interactive, recibido exitosamente"
-            //     });
-            // }
-            // else if(data.stage == 'fetch_accounts'){
-            //     let user = glogal.io.getUser(data.customerId);
+                return response.json({
+                    status: 200,
+                    msg: "Callback con stage interactive, recibido exitosamente"
+                });
+            }
+            else if(data.stage == 'fetch_accounts'){
+                await FinerioCallback.create({data: data});
 
-            //     if(user){
-            //         global.io.emitToSocket(user.socketId, 'credentialSuccessfullyStored', data);
-            //     }
+                let user = glogal.io.getUser(data.customerId);
 
-            //     return response.json({
-            //         status: 200,
-            //         msg: "Callback con stage fetch_accounts, recibido exitosamente"
-            //     });
-            // }
+                if(user){
+                    global.io.emitToSocket(user.socketId, 'credentialSuccessfullyStored', data);
+                }
 
-            await FinerioCallback.create({data: data});
+                return response.json({
+                    status: 200,
+                    msg: "Callback con stage fetch_accounts, recibido exitosamente"
+                });
+            }
+
+            // await FinerioCallback.create({data: data});
 
             response.json({
                 status: 200,
@@ -925,7 +928,7 @@ const finerioController = {
         else{
             return response.json({
                 status: 500,
-                msg: "No se recibió nada en el callback"
+                msg: "No se recibió nada en el callback notify"
             });
         }
     },
@@ -933,31 +936,6 @@ const finerioController = {
         let data = request.body;
 
         if(parseInt(Object.keys(data).length)){
-            // if(data.stage == 'interactive'){
-            //     // await FinerioCallback.create({data: data});
-            //     let user = glogal.io.getUser(data.customerId);
-
-            //     if(user){
-            //         global.io.emitToSocket(user.socketId, 'askForToken', data);
-            //     }
-
-            //     return response.json({
-            //         status: 200,
-            //         msg: "Callback con stage interactive, recibido exitosamente"
-            //     });
-            // }
-            // else if(data.stage == 'fetch_accounts'){
-            //     let user = glogal.io.getUser(data.customerId);
-
-            //     if(user){
-            //         global.io.emitToSocket(user.socketId, 'credentialSuccessfullyStored', data);
-            //     }
-
-            //     return response.json({
-            //         status: 200,
-            //         msg: "Callback con stage fetch_accounts, recibido exitosamente"
-            //     });
-            // }
 
             await FinerioCallback.create({data: data});
 
@@ -969,7 +947,7 @@ const finerioController = {
         else{
             return response.json({
                 status: 500,
-                msg: "No se recibió nada en el callback"
+                msg: "No se recibió nada en el callback success"
             });
         }
     },
@@ -977,31 +955,7 @@ const finerioController = {
         let data = request.body;
 
         if(parseInt(Object.keys(data).length)){
-            // if(data.stage == 'interactive'){
-            //     // await FinerioCallback.create({data: data});
-            //     let user = glogal.io.getUser(data.customerId);
 
-            //     if(user){
-            //         global.io.emitToSocket(user.socketId, 'askForToken', data);
-            //     }
-
-            //     return response.json({
-            //         status: 200,
-            //         msg: "Callback con stage interactive, recibido exitosamente"
-            //     });
-            // }
-            // else if(data.stage == 'fetch_accounts'){
-            //     let user = glogal.io.getUser(data.customerId);
-
-            //     if(user){
-            //         global.io.emitToSocket(user.socketId, 'credentialSuccessfullyStored', data);
-            //     }
-
-            //     return response.json({
-            //         status: 200,
-            //         msg: "Callback con stage fetch_accounts, recibido exitosamente"
-            //     });
-            // }
             await FinerioCallback.create({data: data});
 
             response.json({
@@ -1012,7 +966,7 @@ const finerioController = {
         else{
             return response.json({
                 status: 500,
-                msg: "No se recibió nada en el callback"
+                msg: "No se recibió nada en el callback failure"
             });
         }
     }
