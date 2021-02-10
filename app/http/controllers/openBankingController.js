@@ -22,17 +22,11 @@ const openBankingController = {
         let idUser = request.headers.tokenDecoded.data.id;
         let banks = request.body;
 
-        console.log(banks);
-
         let banksToIgnore = Object.keys(banks).filter(b => banks[b].validate == true);
-
-        console.log(banksToIgnore);
 
         banksToIgnore.map((b) => {
             delete banks[b];
         });
-
-        console.log(banks);
 
         try{
             let user = await User.findById(idUser);
@@ -114,11 +108,6 @@ const openBankingController = {
                 //         msg: 'No hay nuevas credenciales que guardar'
                 //     });
                 // }
-            });
-
-            return response.json({
-                code: 204,
-                msg: 'No hay nuevas credenciales que guardar'
             });
         } 
         catch(error){
