@@ -21,6 +21,13 @@ const openBankingController = {
     store: async(request, response) =>{
         let idUser = request.headers.tokenDecoded.data.id;
         let banks = request.body;
+
+        let banksToIgnore = Object.keys(banks).filter(b => banks[b].validate == true);
+
+        banksToIgnore.map((b) => {
+            delete banks[b];
+        });
+
         try{
             let user = await User.findById(idUser);
             let idFinerio = null;
@@ -54,8 +61,10 @@ const openBankingController = {
 
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
 
+            banks = Object.keys(banks).filter(b=> banks[b].validate === false);
+
             Object.keys(banks).map(async(key) => {
-                if(!banks[key].validate){
+                // if(!banks[key].validate){
                     let params = {
                         customerId: user.idClient.appliance[0].idFinerio.idFinerio,
                         bankId: banks[key].id,
@@ -63,8 +72,6 @@ const openBankingController = {
                         password: banks[key].values.password,
                         securityCode: banks[key].values.securityCode
                     };
-
-                    console.log(params);
                     
                     let credential = credentials.find(credential => credential.username == params.username);
 
@@ -89,27 +96,23 @@ const openBankingController = {
 
                     await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
 
-                    console.log({
-                        code: 200,
-                        msg: 'Credencial guardada correctamente',
-                        idCredential: finerioCredentialAPI.id
-                    });
-
                     return response.json({
                         code: 200,
                         msg: 'Credencial guardada correctamente',
                         idCredential: finerioCredentialAPI.id
                     });
-                }
-                console.log({
-                    code: 204,
-                    msg: 'No hay nuevas credenciales que guardar'
-                });
-                response.json({
-                    code: 204,
-                    msg: 'No hay nuevas credenciales que guardar'
-                });
-    
+                // }
+                // else{
+                //     return response.json({
+                //         code: 204,
+                //         msg: 'No hay nuevas credenciales que guardar'
+                //     });
+                // }
+            });
+
+            return response.json({
+                code: 204,
+                msg: 'No hay nuevas credenciales que guardar'
             });
         } 
         catch(error){
