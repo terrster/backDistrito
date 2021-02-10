@@ -562,7 +562,7 @@ const finerioController = {
                 }
             });
 
-            let user = await User.findById(idUser);
+            var user = await User.findById(idUser);
             var credentials = user.idClient.appliance[0].idFinerio.credentials;
             let index = credentials.findIndex(c => c.id === idCredential);console.log("deleteCredential", index);
             const newCredentials = credentials.splice(index, 1);console.log("deleteCredential", newCredentials);
