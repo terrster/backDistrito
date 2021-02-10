@@ -20,7 +20,7 @@ const bankInformation = {
 const openBankingController = {
     store: async(request, response) =>{
         let idUser = request.headers.tokenDecoded.data.id;
-        let banks = request.body;
+        let banks = request.body;console.log(banks);
 
         try{
             let user = await User.findById(idUser);
@@ -93,6 +93,8 @@ const openBankingController = {
                         msg: 'Credencial guardada correctamente',
                         idCredential: finerioCredentialAPI.id
                     });
+
+                    return;
                 }
                 else{
                     response.json({
@@ -101,7 +103,6 @@ const openBankingController = {
                     });
                 }
             });
-            return;
         } 
         catch(error){
             console.log(error);
