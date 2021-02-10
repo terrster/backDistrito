@@ -603,7 +603,10 @@ const finerioController = {
                 }
             }
 
-            return response.json({err});
+            return response.json({
+                code:500,
+                msg: "Finerio: Algo salió mal tratando de eliminar una credencial."
+            });
         }
     },
     provideToken: async(request) => {
