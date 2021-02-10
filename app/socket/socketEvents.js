@@ -28,7 +28,7 @@ class SocketService {
           console.log(this.users);
 
           socket.on('disconnect', () => {
-              console.log("One user connected!");
+              console.log("One user disconnected!");
               this.users = this.users.filter(user => user.socketId != socket.id);
       
               console.log(this.users);

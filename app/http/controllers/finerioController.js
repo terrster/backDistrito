@@ -900,25 +900,9 @@ const finerioController = {
 
                 return response.json({
                     status: 200,
-                    msg: "Callback con stage interactive, recibido exitosamente"
+                    msg: "Callback notify con stage interactive, recibido exitosamente"
                 });
             }
-            else if(data.stage == 'fetch_accounts'){
-                await FinerioCallback.create({data: data});
-
-                let user = glogal.io.getUser(data.customerId);
-
-                if(user){
-                    global.io.emitToSocket(user.socketId, 'credentialSuccessfullyStored', data);
-                }
-
-                return response.json({
-                    status: 200,
-                    msg: "Callback con stage fetch_accounts, recibido exitosamente"
-                });
-            }
-
-            // await FinerioCallback.create({data: data});
 
             response.json({
                 status: 200,
@@ -938,6 +922,15 @@ const finerioController = {
         if(parseInt(Object.keys(data).length)){
 
             await FinerioCallback.create({data: data});
+                
+            let userFound = glogal.io.getUser(data.customerId);
+
+            let user = await User.findById(userFound.idU);
+            data.user = user;
+            
+            if(userFound){
+                global.io.emitToSocket(userFound.socketId, 'notifySuccess', data);
+            }
 
             response.json({
                 status: 200,
@@ -957,6 +950,12 @@ const finerioController = {
         if(parseInt(Object.keys(data).length)){
 
             await FinerioCallback.create({data: data});
+
+            let user = glogal.io.getUser(data.customerId);
+
+            if(user){
+                global.io.emitToSocket(user.socketId, 'notifyFailure', data);
+            }
 
             response.json({
                 status: 200,
