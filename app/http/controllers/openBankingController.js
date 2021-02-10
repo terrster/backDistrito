@@ -95,12 +95,13 @@ const openBankingController = {
                     });
                 }
                 else{
-                    return response.json({
+                    response.json({
                         code: 204,
                         msg: 'No hay nuevas credenciales que guardar'
                     });
                 }
             });
+            return;
         } 
         catch(error){
             console.log(error);
