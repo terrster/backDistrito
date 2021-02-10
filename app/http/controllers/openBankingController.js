@@ -28,6 +28,8 @@ const openBankingController = {
             delete banks[b];
         });
 
+        console.log(banks);
+
         try{
             let user = await User.findById(idUser);
             let idFinerio = null;
