@@ -574,6 +574,7 @@ const finerioController = {
             const newCredentials = credentials.splice(index, 1);
             await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
             user = await User.findById(idUser);
+            console.log(user.idClient.appliance[0].idFinerio);
 
             if(result.status == 204){
                 if(controller){
