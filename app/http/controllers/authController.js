@@ -12,8 +12,8 @@ const Finerio = require("../models/Finerio");
 const userController = require("../controllers/userController");
 const hubspotController = require("../controllers/hubspotController");
 
-const privateKey = fs.readFileSync(path.resolve("config/private.key"));
-const options = require("../../../config/jwt_options");
+const privateKey = fs.readFileSync(path.resolve("config/jwt/private.key"));
+const options = require("../../../config/jwt/jwt_options");
 const validationsManager = require("../services/validationsManager");
 const tokenManager = require("../services/tokenManager");
 const mailManager = require("../services/mailManager");

@@ -108,8 +108,8 @@ route.group("/finerio", (finerio) => {
 
     //Customers
     finerio.post('/customers', finerioController.storeCustomer);
-    finerio.get('/customers', finerioController.getCustomers);
-    finerio.get('/customers/:id', finerioController.getCustomer);
+    finerio.get('/customers/:cursor', finerioController.getCustomers);
+    finerio.get('/customer/:id', finerioController.getCustomer);
     finerio.put('/customers/:id', finerioController.updateCustomer);
     finerio.delete('/customers/:id', finerioController.deleteCustomer);
 
@@ -119,6 +119,7 @@ route.group("/finerio", (finerio) => {
     finerio.get('/credentials/:id', finerioController.getCredential);
     finerio.put('/credentials/:id', finerioController.updateCredential);
     finerio.delete('/credentials/:id', finerioController.deleteCredential);
+    finerio.get('/credentials/messages/failure', finerioController.getCredentialsErrors);
 
     //Accounts
     finerio.get('/accounts/:id', finerioController.getAccounts);

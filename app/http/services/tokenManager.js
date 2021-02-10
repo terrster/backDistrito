@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 
-const privateKey = fs.readFileSync(path.resolve("config/private.key"));
-const publicKey = fs.readFileSync(path.resolve("config/public.key"));
-const options = require("../../../config/jwt_options");
+const privateKey = fs.readFileSync(path.resolve("config/jwt/private.key"));
+const publicKey = fs.readFileSync(path.resolve("config/jwt/public.key"));
+const options = require("../../../config/jwt/jwt_options");
 
 var tokenManager = {
 

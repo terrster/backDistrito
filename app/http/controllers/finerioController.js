@@ -4,10 +4,10 @@ const _axios = require("axios").default;
 const axios = _axios.create({
     baseURL: 'https://api-v2.finerio.mx/'
 });
-const finerioCredentials = require("../../../config/finerio_credentials");
+const finerioCredentials = require("../../../config/finerio/finerio_credentials");
 const fs = require("fs");
 const path = require("path");
-const finerio_publicKey = fs.readFileSync(path.resolve("config/finerio_public.key"));
+const finerio_publicKey = fs.readFileSync(path.resolve("config/finerio/finerio_public.key"));
 const crypto = require('crypto');
 const moment = require("moment");
 
@@ -233,7 +233,8 @@ const finerioController = {
     getCustomers: async(request, response) => {
         try{
             let token = await finerioCredentials.getToken();
-            let {data} = await axios.get('customers', {    
+            let route = request.params.cursor ? 'customers?cursor='+request.params.cursor : 'customers';
+            let {data} = await axios.get(route, {    
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -348,7 +349,7 @@ const finerioController = {
     //Credentials
     storeCredential: async(request) => {
         try{
-            let { customerId, bankId, username, password, automaticFetching } = request;
+            let { customerId, bankId, username, password, securityCode, automaticFetching } = request;
 
             if(!customerId || !bankId || !username || !password){
                 let res = {
@@ -356,24 +357,38 @@ const finerioController = {
                     msg: "Finerio: Los campos id de cliente, id de institucion bancaria, usuario y contraseña son obligatorios."
                 };
 
-                // return response.json(res);
                 return res;
             }
 
             let usernameEncrypted = Encrypt(username);
             let passwordEncrypted = Encrypt(password);
-            // let securityCodeEncrypted = securityCode ? Encrypt(securityCode) : null;
+            let securityCodeEncrypted = securityCode ? Encrypt(securityCode) : null;
             let automaticFetchingOption = automaticFetching ? automaticFetching : false;
 
+            let params = null;
+
+            if(securityCode){
+                params = {
+                    'customerId': customerId,
+                    'bankId': bankId,
+                    'username': usernameEncrypted,
+                    'password': passwordEncrypted,
+                    'securityCode': securityCodeEncrypted,
+                    'automaticFetching' : automaticFetchingOption
+                };
+            }
+            else{
+                params = {
+                    'customerId': customerId,
+                    'bankId': bankId,
+                    'username': usernameEncrypted,
+                    'password': passwordEncrypted,
+                    'automaticFetching' : automaticFetchingOption
+                };
+            }
+
             let token = await finerioCredentials.getToken();
-            let result = await axios.post('credentials', {
-                'customerId': customerId,
-                'bankId': bankId,
-                'username': usernameEncrypted,
-                'password': passwordEncrypted,
-                // 'securityCode': securityCodeEncrypted,
-                'automaticFetching' : automaticFetchingOption
-            }, {    
+            let result = await axios.post('credentials', params, {    
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -407,27 +422,6 @@ const finerioController = {
             return response.json(error.response);
             //return err;
         }
-    },
-    provideToken: async(request) => {
-        let { idCredential, token } = request;
-
-        let tokenF = await finerioCredentials.getToken();
-        let result = await axios.put(`credentials/${idCredential}/interactive`, {
-            'token': token,
-        }, {    
-            headers: {
-                'Authorization': `Bearer ${tokenF}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        // request.app.get("io").emit('askForTokenResult', result);
-
-        // setTimeout(() => {
-        //     request.app.get("io").emit('askForTokenResult', result);
-        // }, 5000);
-
-        return result;
     },
     getCredentials: async(request, response) => {//ID CUSTOMER
         try{
@@ -492,7 +486,6 @@ const finerioController = {
                     msg: "Finerio: Los campos id de cliente, id de institucion bancaria, usuario y contraseña son obligatorios."
                 };
 
-                //return response.json(res);
                 return res;
             }
 
@@ -501,15 +494,30 @@ const finerioController = {
             let securityCodeEncrypted = securityCode ? Encrypt(securityCode) : null;
             let automaticFetchingOption = automaticFetching ? automaticFetching : false;
 
+            let params = null;
+
+            if(securityCode){
+                params = {
+                    'customerId': customerId,
+                    'bankId': bankId,
+                    'username': usernameEncrypted,
+                    'password': passwordEncrypted,
+                    'securityCode': securityCodeEncrypted,
+                    'automaticFetching' : automaticFetchingOption
+                };
+            }
+            else{
+                params = {
+                    'customerId': customerId,
+                    'bankId': bankId,
+                    'username': usernameEncrypted,
+                    'password': passwordEncrypted,
+                    'automaticFetching' : automaticFetchingOption
+                };
+            }
+
             let token = await finerioCredentials.getToken();
-            let result = await axios.put(`credentials/${idCredential}`, {
-                'customerId': customerId,
-                'bankId': bankId,
-                'username': usernameEncrypted,
-                'password': passwordEncrypted,
-                'securityCode': securityCodeEncrypted,
-                'automaticFetching' : automaticFetchingOption
-            }, {    
+            let result = await axios.put(`credentials/${idCredential}`, params, {    
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -521,7 +529,6 @@ const finerioController = {
                     msg: "Finerio: La credencial ha sido actualizada correctamente, pendiente a validación."
                 };
 
-                //return response.json(res);
                 return res;
             }
         }
@@ -543,9 +550,12 @@ const finerioController = {
     },
     deleteCredential: async(request, response) => {
         try{
-            let idUser = request.headers.tokenDecoded.data.id;
+            let idUser = request.idUser || request.headers.tokenDecoded.data.id;
+            let idCredential = request.idCredential || request.params.id;
+            let controller = request.controller || false;
+
             let token = await finerioCredentials.getToken();
-            let result = await axios.delete(`credentials/${request.params.id}`, {    
+            let result = await axios.delete(`credentials/${idCredential}`, {    
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -554,20 +564,28 @@ const finerioController = {
 
             let user = await User.findById(idUser);
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
-            let index = credentials.findIndex(c => c.id === request.params.id);
+            let index = credentials.findIndex(c => c.id === idCredential);
             const newCredentials = credentials.splice(index, index);
-
             await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
             user = await User.findById(idUser);
 
             if(result.status == 204){
-                return response.json({
-                    msg: "Finerio: Credencial eliminada correctamente.",
-                    user: user 
-                });
+                if(controller){
+                    return {
+                        code: 204,
+                        msg: "Finerio: Credencial eliminada correctamente.",
+                        user: user 
+                    }
+                }
+                else{
+                    return response.json({
+                        msg: "Finerio: Credencial eliminada correctamente.",
+                        user: user 
+                    });
+                }
             }
         }
-        catch(error){
+        catch(error){console.log(error);
             var err = {
                 msg: "Finerio: Algo salió mal tratando de eliminar una credencial.",
                 error: error.response.data.errors
@@ -579,8 +597,40 @@ const finerioController = {
                 }
             }
 
-            return response.json(err);
+            return response.json({err});
         }
+    },
+    provideToken: async(request) => {
+        let { idCredential, token } = request;
+
+        let tokenF = await finerioCredentials.getToken();
+        let result = await axios.put(`credentials/${idCredential}/interactive`, {
+            'token': token,
+        }, {    
+            headers: {
+                'Authorization': `Bearer ${tokenF}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // request.app.get("io").emit('askForTokenResult', result);
+
+        // setTimeout(() => {
+        //     request.app.get("io").emit('askForTokenResult', result);
+        // }, 5000);
+
+        return result;
+    },
+    getCredentialsErrors: async(request, response) => {
+        let tokenF = await finerioCredentials.getToken();
+        let {data} = await axios.get(`credentials/messages/failure`, {    
+            headers: {
+                'Authorization': `Bearer ${tokenF}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return response.json(data);
     },
     //Accounts
     getAccounts: async(request, response) => {//ID Credential
@@ -835,22 +885,128 @@ const finerioController = {
         console.log(accountRsp);
     },
     //Callback
-    callback: async(request, response) => {
+    notify: async(request, response) => {
         let data = request.body;
 
         if(parseInt(Object.keys(data).length)){
-            if(data.stage == 'interactive'){
-                await FinerioCallback.create({data: data});
+            // if(data.stage == 'interactive'){
+            //     // await FinerioCallback.create({data: data});
+            //     let user = glogal.io.getUser(data.customerId);
 
-                return response.json({
-                    status: 200,
-                    msg: "Callback con stage interactive, recibido exitosamente"
-                });
-            }
+            //     if(user){
+            //         global.io.emitToSocket(user.socketId, 'askForToken', data);
+            //     }
+
+            //     return response.json({
+            //         status: 200,
+            //         msg: "Callback con stage interactive, recibido exitosamente"
+            //     });
+            // }
+            // else if(data.stage == 'fetch_accounts'){
+            //     let user = glogal.io.getUser(data.customerId);
+
+            //     if(user){
+            //         global.io.emitToSocket(user.socketId, 'credentialSuccessfullyStored', data);
+            //     }
+
+            //     return response.json({
+            //         status: 200,
+            //         msg: "Callback con stage fetch_accounts, recibido exitosamente"
+            //     });
+            // }
+
+            await FinerioCallback.create({data: data});
 
             response.json({
                 status: 200,
-                msg: "Callback recibido exitosamente"
+                msg: "Callback notify, recibido exitosamente"
+            });
+        }
+        else{
+            return response.json({
+                status: 500,
+                msg: "No se recibió nada en el callback"
+            });
+        }
+    },
+    success: async(request, response) => {
+        let data = request.body;
+
+        if(parseInt(Object.keys(data).length)){
+            // if(data.stage == 'interactive'){
+            //     // await FinerioCallback.create({data: data});
+            //     let user = glogal.io.getUser(data.customerId);
+
+            //     if(user){
+            //         global.io.emitToSocket(user.socketId, 'askForToken', data);
+            //     }
+
+            //     return response.json({
+            //         status: 200,
+            //         msg: "Callback con stage interactive, recibido exitosamente"
+            //     });
+            // }
+            // else if(data.stage == 'fetch_accounts'){
+            //     let user = glogal.io.getUser(data.customerId);
+
+            //     if(user){
+            //         global.io.emitToSocket(user.socketId, 'credentialSuccessfullyStored', data);
+            //     }
+
+            //     return response.json({
+            //         status: 200,
+            //         msg: "Callback con stage fetch_accounts, recibido exitosamente"
+            //     });
+            // }
+
+            await FinerioCallback.create({data: data});
+
+            response.json({
+                status: 200,
+                msg: "Callback success, recibido exitosamente"
+            });
+        }
+        else{
+            return response.json({
+                status: 500,
+                msg: "No se recibió nada en el callback"
+            });
+        }
+    },
+    failure: async(request, response) => {
+        let data = request.body;
+
+        if(parseInt(Object.keys(data).length)){
+            // if(data.stage == 'interactive'){
+            //     // await FinerioCallback.create({data: data});
+            //     let user = glogal.io.getUser(data.customerId);
+
+            //     if(user){
+            //         global.io.emitToSocket(user.socketId, 'askForToken', data);
+            //     }
+
+            //     return response.json({
+            //         status: 200,
+            //         msg: "Callback con stage interactive, recibido exitosamente"
+            //     });
+            // }
+            // else if(data.stage == 'fetch_accounts'){
+            //     let user = glogal.io.getUser(data.customerId);
+
+            //     if(user){
+            //         global.io.emitToSocket(user.socketId, 'credentialSuccessfullyStored', data);
+            //     }
+
+            //     return response.json({
+            //         status: 200,
+            //         msg: "Callback con stage fetch_accounts, recibido exitosamente"
+            //     });
+            // }
+            await FinerioCallback.create({data: data});
+
+            response.json({
+                status: 200,
+                msg: "Callback failure, recibido exitosamente"
             });
         }
         else{

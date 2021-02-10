@@ -12,8 +12,8 @@ const fs = require("fs");
 const path = require("path");
 
 const router = express.Router(); 
-const publicKey = fs.readFileSync(path.resolve("config/public.key"));
-const options = require("../../../config/jwt_options");
+const publicKey = fs.readFileSync(path.resolve("config/jwt/public.key"));
+const options = require("../../../config/jwt/jwt_options");
 
 router.use((request, response, next) => {
     const token = request.headers['token'];

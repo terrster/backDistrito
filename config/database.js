@@ -1,19 +1,41 @@
-const mongoose = require('mongoose')
+'use strict'
 
-///////////Environment Variables
-const USER_DB = process.env.USER_DB
-const PASSWORD_DB =process.env.PASSWORD_DB 
-const CLUSTER_MONGO = process.env.CLUSTER_MONGO
+const mongoose = require('mongoose');
 
-////////////generate connection url
-// const url = (process.env.APP_ENV === 'local')
-//                 ? process.env.CLUSTER_MONGO 
-//                 : `mongodb+srv://${USER_DB}:${PASSWORD_DB}${CLUSTER_MONGO}`;
-const url = `mongodb+srv://${USER_DB}:${PASSWORD_DB}${CLUSTER_MONGO}`;
+class DB{
+    constructor(){
+        if(process.env.NODE_ENV === 'localhost'){
+            if(process.env.USER_DB === '' && process.env.PASSWORD_DB === ''){
+                this.destiny = `mongodb://${process.env.CLUSTER}/${process.env.DATABASE}`;
+            }
+            else if(process.env.CLUSTER !== "localhost:27017"){//localhost:27017
+                this.destiny = `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}${process.env.CLUSTER}/${process.env.DATABASE}?retryWrites=true&w=majority`;
+            }
+            else{
+                this.destiny = `mongodb://${process.env.USER_DB}:${process.env.PASSWORD_DB}@${process.env.CLUSTER}/${process.env.DATABASE}`;
+            }
+        }
+        else{
+            this.destiny = `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}${process.env.CLUSTER}/${process.env.DATABASE}?retryWrites=true&w=majority`;
+        }
+    }
 
-mongoose.set('useFindAndModify', false);
-mongoose.connect(url, {
-    useCreateIndex: true,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(db => console.log('Database is connected'))
+    async connect(){
+        try{
+            await mongoose.connect(this.destiny, {
+                useCreateIndex: true,    
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                useFindAndModify: false
+            });
+
+            console.log("Database is connected successfully");
+        }
+        catch(error){
+            // console.log(error);
+            console.log("Something went wrong trying to establish a connection with the database :(");
+        }
+    }
+}
+
+module.exports = DB;
