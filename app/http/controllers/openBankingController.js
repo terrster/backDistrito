@@ -74,10 +74,7 @@ const openBankingController = {
                             controller: true
                         });
 
-                        let index = credentials.findIndex(credential => credential.username == params.username);
-                        credentials.splice(index, (index > 0 ? 1 : 0));
-                        console.log(credentials);
-
+                        credentials = credentials.filter(c => c.username != params.username);
                     }
                     
                     let finerioCredentialAPI = await finerioController.storeCredential(params);
@@ -95,6 +92,12 @@ const openBankingController = {
                         code: 200,
                         msg: 'Credencial guardada correctamente',
                         idCredential: finerioCredentialAPI.id
+                    });
+                }
+                else{
+                    return response.json({
+                        code: 204,
+                        msg: 'No hay nuevas credenciales que guardar'
                     });
                 }
             });

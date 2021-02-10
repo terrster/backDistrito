@@ -565,9 +565,8 @@ const finerioController = {
                 }
             });
 
-            let index = credentials.findIndex(c => c.id === idCredential);
-            const newCredentials = credentials.splice(index, (index > 0 ? 1 : 0));
-            await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
+            credentials = credentials.filter(c => c.id != idCredential);
+            await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
             user = await User.findById(idUser);
 
             if(result.status == 204){
@@ -585,6 +584,9 @@ const finerioController = {
                     });
                 }
             }
+            else{
+                console.log("deleteCredential Dentro de try:", result.status);
+            }
         }
         catch(error){
             let err = {
@@ -593,16 +595,16 @@ const finerioController = {
             };
 
             if(error.response.status == 404 && error.response.data.errors[0].code == 'credential.not.found'){
+                credentials = credentials.filter(c => c.id != idCredential);
+                await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
+                user = await User.findById(idUser);
+
                 err = {
                     code: 404,
                     msg: "Finerio: La credencial no ha sido encontrada.",
+                    user
                 }
             }
-
-            let index = credentials.findIndex(c => c.id === idCredential);;
-            const newCredentials = credentials.splice(index, (index > 0 ? 1 : 0));
-            await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
-            user = await User.findById(idUser);
 
             if(controller){
                 return err;
