@@ -25,17 +25,18 @@ class Server{
         this.app.use(fileUpload());
 
         this.app.use((request, response, next) => {
+            const xForwardedForAllowed = ['2806:2f0:9160:b687:bcd0:4be0:f14a:a035'];//x-forwarded-for - public iPv6
             const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com', 'https://impmx.com', 'https://dev.impmx.com', 'https://api-v2.finerio.mx'];
             const origin = request.headers.origin;
+            const xForwardedFor = request.headers['x-forwarded-for'];
+            console.log(xForwardedFor);
             
             response.header('Access-Control-Allow-Origin', '*');
             response.header('Access-Control-Allow-Headers', '*');
             response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
             response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-            
-            console.log(request.headers);
-        
-            if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
+                    
+            if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && (allowedOrigins.includes(origin) || xForwardedForAllowed.includes(xForwardedFor))){
                 next();
             }
             else if(process.env.APP_ENV === 'local'){
