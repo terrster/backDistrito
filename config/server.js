@@ -32,6 +32,8 @@ class Server{
             response.header('Access-Control-Allow-Headers', '*');
             response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
             response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+            
+            console.log(request.headers);
         
             if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
                 next();
