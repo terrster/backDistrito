@@ -901,9 +901,11 @@ const finerioController = {
                 await FinerioCallback.create({data: data});
                 
                 let user = global.io.getUser(data.customerId);
+                console.log(user);
 
                 if(user){
                     global.io.emitToSocket(user.socketId, 'askForToken', data);
+                    console.log('event notify sent');
                 }
 
                 return response.json({
@@ -932,12 +934,13 @@ const finerioController = {
             await FinerioCallback.create({data: data});
                 
             let userFound = global.io.getUser(data.customerId);
-
+            console.log(userFound);
             let user = await User.findById(userFound.idU);
             data.user = user;
             
             if(userFound){
                 global.io.emitToSocket(userFound.socketId, 'notifySuccess', data);
+                console.log('event success sent');
             }
 
             response.json({
@@ -960,9 +963,11 @@ const finerioController = {
             await FinerioCallback.create({data: data});
 
             let user = global.io.getUser(data.customerId);
+            console.log(user);
 
             if(user){
                 global.io.emitToSocket(user.socketId, 'notifyFailure', data);
+                console.log('event failure sent');
             }
 
             response.json({
