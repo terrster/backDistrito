@@ -27,6 +27,10 @@ class SocketService {
           })
           console.log(this.users);
 
+          socket.emit('welcome', {
+            msg: "Bienvenido a Distrito Pyme!"
+          });
+
           socket.on('disconnect', () => {
               console.log("One user disconnected!");
               this.users = this.users.filter(user => user.socketId != socket.id);
