@@ -20,18 +20,18 @@ class SocketService {
     try{
       this.io.on('connection', socket => {
 
-          console.log("New user connected!");
+          // console.log("New user connected!");
           this.users.push({
               idU : socket.handshake.query.idU,
               socketId: socket.id
           })
-          console.log(this.users);
+          // console.log(this.users);
 
           socket.on('disconnect', () => {
-              console.log("One user disconnected!");
+              // console.log("One user disconnected!");
               this.users = this.users.filter(user => user.socketId != socket.id);
       
-              console.log(this.users);
+              // console.log(this.users);
           })
       });
 
@@ -45,7 +45,7 @@ class SocketService {
   setIdFinerio(idU, idFinerio){
     let index = this.users.findIndex(user => user.idU == idU);
     this.users[index].idFinerio = idFinerio;
-    console.log(this.users);
+    // console.log(this.users);
   }
 
   /*
