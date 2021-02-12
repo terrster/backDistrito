@@ -607,7 +607,7 @@ const finerioController = {
 
             if(error.response.status == 404 && error.response.data.errors[0].code == 'credential.not.found'){
                 credentials = credentials.filter(c => c.id != idCredential);
-                await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: newCredentials});
+                await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
                 user = await User.findById(idUser);
 
                 err = {
