@@ -50,7 +50,7 @@ class Server{
                     Miguel Wayas: 172.69.170.146
                     Finerio: 3.21.17.42
                 */
-                const allowedIPS = ['172.69.170.146', '3.21.17.42'];
+                const allowedIPS = ['172.69.170.146', '3.21.17.42'];console.log(request.headers);
         
                 if(allowedIPS.includes(request.headers['x-forwarded-for']) || allowedIPS.includes(request.headers['x-real-ip'])){
                     next();
