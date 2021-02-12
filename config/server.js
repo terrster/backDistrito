@@ -50,13 +50,13 @@ class Server{
                     - IP's -
                     Finerio: 3.21.17.42
                 */
-                const allowedIPS = ['3.21.17.42'];console.log(request.headers);
+                const allowedIPS = ['3.21.17.42'];
         
                 if(allowedIPS.includes(request.headers['x-forwarded-for'])){
                     next();
                 }
-                else if(request.headers.hasOwnProperty('token_secret')){                    
-                    if(request.headers.token_secret === 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){
+                else if(request.headers.hasOwnProperty('tokensecret')){                    
+                    if(request.headers.tokensecret === 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){
                         next();
                     }
                     else{
