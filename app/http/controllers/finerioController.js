@@ -559,6 +559,11 @@ const finerioController = {
         var idCredential = request.idCredential || request.params.id;
         var controller = request.controller || false;
 
+        if(idUser.length < 20){
+            let finerio = await Finerio.findById(idUser);
+            idUser = finerio.idUser;
+        }
+
         var user = await User.findById(idUser);
         var credentials = user.idClient.appliance[0].idFinerio.credentials;
 
@@ -974,6 +979,13 @@ const finerioController = {
             if(user){
                 global.io.emitToSocket(user.socketId, 'notifyFailure', data);
                 // console.log('event failure sent');
+            }
+            else{
+                this.deleteCredential({
+                    idUser: data.customerId,
+                    idCredential: data.credentialId,
+                    controller: true
+                });
             }
 
             response.json({
