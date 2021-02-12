@@ -50,7 +50,7 @@ class Server{
                     - IP's -
                     Finerio: 3.21.17.42
                 */
-                const allowedIPS = ['3.21.17.42'];
+                const allowedIPS = ['3.21.17.42'];console.log(request.headers);
         
                 if(allowedIPS.includes(request.headers['x-forwarded-for'])){
                     next();
