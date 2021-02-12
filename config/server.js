@@ -47,18 +47,29 @@ class Server{
                     Then you need to add the ip in tools section in the part of access rules of ip. 
                 */
                 /*
-                    Miguel Wayas: 172.69.170.146
+                    - IP's -
                     Finerio: 3.21.17.42
                 */
-                const allowedIPS = ['172.69.170.146', '3.21.17.42'];console.log(request.headers);
+                const allowedIPS = ['3.21.17.42'];
         
-                if(allowedIPS.includes(request.headers['x-forwarded-for']) || allowedIPS.includes(request.headers['x-real-ip'])){
+                if(allowedIPS.includes(request.headers['x-forwarded-for'])){
                     next();
+                }
+                else if(request.headers.hasOwnProperty('token_secret')){                    
+                    if(request.headers.token_secret === 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){
+                        next();
+                    }
+                    else{
+                        return response.json({
+                            status: 403,
+                            msg: `You don´t have permissions to access, your token secret is incorrect.`
+                        });
+                    }
                 }
                 else{
                     return response.json({
                         status: 403,
-                        msg: `You don´t have permissions. Only specific domains are allowed to access it.`
+                        msg: `You don´t have permissions. Only specific domains are allowed to access.`
                     });
                 }
             }
