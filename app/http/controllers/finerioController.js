@@ -144,7 +144,10 @@ const finerioController = {
                 }
             });
 
-            return response.json(banks);
+            return response.json({
+                code: 200,
+                banks
+            });
         }
         catch(error){
             console.log(error);
@@ -153,7 +156,10 @@ const finerioController = {
             //     error: error.response.data.errors
             // };
 
-            // return response.json(err);
+            return response.json({
+                code: 500,
+                msg: 'Ha ocurrido un error al tratar de obtener los bancos.'
+            });
         };
     },
     getBank: async(request, response) => {

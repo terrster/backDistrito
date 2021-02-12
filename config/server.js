@@ -24,7 +24,7 @@ class Server{
         this.app.use(bodyParser.json());
         this.app.use(fileUpload());
 
-        this.app.use((request, response, next) => {
+        this.app.use((request, response, next) => {console.log(request.headers);
             const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com', 'https://impmx.com', 'https://dev.impmx.com', 'https://api-v2.finerio.mx'];
             const origin = request.headers.origin;
             
