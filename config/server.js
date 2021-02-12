@@ -24,7 +24,7 @@ class Server{
         this.app.use(bodyParser.json());
         this.app.use(fileUpload());
 
-        this.app.use((request, response, next) => {console.log(request.headers);
+        this.app.use((request, response, next) => {
             const allowedOrigins = ['https://distritopyme.com', 'https://dev.distritopyme.com', 'https://impmx.com', 'https://dev.impmx.com', 'https://api-v2.finerio.mx'];
             const origin = request.headers.origin;
             
@@ -47,12 +47,12 @@ class Server{
                     Then you need to add the ip in tools section in the part of access rules of ip. 
                 */
                 /*
+                    Miguel Wayas: 172.69.170.146
                     Finerio: 3.21.17.42
-                    Miguel Wayas Ipv6
                 */
-                const allowedIPS = ['3.21.17.42', '2806:2f0:9160:b687:bcd0:4be0:f14a:a035'];
+                const allowedIPS = ['172.69.170.146', '3.21.17.42'];
         
-                if(allowedIPS.includes(request.headers['x-forwarded-for'])){
+                if(allowedIPS.includes(request.headers['x-forwarded-for']) || allowedIPS.includes(request.headers['x-real-ip'])){
                     next();
                 }
                 else{
