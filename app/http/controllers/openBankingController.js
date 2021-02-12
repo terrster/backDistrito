@@ -56,12 +56,20 @@ const openBankingController = {
 
                     idFinerio = finerioStored.idFinerio;
                     global.io.setIdFinerio(idUser, idFinerio);
+                    user = await User.findById(idUser);
                 }
             }
 
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
 
             // banks = Object.keys(banks).filter(b=> banks[b].validate === false);
+
+            console.log(credentials);
+            console.log(banks);
+
+            return response.status(500).json({
+                msg: "algo pasó"
+            });
 
             Object.keys(banks).map(async(key) => {
                 // if(!banks[key].validate){

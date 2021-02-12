@@ -21,10 +21,17 @@ class SocketService {
       this.io.on('connection', socket => {
 
           // console.log("New user connected!");
+
+          let userExist = this.users.find(user => user.idU == socket.handshake.query.idU);
+
+          if(userExist){
+            this.io.to(userExist.socketId).emit('forceDisconnect', {});
+          }
+
           this.users.push({
               idU : socket.handshake.query.idU,
               socketId: socket.id
-          })
+          });
           // console.log(this.users);
 
           socket.on('disconnect', () => {
