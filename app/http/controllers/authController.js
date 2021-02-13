@@ -24,11 +24,11 @@ const authController = {
         try{
             let data = request.body;
 
-            let userExist = await User.findOne({ email: data.email });
-            let contactExist = await hubspotController.contact.getByEmail(data.email);
+            let userExist = await User.findOne({ email: data.email.trim() });
+            let contactExist = await hubspotController.contact.getByEmail(data.email.trim());
 
-            let userExistMin = await User.findOne({ email: data.email.toLowerCase() });
-            let contactExistMin = await hubspotController.contact.getByEmail(data.email.toLowerCase());
+            let userExistMin = await User.findOne({ email: data.email.toLowerCase().trim() });
+            let contactExistMin = await hubspotController.contact.getByEmail(data.email.toLowerCase().trim());
 
             if(userExist || contactExist || userExistMin || contactExistMin){
                 return response.json({ 
@@ -80,7 +80,7 @@ const authController = {
     login: async (request, response) => { 
         let { email, password } = request.body;
 
-        let user = await User.findOne({ email: email });
+        let user = await User.findOne({ email: email.toLowerCase().trim() });
 
         if(!user){
             return response.status(200).json({ 
