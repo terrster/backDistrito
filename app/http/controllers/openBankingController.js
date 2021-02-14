@@ -85,28 +85,31 @@ const openBankingController = {
                     }
                     
                     let finerioCredentialAPI = await finerioController.storeCredential(params);
-                    
-                    credentials.push({
-                        id: finerioCredentialAPI.id,
-                        idBank : params.bankId,
-                        bankName: bankInformation[params.bankId],
-                        username : params.username
-                    });
 
-                    await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
-
-                    return response.json({
-                        code: 200,
-                        msg: 'Credencial guardada correctamente',
-                        idCredential: finerioCredentialAPI.id
-                    });
-                // }
-                // else{
-                //     return response.json({
-                //         code: 204,
-                //         msg: 'No hay nuevas credenciales que guardar'
-                //     });
-                // }
+                    if(finerioCredentialAPI.hasOwnProperty(status)){
+                        if(finerioCredentialAPI.status == 500){
+                            return response.json({
+                                code: 500,
+                                msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios'
+                            });
+                        }
+                    }
+                    else{
+                        credentials.push({
+                            id: finerioCredentialAPI.id,
+                            idBank : params.bankId,
+                            bankName: bankInformation[params.bankId],
+                            username : params.username
+                        });
+    
+                        await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
+    
+                        return response.json({
+                            code: 200,
+                            msg: 'Credencial guardada correctamente',
+                            idCredential: finerioCredentialAPI.id
+                        });
+                    }
             });
         } 
         catch(error){

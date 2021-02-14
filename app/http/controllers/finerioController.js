@@ -403,17 +403,17 @@ const finerioController = {
 
             return result.data;
             
-            if(result.status == 201 && result.data.status == 'VALIDATE'){
-                let res = {
-                    msg: "Finerio: La credencial ha sido guardada correctamente, pendiente a validación.",
-                    data: result.data
-                };
+            // if(result.status == 201 && result.data.status == 'VALIDATE'){
+            //     let res = {
+            //         msg: "Finerio: La credencial ha sido guardada correctamente, pendiente a validación.",
+            //         data: result.data
+            //     };
 
-                //return response.json(res);
-                return res;
-            }
+            //     //return response.json(res);
+            //     return res;
+            // }
         }
-        catch(error){console.log(error)
+        catch(error){console.log(error.response.data)
             // var err = {
             //     msg: "Finerio: Algo salió mal tratando de registrar una credencial.",
             //     error: error.response.data
@@ -425,8 +425,7 @@ const finerioController = {
             //     };
             // }
 
-            // return error.response;
-            //return err;
+            return error.response.data;
         }
     },
     getCredentials: async(request, response) => {//ID CUSTOMER
