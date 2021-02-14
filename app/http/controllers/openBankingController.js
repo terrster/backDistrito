@@ -88,7 +88,8 @@ const openBankingController = {
 
                     if(finerioCredentialAPI.hasOwnProperty('status')){
                         if(finerioCredentialAPI.status == 500){
-                            return response.json({
+                            console.log(finerioCredentialAPI.status);
+                            response.json({
                                 code: 500,
                                 msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios'
                             });
