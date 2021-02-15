@@ -86,7 +86,7 @@ const openBankingController = {
                     }
                     
                     let finerioCredentialAPI = await finerioController.storeCredential(params);
-                    console.log(finerioCredentialAPI);
+                    console.log("finerioCredentialAPI:",finerioCredentialAPI);
 
                     if(finerioCredentialAPI.hasOwnProperty('status')){
                         if(finerioCredentialAPI.status == 500){
@@ -115,7 +115,7 @@ const openBankingController = {
             // });
         } 
         catch(error){
-            console.log(error);
+            console.log("Error:", error);
             return response.json({
                 code: 500,
                 msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios'
