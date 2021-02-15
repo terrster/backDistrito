@@ -87,11 +87,8 @@ const openBankingController = {
                     }
                     
                     let finerioCredentialAPI = await finerioController.storeCredential(params);
-                    console.log(finerioCredentialAPI);
 
                     if(finerioCredentialAPI.status == "VALIDATE"){
-                        console.log(finerioCredentialAPI);
-
                         credentials.push({
                             id: finerioCredentialAPI.id,
                             idBank : params.bankId,
@@ -106,15 +103,12 @@ const openBankingController = {
                             msg: 'Credencial guardada correctamente',
                             idCredential: finerioCredentialAPI.id
                         });
-                        
                     }
                     else {
-                        console.log(finerioCredentialAPI);
-
-                            return response.json({
-                                code: 500,
-                                msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios.'
-                            });
+                        return response.json({
+                            code: 500,
+                            msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios.'
+                        });
                     }
             // });
         } 
