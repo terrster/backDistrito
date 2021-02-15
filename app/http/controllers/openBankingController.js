@@ -116,8 +116,7 @@ const openBankingController = {
 
                     return response.json({
                         code: 200,
-                        msg: 'Credencial guardada correctamente',
-                        idCredential: finerioCredentialAPI.id
+                        msg: 'Credencial guardada correctamente'
                     });
 
             // });
