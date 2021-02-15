@@ -479,7 +479,7 @@ const finerioController = {
                     msg: "Finerio: La credencial no ha sido encontrada."
                 };
             }
-
+            
             return response.json(err);
         }
     },
