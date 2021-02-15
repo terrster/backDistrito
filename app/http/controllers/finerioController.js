@@ -413,7 +413,8 @@ const finerioController = {
             //     return res;
             // }
         }
-        catch(error){console.log(error.response.data)
+        catch(error){
+            // console.log(error.response.data)
             // var err = {
             //     msg: "Finerio: Algo salió mal tratando de registrar una credencial.",
             //     error: error.response.data
