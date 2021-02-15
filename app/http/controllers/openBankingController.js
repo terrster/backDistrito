@@ -61,6 +61,7 @@ const openBankingController = {
             }
 
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
+            console.log(banks);
 
             Object.keys(banks).map(async(key) => {
                 // if(!banks[key].validate){
