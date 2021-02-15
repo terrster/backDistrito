@@ -85,6 +85,7 @@ const openBankingController = {
                     }
                     
                     let finerioCredentialAPI = await finerioController.storeCredential(params);
+                    console.log(finerioCredentialAPI);
 
                     if(finerioCredentialAPI.hasOwnProperty('status')){
                         if(finerioCredentialAPI.status == 500){
