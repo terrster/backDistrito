@@ -18,7 +18,7 @@ const bankInformation = {
 };
 
 const openBankingController = {
-    store: async(request, response) =>{console.log("Recibiendo...");
+    store: async(request, response) =>{
         let idUser = request.headers.tokenDecoded.data.id;
         let banks = request.body;
 
@@ -66,58 +66,53 @@ const openBankingController = {
             // Object.keys(banks).map(async(key) => {
                 // if(!banks[key].validate){
 
-                    // let params = {
-                    //     customerId: user.idClient.appliance[0].idFinerio.idFinerio,
-                    //     bankId: bank.id,
-                    //     username: bank.values.username,
-                    //     password: bank.values.password,
-                    //     securityCode: bank.values.securityCode
-                    // };
+                    let params = {
+                        customerId: user.idClient.appliance[0].idFinerio.idFinerio,
+                        bankId: bank.id,
+                        username: bank.values.username,
+                        password: bank.values.password,
+                        securityCode: bank.values.securityCode
+                    };
                     
-                    // let credentialExist = credentials.find(credential => credential.username == params.username);
+                    let credentialExist = credentials.find(credential => credential.username == params.username);
 
-                    // if(credentialExist){
-                    //     await finerioController.deleteCredential({
-                    //         idUser: idUser,
-                    //         idCredential: credentialExist.id,
-                    //         controller: true
-                    //     });
+                    if(credentialExist){
+                        await finerioController.deleteCredential({
+                            idUser: idUser,
+                            idCredential: credentialExist.id,
+                            controller: true
+                        });
 
-                    //     credentials = credentials.filter(c => c.username != params.username);
-                    // }
+                        credentials = credentials.filter(c => c.username != params.username);
+                    }
                     
-                    // let finerioCredentialAPI = await finerioController.storeCredential(params);
-                    // console.log("finerioCredentialAPI:",finerioCredentialAPI);
+                    let finerioCredentialAPI = await finerioController.storeCredential(params);
+                    console.log("finerioCredentialAPI:",finerioCredentialAPI);
 
-                    // if(finerioCredentialAPI.hasOwnProperty('status')){
-                    //     if(finerioCredentialAPI.status == 500){
-                    //         return response.json({
-                    //             code: 500,
-                    //             msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios'
-                    //         });
-                    //     }
-                    // }
-                    // else{
-                    //     credentials.push({
-                    //         id: finerioCredentialAPI.id,
-                    //         idBank : params.bankId,
-                    //         bankName: bankInformation[params.bankId],
-                    //         username : params.username
-                    //     });
+                    if(finerioCredentialAPI.hasOwnProperty('status')){
+                        if(finerioCredentialAPI.status == 500){
+                            return response.json({
+                                code: 500,
+                                msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios'
+                            });
+                        }
+                    }
+                    else{
+                        credentials.push({
+                            id: finerioCredentialAPI.id,
+                            idBank : params.bankId,
+                            bankName: bankInformation[params.bankId],
+                            username : params.username
+                        });
     
-                    //     await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
+                        await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
     
-                    //     response.json({
-                    //         code: 200,
-                    //         msg: 'Credencial guardada correctamente',
-                    //         idCredential: finerioCredentialAPI.id
-                    //     });
-                    // }
-
-                    return response.json({
-                        code: 500,
-                        msg: 'Credencial guardada correctamente'
-                    });
+                        return response.json({
+                            code: 200,
+                            msg: 'Credencial guardada correctamente',
+                            idCredential: finerioCredentialAPI.id
+                        });
+                    }
 
             // });
         } 
