@@ -87,38 +87,33 @@ const openBankingController = {
                     }
                     
                     let finerioCredentialAPI = await finerioController.storeCredential(params);
-                    console.log(finerioCredentialAPI);
 
-                    // if(finerioCredentialAPI.hasOwnProperty('status')){
-                    //     if(finerioCredentialAPI.status == 500){
-                    //         return response.status(200).json({
-                    //             code: 500,
-                    //             msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios'
-                    //         });
-                    //     }
-                    // }
-                    // else{
-                    //     credentials.push({
-                    //         id: finerioCredentialAPI.id,
-                    //         idBank : params.bankId,
-                    //         bankName: bankInformation[params.bankId],
-                    //         username : params.username
-                    //     });
+                    if(finerioCredentialAPI.hasOwnProperty('status')){
+                        if(finerioCredentialAPI.status == 500){
+                            console.log(finerioCredentialAPI);
+
+                            return response.status(200).json({
+                                code: 500,
+                                msg: 'Ha ocurrido un error al tratar de guardar tus datos bancarios.'
+                            });
+                        }
+                    }
+                    else{
+                        credentials.push({
+                            id: finerioCredentialAPI.id,
+                            idBank : params.bankId,
+                            bankName: bankInformation[params.bankId],
+                            username : params.username
+                        });
     
-                    //     await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
+                        await Finerio.findByIdAndUpdate(user.idClient.appliance[0].idFinerio._id, {credentials: credentials});
     
-                    //     return response.status(200).json({
-                    //         code: 200,
-                    //         msg: 'Credencial guardada correctamente',
-                    //         idCredential: finerioCredentialAPI.id
-                    //     });
-                    // }
-
-                    return response.status(200).json({
-                        code: 200,
-                        msg: 'Credencial guardada correctamente'
-                    });
-
+                        return response.status(200).json({
+                            code: 200,
+                            msg: 'Credencial guardada correctamente',
+                            idCredential: finerioCredentialAPI.id
+                        });
+                    }
             // });
         } 
         catch(error){
