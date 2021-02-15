@@ -114,7 +114,7 @@ const openBankingController = {
                     //     });
                     // }
 
-                    return response.json({
+                    return response.status(200).json({
                         code: 200,
                         msg: 'Credencial guardada correctamente'
                     });
