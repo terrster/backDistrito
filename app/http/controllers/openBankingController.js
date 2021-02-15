@@ -61,24 +61,24 @@ const openBankingController = {
             }
 
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
-            console.log(banks);
+            let bank = Object.values(banks)[0];
 
-            Object.keys(banks).map(async(key) => {
+            // Object.keys(banks).map(async(key) => {
                 // if(!banks[key].validate){
                     let params = {
                         customerId: user.idClient.appliance[0].idFinerio.idFinerio,
-                        bankId: banks[key].id,
-                        username: banks[key].values.username,
-                        password: banks[key].values.password,
-                        securityCode: banks[key].values.securityCode
+                        bankId: bank.id,
+                        username: bank.values.username,
+                        password: bank.values.password,
+                        securityCode: bank.values.securityCode
                     };
                     
-                    let credential = credentials.find(credential => credential.username == params.username);
+                    let credentialExist = credentials.find(credential => credential.username == params.username);
 
-                    if(credential){
+                    if(credentialExist){
                         await finerioController.deleteCredential({
                             idUser: idUser,
-                            idCredential: credential.id,
+                            idCredential: credentialExist.id,
                             controller: true
                         });
 
@@ -112,7 +112,7 @@ const openBankingController = {
                             idCredential: finerioCredentialAPI.id
                         });
                     }
-            });
+            // });
         } 
         catch(error){
             console.log(error);
