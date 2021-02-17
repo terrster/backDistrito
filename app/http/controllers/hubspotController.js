@@ -214,6 +214,10 @@ const deal = {
                                     "name": "n3_20_clientes_pagan_a_mas_de_30_dias"
                                 },
                                 {
+                                    "value": format.EMPRESARIAL_CREDIT_CARD[request.empresarialCreditCard],
+                                    "name": "n3_21_tarjeta_credito_empresarial"
+                                },
+                                {
                                     "value": request.phone,
                                     "name": "telefono"
                                 },

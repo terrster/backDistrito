@@ -52,19 +52,18 @@ class Server{
                 */
                 const allowedIPS = ['3.21.17.42'];
         
-                // if(request.headers.hasOwnProperty('tokensecret')){                    
-                //     if(request.headers.tokensecret === 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){
-                //         next();
-                //     }
-                //     else{
-                //         return response.json({
-                //             status: 403,
-                //             msg: `You don´t have permissions to access, your token secret is incorrect.`
-                //         });
-                //     }
-                // }
-                // else 
-                if(allowedIPS.includes(request.headers['x-forwarded-for'])){
+                if(request.headers.hasOwnProperty('tokensecret')){                    
+                    if(request.headers.tokensecret === 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){
+                        next();
+                    }
+                    else{
+                        return response.json({
+                            status: 403,
+                            msg: `You don´t have permissions to access, your token secret is incorrect.`
+                        });
+                    }
+                }
+                else if(allowedIPS.includes(request.headers['x-forwarded-for'])){
                     next();
                 }
                 else{

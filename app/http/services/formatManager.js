@@ -63,6 +63,12 @@ const YES_NO_QUESTION = {
     0: "No"
 };
 
+const EMPRESARIAL_CREDIT_CARD = {
+    1: "Sí",
+    2: "Tarjeta crédito empresarial",
+    0: "No"
+};
+
 //General info
 
 const CIVIL_STATUS = {//civilStatus
@@ -93,6 +99,7 @@ module.exports = {
     GYRE,
     WARRANTY,
     YES_NO_QUESTION,
+    EMPRESARIAL_CREDIT_CARD,
     CIVIL_STATUS,
     CAR_CREDIT,
     RELATIVE

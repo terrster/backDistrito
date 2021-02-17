@@ -30,6 +30,7 @@ const comercialInfoController = {
                 employeesNumber,
                 bankAccount, //Only PM
                 paymentsMoreThan30,
+                empresarialCreditCard, //Only PM, PFAE
                 specific,
                 phone,
                 webSite,
@@ -56,6 +57,7 @@ const comercialInfoController = {
                     employeesNumber,
                     bankAccount, //Only PM
                     paymentsMoreThan30,
+                    empresarialCreditCard, //Only PM, PFAE
                     specific,
                     phone,
                     webSite,
@@ -101,6 +103,7 @@ const comercialInfoController = {
                 employeesNumber,
                 bankAccount, //Only PM
                 paymentsMoreThan30,
+                empresarialCreditCard, //Only PM, PFAE
                 specific,
                 phone,
                 webSite,
@@ -187,6 +190,7 @@ const comercialInfoController = {
                 employeesNumber,
                 bankAccount, //Only PM
                 paymentsMoreThan30,
+                empresarialCreditCard, //Only PM, PFAE
                 specific,
                 phone,
                 webSite,
@@ -213,6 +217,7 @@ const comercialInfoController = {
                     employeesNumber,
                     bankAccount, //Only PM
                     paymentsMoreThan30,
+                    empresarialCreditCard, //Only PM, PFAE
                     specific,
                     phone,
                     webSite,
@@ -258,6 +263,7 @@ const comercialInfoController = {
                 employeesNumber,
                 bankAccount, //Only PM
                 paymentsMoreThan30,
+                empresarialCreditCard, //Only PM, PFAE
                 specific,
                 phone,
                 webSite,

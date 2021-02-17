@@ -11,6 +11,7 @@ const comercialInfoSchema = new Schema({
   employeesNumber: String,
   bankAccount: Number,//Only PM
   paymentsMoreThan30: Boolean,//Except PF
+  empresarialCreditCard: Number,
   specific:String,
   phone: String ,
   address: { type: Schema.Types.ObjectId, ref: 'Address', autopopulate: true },
