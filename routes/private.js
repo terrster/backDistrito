@@ -15,22 +15,22 @@ const finerioController = require("../app//http/controllers/finerioController");
 const pdfController = require("../app/http/controllers/pdfController");
 const circuloCreditoController = require("../app/http/controllers/circuloCreditoController");
 
-route.use((request, response, next) => {
-    if(!request.query.token){
-        response.json({ 
-            mensaje: 'Token no proveído' 
-        });  
-    }
-    else{
-        if(request.query.token != 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){
-            response.json({ 
-                mensaje: 'Token inválido' 
-            }); 
-        }
-    }
+// route.use((request, response, next) => {
+//     if(!request.query.tokensecret){
+//         response.json({ 
+//             mensaje: 'Token no proveído' 
+//         });  
+//     }
+//     else{
+//         if(request.query.tokensecret != 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){
+//             response.json({ 
+//                 mensaje: 'Token inválido' 
+//             }); 
+//         }
+//     }
     
-    next();
-});
+//     next();
+// });
 
 //Solicitud routes
 route.group("/solicitud", (solicitud) => {

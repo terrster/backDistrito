@@ -786,6 +786,15 @@ const finerioController = {
 
             for await(let account of accounts){//Se leen todas las cuentas de cada credencial del usuario
                 try{
+                    // let accountDetails = await axios.get(`accounts/${account.id}/details`, {    
+                    //     headers: {
+                    //         'Authorization': `Bearer ${token}`,
+                    //         'Content-Type': 'application/json'
+                    //     }
+                    // });
+
+                    // console.log(accountDetails.data.name);
+
                     let {data} = await axios.get(`transactions?accountId=${account.id}`, {//Se obtienen todas las transacciones de cada cuenta    
                         headers: {
                             'Authorization': `Bearer ${token}`,

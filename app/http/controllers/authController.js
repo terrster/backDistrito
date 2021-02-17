@@ -30,7 +30,7 @@ const authController = {
             let userExistMin = await User.findOne({ email: data.email.toLowerCase().trim() });
             let contactExistMin = await hubspotController.contact.getByEmail(data.email.toLowerCase().trim());
 
-            if((userExist || contactExist) && (userExistMin || contactExistMin)){
+            if(userExist || contactExist || userExistMin || contactExistMin){
                 return response.json({ 
                     code: 500,
                     msg: "El correo electrónico ya existe"
@@ -46,6 +46,7 @@ const authController = {
             let dealStored = await hubspotController.deal.store(data);
 
             if(dealStored.code == 403){
+                await hubspotController.contact.delete(data.hubspotContactId);
                 return response.json(dealStored);
             }
 

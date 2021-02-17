@@ -860,6 +860,18 @@ const contact = {
 
             return response;
         }
+    },
+    delete: async(hubspotContactId) => {
+        try{
+            const response = await axios.delete('contacts/v1/contact/vid/' + hubspotContactId + hapiKey);
+
+            if(response.status == 200){
+                return response.data;
+            }
+        }
+        catch(error){
+            return null;
+        }
     }
 
 };
