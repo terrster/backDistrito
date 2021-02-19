@@ -2,6 +2,7 @@
 
 const User = require("../models/User");
 const finerioController = require("../controllers/finerioController");
+const hubspotController = require('../controllers/hubspotController');
 const Finerio = require("../models/Finerio");
 const Appliance = require("../models/Appliance");
 
@@ -41,6 +42,11 @@ const openBankingController = {
                 let finerioAPI = await finerioController.storeCustomer(user.email);
 
                 if(finerioAPI.code == 200){
+                    await hubspotController.deal.update(user.hubspotDealId, 'single_field', {
+                        name: 'id_finerio',
+                        value: finerioAPI.data.id
+                    });
+
                     let finerioStored = await Finerio.create({
                         idUser: {
                             _id: idUser

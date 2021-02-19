@@ -11,7 +11,9 @@ const finerio_publicKey = fs.readFileSync(path.resolve("config/finerio/finerio_p
 const crypto = require('crypto');
 const moment = require("moment");
 
+const hubspotController = require('../controllers/hubspotController');
 const User = require("../models/User");
+const Appliance = require("../models/Appliance");
 const Finerio = require("../models/Finerio");
 const FinerioCallback = require("../models/FinerioCallback");
 
@@ -190,6 +192,59 @@ const finerioController = {
         }
     },
     //Customers
+    cleanCustomers: async(request, response) => {
+        try{
+            let users = await User.find({});
+            let usersWithFinerio = users.filter(user => user.idClient.appliance[0] && user.idClient.appliance[0].idFinerio);
+            // let usersWithFinerio = users.filter(user => user.idClient.appliance[0] && user.idClient.appliance[0].idComercialInfo && user.idClient.appliance[0].idComercialInfo.idFinerio);
+
+            let token = await finerioCredentials.getToken();
+            
+            usersWithFinerio.map(async(user) => {
+                console.log(user.idClient.appliance[0].idFinerio._id);
+                //TODO:Borrar de Hubspot
+                await hubspotController.deal.update(user.hubspotDealId, 'single_field', {
+                    name: 'id_finerio',
+                    value: ""
+                });
+                
+                //TODO:Borrar de Mongo
+                await Finerio.findByIdAndRemove(user.idClient.appliance[0].idFinerio._id);
+                await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+                    $unset: {
+                        'idFinerio': null
+                    }
+                });
+
+                //TODO:Borrar de Finerio
+                await axios.delete(`customers/${user.idClient.appliance[0].idFinerio.idFinerio}`, {    
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            });     
+            
+            // let customers = [];
+
+            // customers.map(async(customer) => {
+            //     //TODO:Borrar de Finerio
+            //     await axios.delete(`customers/${customer}`, {    
+            //         headers: {
+            //             'Authorization': `Bearer ${token}`,
+            //             'Content-Type': 'application/json'
+            //         }
+            //     });
+            // });
+            
+            return response.json({
+                usersWithFinerio: usersWithFinerio.length
+            });
+        }
+        catch(error){
+           console.log(error); 
+        }
+    },
     storeCustomer: async(email) => {
         try{
             let token = await finerioCredentials.getToken();
@@ -444,7 +499,7 @@ const finerioController = {
         catch(error){
             var err = {
                 msg: "Finerio: Algo salió mal tratando de obtener las credenciales del cliente.",
-                error: error.response.data
+                error: error.response
             };
 
             if(error.response.status == 404 && error.response.data.errors[0].code == 'customer.not.found'){

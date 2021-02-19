@@ -107,8 +107,9 @@ route.group("/finerio", (finerio) => {
     finerio.get('/bank/:id/fields', finerioController.getBank);
 
     //Customers
+    finerio.get('/cleancustomers', finerioController.cleanCustomers);
     finerio.post('/customers', finerioController.storeCustomer);
-    finerio.get('/customers/:cursor', finerioController.getCustomers);
+    finerio.get('/customers/:cursor?', finerioController.getCustomers);
     finerio.get('/customer/:id', finerioController.getCustomer);
     finerio.put('/customers/:id', finerioController.updateCustomer);
     finerio.delete('/customers/:id', finerioController.deleteCustomer);
