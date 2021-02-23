@@ -201,14 +201,14 @@ const finerioController = {
             let token = await finerioCredentials.getToken();
             
             usersWithFinerio.map(async(user) => {
-                console.log(user.idClient.appliance[0].idFinerio._id);
-                //TODO:Borrar de Hubspot
+                // console.log(user.idClient.appliance[0].idFinerio._id);
+                //Borrar de Hubspot
                 await hubspotController.deal.update(user.hubspotDealId, 'single_field', {
                     name: 'id_finerio',
                     value: ""
                 });
                 
-                //TODO:Borrar de Mongo
+                //Borrar de Mongo
                 await Finerio.findByIdAndRemove(user.idClient.appliance[0].idFinerio._id);
                 await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
                     $unset: {
@@ -216,7 +216,7 @@ const finerioController = {
                     }
                 });
 
-                //TODO:Borrar de Finerio
+                //Borrar de Finerio
                 await axios.delete(`customers/${user.idClient.appliance[0].idFinerio.idFinerio}`, {    
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -228,7 +228,7 @@ const finerioController = {
             // let customers = [];
 
             // customers.map(async(customer) => {
-            //     //TODO:Borrar de Finerio
+            //     //Borrar de Finerio
             //     await axios.delete(`customers/${customer}`, {    
             //         headers: {
             //             'Authorization': `Bearer ${token}`,
@@ -798,11 +798,20 @@ const finerioController = {
         let idDistrito = request.params.id;
 
         if(!idDistrito){
-            return response.json("Id Distrito no proveído");
+            return response.json({
+                code: 403,
+                msg: "Id Distrito no proveído"
+            });
         }
 
         try{
             let user = await User.findOne({"idDistrito": idDistrito});
+            if(!user){
+                return response.json({
+                    code: 404,
+                    msg: 'Usuario no encontrado'
+                });
+            }
             let token = await finerioCredentials.getToken();
 
             let credentials = user.idClient.appliance[0].idFinerio.credentials;
@@ -841,12 +850,18 @@ const finerioController = {
 
             for await(let account of accounts){//Se leen todas las cuentas de cada credencial del usuario
                 try{
-                    // let accountDetails = await axios.get(`accounts/${account.id}/details`, {    
-                    //     headers: {
-                    //         'Authorization': `Bearer ${token}`,
-                    //         'Content-Type': 'application/json'
-                    //     }
-                    // });
+                    let accountDetails = await axios.get(`accounts/${account.id}/details`, {    
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    let sameOwner = false;
+
+                    if(accountDetails.data.name.includes(user.name.toUpperCase()) && accountDetails.data.name.includes(user.lastname.toUpperCase()) && accountDetails.data.name.includes(user.idClient.appliance[0].idGeneralInfo.secondLastname.toUpperCase())){
+                        sameOwner = true;
+                    }
 
                     // console.log(accountDetails.data.name);
 
@@ -866,10 +881,12 @@ const finerioController = {
                                 idBank: account.idBank,
                                 bankName: account.bankName,
                                 username: account.username,
+                                sameOwner: sameOwner,
                                 accounts: [
                                     {
                                         idAccount: account.id,
                                         name: account.name,
+                                        owner: accountDetails.data.name,
                                         transactions: transactionsMapping
                                     }
                                 ]
@@ -885,6 +902,7 @@ const finerioController = {
                             transactions[indexCredential].accounts[indexAccount] = {    
                                 idAccount: account.id,
                                 name: account.name,
+                                owner: accountDetails.data.name,
                                 transactions: transactionsMapping
                             }
                         }
@@ -896,10 +914,12 @@ const finerioController = {
                                 idBank: account.idBank,
                                 bankName: account.bankName,
                                 username: account.username,
+                                sameOwner: sameOwner,
                                 accounts: [
                                     {
                                         idAccount: account.id,
                                         name: account.name,
+                                        owner: accountDetails.data.name,
                                         transactions: transactionsMapping
                                     }     
                                 ]                           
@@ -922,6 +942,7 @@ const finerioController = {
                         transactions[indexCredential].accounts[indexAccount] = {    
                             idAccount: account.id,
                             name: account.name,
+                            owner: '',
                             transactions: []
                         }
                     }
@@ -933,6 +954,7 @@ const finerioController = {
                             idBank: account.idBank,
                             bankName: account.bankName,
                             username: account.username,
+                            sameOwner: false,
                             accounts: [
                                 {
                                     idAccount: account.id,

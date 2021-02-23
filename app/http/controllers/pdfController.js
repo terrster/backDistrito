@@ -40,12 +40,14 @@ const pdfController = {
                                 <tr>
                                     <th>Banco</th>
                                     <th>Usuario/Cuenta/Clabe/No. tarjeta</th>
+                                    <th>Cuenta verificada</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td>${credential.bankName}</td>
                                     <td>${credential.username}</td>
+                                    <td>${credential.sameOwner ? 'Verificada' : 'No verificada'}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -61,11 +63,13 @@ const pdfController = {
                                 <thead>
                                     <tr>
                                         <th>Nombre de cuenta</th>
+                                        <th>Propietario</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>${account.name}</td>
+                                        <td>${account.owner}</td>
                                     </tr>
                                 </tbody>
                             </table>
