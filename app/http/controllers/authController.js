@@ -30,6 +30,8 @@ const authController = {
             let userExistMin = await User.findOne({ email: data.email.toLowerCase().trim() });
             let contactExistMin = await hubspotController.contact.getByEmail(data.email.toLowerCase().trim());
 
+            data.email = data.email.toLowerCase().trim();
+
             if(userExist || contactExist || userExistMin || contactExistMin){
                 return response.json({ 
                     code: 500,
@@ -81,7 +83,7 @@ const authController = {
     login: async (request, response) => { 
         let { email, password } = request.body;
 
-        let user = await User.findOne({ email: email.trim() });
+        let user = await User.findOne({ email: email.toLowerCase().trim() });
 
         if(!user){
             return response.status(200).json({ 
@@ -128,8 +130,8 @@ const authController = {
         }
 
         try{
-            let userNormal = await User.findOne({ email: email }, {}, { autopopulate: false });
-            let userMin = await User.findOne({ email: email.toLowerCase() }, {}, { autopopulate: false });
+            let userNormal = await User.findOne({ email: email.trim() }, {}, { autopopulate: false });
+            let userMin = await User.findOne({ email: email.toLowerCase().trim() }, {}, { autopopulate: false });
 
             if(!userNormal && !userMin){
                 return response.status(200).json({ 
