@@ -130,6 +130,7 @@ const deleteFromServer = (filesUploadedToServer) => {
 
 module.exports = {
     uploadToServer,
+    uploadFileS3,
     uploadToS3,
     deleteFromServer
 };

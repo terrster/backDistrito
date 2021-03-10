@@ -3,6 +3,8 @@
 const pdf = require('html-pdf');
 const fs = require('fs');
 const User = require("../models/User");
+const fileManager = require("../services/fileManager");
+const hubspotController = require('../controllers/hubspotController');
 
 const pdfController = {
 
@@ -306,14 +308,30 @@ const pdfController = {
             `;
 
 
-            try{
-                await pdf.create(content).toBuffer(function(error, buffer){
-                    response.header("Access-Control-Allow-Origin", "*");
-                    response.header("Access-Control-Allow-Headers", "X-Requested-With");
-                    response.header('content-type', 'application/pdf');
-                    return response.send(buffer);
+            try{                   
+                await pdf.create(content).toBuffer(async(error, buffer) => {
+                    if(error){
+                        return null;
+                    }
+
+                    let fileName = `${new Date().getTime()}-${user.name}_${user.lastname}_${user.idDistrito}.pdf`;
+                    locationURIS3 = await fileManager.uploadFileS3(fileName, buffer, 'application/pdf');
+
+                    await hubspotController.deal.update(user.hubspotDealId, 'single_field', {
+                        name: 'n9_3_12_movimientos_bancarios_openbanking',
+                        value: locationURIS3
+                    });
                 });
 
+                // response.header("Access-Control-Allow-Origin", "*");
+                // response.header("Access-Control-Allow-Headers", "X-Requested-With");
+                // response.header('content-type', 'application/pdf');
+                // return response.send(buffer);
+
+                return response.json({
+                    code: 200,
+                    msg: 'Documento open banking generado correctamente'
+                });
             }
             catch(error){
                 console.log(error);
