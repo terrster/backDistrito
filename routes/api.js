@@ -27,6 +27,7 @@ const referenceController = require("../app/http/controllers/referenceController
 const documentsController = require("../app/http/controllers/documentsController");
 const finerioController = require("../app//http/controllers/finerioController");
 const openBankingController = require("../app//http/controllers/openBankingController");
+const kykoyaController = require("../app/http/controllers/kykoyaController");
 
 route.use(verifyToken);
 route.use(async(request, response, next) => {
@@ -135,6 +136,15 @@ route.group("/open-banking", (credentials) => {
     credentials.post('/store', openBankingController.store);
     credentials.post('/storeToken', openBankingController.storeToken);
     credentials.delete('/delete', openBankingController.storeToken);
+});
+
+//Kykoya
+route.group("/kykoya", (kykoya) => {
+    kykoya.post("/bureau-report", kykoyaController.createBureauReport);
+    kykoya.get("/bureau-reports/:id", kykoyaController.getBureauReport);
+    kykoya.get("/bureau-reports", kykoyaController.listBureauReports);
+    kykoya.post("/prospector", kykoyaController.createProspector);
+    kykoya.get("/prospector/:id", kykoyaController.getProspector);
 });
 
 module.exports = route;

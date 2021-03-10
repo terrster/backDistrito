@@ -1,10 +1,9 @@
 'use strict'
-
 const _axios = require("axios").default;
 const axios = _axios.create({
-    baseURL: 'http://api.hubapi.com/',
+    baseURL: 'https://api.hubapi.com/',
     headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
     }
 });
 require('dotenv').config({
@@ -139,7 +138,7 @@ const deal = {
                                     "name": request.name
                                 }
                             ]
-                        }
+                        };
                     case 'type'://tipo de negocio                        
                         return {
                             "properties": [
@@ -206,7 +205,7 @@ const deal = {
                                     "name": "n3_18_numero_de_empleados"
                                 },
                                 {
-                                    "value": format.YES_NO_QUESTION[request.bankAccount],
+                                    "value": request.bankAccount ? format.YES_NO_QUESTION[request.bankAccount] : '',
                                     "name": "n3_19_cuenta_bancaria_pm"
                                 },
                                 {
@@ -323,7 +322,7 @@ const deal = {
                                     "name": "n6_3_tarjeta_de_cr_dito"
                                 },
                                 {
-                                    "value": request.last4,
+                                    "value": request.last4 ? request.last4 : '',
                                     "name": "n6_4_tdc_4_d_gitos"
                                 },
                                 {//información general - domicilio
@@ -343,7 +342,7 @@ const deal = {
                                     "name": "n4_7_num_ext"
                                 },
                                 {
-                                    "value": request.intNumber,
+                                    "value": request.intNumber ? request.intNumber : '',
                                     "name": "n4_8_num_int"
                                 },
                                 {

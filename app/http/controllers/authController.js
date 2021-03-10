@@ -83,7 +83,7 @@ const authController = {
     login: async (request, response) => { 
         let { email, password } = request.body;
 
-        let user = await User.findOne({ email: email.toLowerCase().trim() });
+        let user = await User.findOne({ email: email.trim() });
 
         if(!user){
             return response.status(200).json({ 
