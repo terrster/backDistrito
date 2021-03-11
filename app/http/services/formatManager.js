@@ -47,9 +47,9 @@ const GYRE = {//gyre
 };
 
 const WARRANTY = {
-    1: "Sí",
-    2: "Sí",
-    3: "Sí",
+    1: "Inmobiliaria",
+    2: "Activo fijo",
+    3: "Ambos",
     4: "No"
 };
 
