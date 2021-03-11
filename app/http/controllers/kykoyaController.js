@@ -17,48 +17,53 @@ const kykoyaController = {
             let headers = signRequest('POST', requestURI);
 
             let API_RESPONSE = await axios.post(requestURI, {
-                "data": {
-                   "type": "bureau_report",
-                   "attributes": {
-                     "query": {
-                       "intl": {
-                         "operator_reference": "2061841",
-                         "responsability_type": "I",
-                         "product_type": "PL",
-                         "currency": "MX",
-                         "lang": "SP"
-                       },
-                       "pn": {
-                         "PN": "ADAMS",
-                         "00": "ARETIA",
-                         "02": "DIMITRI ARNULFO",
-                         "04": "17121950",
-                         "05": "BEAS50121757A",
-                         "12": "M"
-                       },
-                       "pa": [
-                         { "PA": "PRL BQUES REFORMA114 EDI 2 A DEP701",
-                           "01": "BOSQUES DE LAS LOMAS",
-                           "03": "CUAJIMALPA DE MORELOS",
-                           "04": "DF",
-                           "05": "05120",
-                           "13": "MX" }
-                       ]
+                    "data": {
+                       "type": "bureau_report",
+                       "attributes": {
+                         "query": {
+                           "intl": {
+                             "operator_reference": "2061841                  ",
+                             "responsability_type": "I",
+                             "product_type": "PL",
+                             "currency": "MX",
+                             "lang": "SP"
+                           },
+                           "pn": {
+                             "PN": "ADAMS",
+                             "00": "ARIETA",
+                             "02": "DIMITRI ARNULFO",
+                             "04": "17121950",
+                             "05": "BEAS50121757A",
+                             "12": "M"
+                           },
+                           "pa": [
+                             { "PA": "PR BOQUES REFORMA114 EDI 2 DEP701",
+                               "01": "BOSQUES DE LAS LOMAS",
+                               "03": "CUAJIMALPA DE MORELOS",
+                               "04": "CDMX",
+                               "05": "05120",
+                               "13": "MX" }
+                           ]
+                         }
+                       }
                      }
-                   }
-                 }
-               }, {
-                headers: headers
-            });
+               }, 
+                {
+                    headers: headers
+                }
+            );
+
+            console.log(API_RESPONSE.data);
             
             return response.json({
                 code: 200,
-                msg: 'Reporte de buró de crédito creado exitosamente.',
-                API_RESPONSE
+                msg: 'Reporte de buró de crédito creado exitosamente.'
             });
         }
         catch(error){
             console.log(error);
+            // console.log(error.response.status + " | " + error.response.statusText);
+            // console.log(error.response.data.errors);
         }
     },
     getBureauReport: async(request, response) => {
@@ -67,6 +72,12 @@ const kykoyaController = {
 
         try{
             let headers = signRequest('GET', requestURI);
+
+            let API_RESPONSE = await axios.get(requestURI, {
+                headers
+            });
+
+            console.log(API_RESPONSE.data.attributes.response);
 
             return response.json({
                 code: 200,
