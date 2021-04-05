@@ -78,6 +78,29 @@ const CIVIL_STATUS = {//civilStatus
     WIDOWER: "Viudo", 
 };
 
+const AGE = (birthDate) => {
+    let userDay = parseInt(birthDate.split("/")[0]);
+    let userMonth = parseInt(birthDate.split("/")[1]);
+    let userYear = parseInt(birthDate.split("/")[2]);
+
+    let date = new Date();
+    let currentDay = date.getDate();
+    let currentMonth = date.getMonth() + 1;
+    let currentYear = date.getFullYear();
+
+    let age = currentYear - userYear;
+
+    if(currentMonth < userMonth){
+        age--;
+    }
+
+    if(currentMonth == userMonth && currentDay < userDay){
+        age--;
+    }
+
+    return age;
+}
+
 const CAR_CREDIT = {//carCredit
     MORE4: "Hace 4 años o más",
     YES: "Sí",
@@ -101,6 +124,7 @@ module.exports = {
     YES_NO_QUESTION,
     EMPRESARIAL_CREDIT_CARD,
     CIVIL_STATUS,
+    AGE,
     CAR_CREDIT,
     RELATIVE
 };

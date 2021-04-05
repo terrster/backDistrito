@@ -298,6 +298,10 @@ const deal = {
                                     "name": "n4_5_fecha_de_nacimiento"
                                 },
                                 {
+                                    "value": format.AGE(request.birthDate),
+                                    "name": "n4_94_edad"
+                                },
+                                {
                                     "value": request.rfcPerson,
                                     "name": "n3_15_rfc_pm"
                                 },
