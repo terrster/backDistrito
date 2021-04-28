@@ -32,7 +32,7 @@ class SocketService {
               idU : socket.handshake.query.idU,
               socketId: socket.id
           });
-          console.log(this.users);
+          // console.log(this.users);
 
           socket.on('disconnect', () => {
               // console.log("One user disconnected!");

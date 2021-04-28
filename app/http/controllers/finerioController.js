@@ -996,16 +996,13 @@ const finerioController = {
         if(parseInt(Object.keys(data).length)){
             if(data.stage == 'interactive'){
                 await FinerioCallback.create({data: data});
-                console.log("Users");
-                console.log(global.io.getUsers());
                 
                 let user = global.io.getUser(data.customerId);
-                console.log("User");
-                console.log(user);
+                // console.log(user);
 
                 if(user){
                     global.io.emitToSocket(user.socketId, 'askForToken', data);
-                    console.log('event notify sent');
+                    // console.log('event notify sent');
                 }
 
                 return response.json({
