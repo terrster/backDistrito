@@ -998,11 +998,11 @@ const finerioController = {
                 await FinerioCallback.create({data: data});
                 
                 let user = global.io.getUser(data.customerId);
-                // console.log(user);
+                console.log(user);
 
                 if(user){
                     global.io.emitToSocket(user.socketId, 'askForToken', data);
-                    // console.log('event notify sent');
+                    console.log('event notify sent');
                 }
 
                 return response.json({
