@@ -32,7 +32,7 @@ class SocketService {
               idU : socket.handshake.query.idU,
               socketId: socket.id
           });
-          // console.log(this.users);
+          console.log(this.users);
 
           socket.on('disconnect', () => {
               // console.log("One user disconnected!");
@@ -66,6 +66,10 @@ class SocketService {
 
   getUser(idFinerio){
     return this.users.find(user => user.idFinerio == idFinerio);
+  }
+
+  getUsers(){
+    return this.users;
   }
 
   emitToSocket(socketId, event, data){

@@ -996,8 +996,11 @@ const finerioController = {
         if(parseInt(Object.keys(data).length)){
             if(data.stage == 'interactive'){
                 await FinerioCallback.create({data: data});
+                console.log("Users");
+                console.log(global.io.getUsers());
                 
                 let user = global.io.getUser(data.customerId);
+                console.log("User");
                 console.log(user);
 
                 if(user){
