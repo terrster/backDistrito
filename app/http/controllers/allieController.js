@@ -46,11 +46,16 @@ const CHECK_TYPE_CREDIT = (typeCredit) => {
         if(typeCredit[tc] === true && tc !== 'otro'){
             typeCreditsTXT += TYPE_CREDIT[tc] + ';';
         }
-        else if(typeCredit['otro'] === true){
-            typeCreditsTXT += typeCredit['otroTxt'] + ';';
-        }
     });
-    return typeCreditsTXT.slice(0, -1);
+
+    if(typeCredit['otro'] === true){
+        typeCreditsTXT += typeCredit['otroTxt'];
+    }
+    else{
+        typeCreditsTXT = typeCreditsTXT.slice(0, -1)
+    }
+
+    return typeCreditsTXT;
 }
 
 const TAX_REGIME = {
