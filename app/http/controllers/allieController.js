@@ -171,7 +171,18 @@ const allieController = {
                         "value": data.sales,
                         "name": "respuesta_unykoo_2_buro_moral_"
                     },
-                    
+                    {
+                        "value": data.averageRate,
+                        "name": "tasa_preaut"
+                    },
+                    {
+                        "value": data.deadline,
+                        "name": "plazo_preaut"
+                    },
+                    {
+                        "value": data.openingExpenses,
+                        "name": "comision_apertura_preaut"
+                    },
                     //Antigüedad mínima del negocio
                     {
                         "value": ANTIQUITY[data.antiquity],
