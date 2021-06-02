@@ -3,11 +3,11 @@
 const axios = require("axios");
 const fileManager = require("../services/fileManager");
 
-// #Hubspot - ImpulsoMx
+// #Hubspot - Alianzas DP
 const hubspotAllie = {
     baseURL: 'https://api.hubapi.com/',
     pipeline: '9491843',
-    dealstage: '9491844',
+    dealstage: '9491847',
     hapiKey: '?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3'
 };
 
