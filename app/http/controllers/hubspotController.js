@@ -45,6 +45,10 @@ const deal = {
                         "name": "dealname"
                     },
                     {
+                        "value": request.channel,
+                        "name": "canal_de_entrada"
+                    },
+                    {
                         "value": request.dealstage || process.env.DATE_HUB,
                         "name": "dealstage" 
                     },

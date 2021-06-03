@@ -11,6 +11,52 @@ const hubspotAllie = {
     hapiKey: '?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3'
 };
 
+const getContactByEmail = async(email) => {
+    try{
+        const response = await axios.get(hubspotAllie.baseURL + 'contacts/v1/contact/email/' + email + '/profile' + hubspotAllie.hapiKey);
+
+        if(response.status == 200){
+            return response.data;
+        }
+    }
+    catch(error){
+        return null;
+    }
+}
+
+const storeContact = async(request) => {
+    try{
+        let contactParams = {
+            "properties": [
+                {
+                    "value": request.email,
+                    "property": "email"
+                },
+                {
+                    "value": request.allieName,
+                    "property": "jobtitle"
+                },
+                {
+                    "value": request.nameMainContact,
+                    "property": "firstname"
+                }
+            ]
+        };
+
+        const {data} = await axios.post(hubspotAllie.baseURL + 'contacts/v1/contact' + hubspotAllie.hapiKey, contactParams);
+        return data;
+    }
+    catch(error){
+        let response = {
+            msg: "Hubspot: Algo salió mal tratando de crear un contact",
+            error: error
+        };
+
+        // console.log(response);
+        return response;
+    }
+}
+
 const CHECK_EMAIL = (leadEmail) => {
     leadEmail = JSON.parse(leadEmail);
     let leadEmailTXT = '';
@@ -117,12 +163,34 @@ const allieController = {
         try{
             let data = request.body;
             let {logo} = request.files;
-  
+
+            let email = CHECK_EMAIL(data.leadEmail);
+            let contactExist = await getContactByEmail(email.split(";")[0]);
+
+            if(contactExist){
+                return response.json({ 
+                    code: 500,
+                    msg: `El correo electrónico ya existe: ${email.split(";")[0]}`
+                });
+            }
+
+            let contactStored = await storeContact({
+                email: email.split(";")[0],
+                allieName: data.allieName.trim(),
+                nameMainContact: data.nameMainContact.trim()
+            });
+            data.hubspotContactId = contactStored.vid;
+
             let alianza = data.allieName.replace(/ /g, "");
             let fileName = `${new Date().getTime()}-${alianza}.${logo.mimetype.split("/")[1]}`;
             let locationURIS3 = await fileManager.uploadFileS3(fileName, logo.data, logo.mimetype);
 
             let dealParams = {
+                "associations": {
+                    "associatedVids": [
+                        data.hubspotContactId,
+                    ],
+                },
                 "properties": [
                     //Información del negocio
                     {
@@ -144,7 +212,7 @@ const allieController = {
                     },
                     //Correos electronicos
                     {
-                        "value": CHECK_EMAIL(data.leadEmail),
+                        "value": email,
                         "name": "email"
                     },
                     //Tipo de credito que ofreces
@@ -239,7 +307,7 @@ const allieController = {
             }
         }
         catch(error){
-            console.log(error.response.data);
+            console.log(error);
             return response.json({
                 code: 500,
                 msg: "Algo salió mal tratando de dar de alta la alianza",
