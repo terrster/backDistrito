@@ -14,6 +14,7 @@ const solicitudController = require("../app/http/controllers/solicitudController
 const finerioController = require("../app//http/controllers/finerioController");
 const pdfController = require("../app/http/controllers/pdfController");
 const circuloCreditoController = require("../app/http/controllers/circuloCreditoController");
+const smsController = require("../app/http/controllers/smsController");
 
 // route.use((request, response, next) => {
 //     if(!request.query.tokensecret){
@@ -51,5 +52,9 @@ route.group("/pdf", (pdf) => {
 route.group("/impmx", (impmx) => {
     impmx.get('/alta/:id', circuloCreditoController.alta);
 });
+
+//SMS
+route.post("/sms_internal_notify", smsController.internalNotify);
+route.post("/sms_external_notify", smsController.externalNotify);
 
 module.exports = route;
