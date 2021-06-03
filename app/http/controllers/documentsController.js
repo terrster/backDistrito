@@ -119,6 +119,7 @@ const updateHubspotMongoFiles = async(id, hubspotDealId, filesUploaded) => {
                 }
                 else{
                     properties = {
+                        ...properties,
                         [params.name] : {
                             "value" : params.value
                         }
@@ -347,42 +348,46 @@ const documentsController = {
         }
 
         let user = await User.findById(idUser);
+        let hubspot = await hubspotController.deal.show(user.hubspotDealId);
+        let docs = await Documents.findById(id);
 
-        if(data.name != data.url){
-            let hubspot = await hubspotController.deal.show(user.hubspotDealId);
-            let docs = await Documents.findById(id);
+        let property = await getNameProperty(data.name);
+        let propName = '';
 
-            let property = await getNameProperty(data.name);
-            var propName = '';
-            
-            for(let i = 0; i<property.length; i++){
-                if(hubspot.properties[property[i]].value == data.url){
-                    propName = hubspot.properties[property[i]].versions[0].name;
-                    break;
+        Object.keys(hubspot.properties).map((p) => {
+            if(property.includes(p)){
+                if(hubspot.properties[p].hasOwnProperty('value')){
+                    if(hubspot.properties[p].value === data.url){
+                        propName = p;
+                    }
                 }
             }
+        });
 
+        if(propName != ''){
             let index = docs[data.name].indexOf(data.url);
+            let fileName = data.url.split("/")[3];
 
             let params = {
                 name: propName,
                 value: ""
             };
 
+            await fileManager.deleteFileS3(fileName);
             await hubspotController.deal.update(user.hubspotDealId, 'documents-update', params);
             await Documents.findByIdAndUpdate(id, {$pull: {[data.name]: docs[data.name][index] } });
 
             let statusValue = await missingFiles(user, id);
             await Documents.findByIdAndUpdate(id, {status: statusValue});
-
-            user = await User.findById(idUser);
-
-            return response.json({
-                code: 200,
-                msg: 'Documento eliminado exitosamente',
-                user: user
-            });
         }
+
+        user = await User.findById(idUser);
+
+        return response.json({
+            code: 200,
+            msg: 'Documento eliminado exitosamente',
+            user: user
+        });
     }
     
 }

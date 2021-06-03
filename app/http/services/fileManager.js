@@ -101,6 +101,23 @@ const uploadToS3 = async(filesUploadedToServer) => {
     return filesUploadedToS3;
 };
 
+const deleteFileS3 = async(fileName) => {
+    return new Promise((resolve, reject) => {
+   
+        const bucket = S3.bucket();
+        const callback = (error, data) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve(data.Location);
+        }
+        bucket.deleteObject({
+            Key: fileName
+        }, callback)
+      });
+}
+
 const deleteFromServer = (filesUploadedToServer) => {
     Object.keys(filesUploadedToServer).map((key) => {
         if(filesUploadedToServer[key].length > 1){
@@ -132,5 +149,6 @@ module.exports = {
     uploadToServer,
     uploadFileS3,
     uploadToS3,
+    deleteFileS3,
     deleteFromServer
 };
