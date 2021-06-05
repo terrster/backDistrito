@@ -62,15 +62,15 @@ const CHECK_EMAIL = (leadEmail) => {
     let leadEmailTXT = '';
 
     if(leadEmail.primary != ''){
-        leadEmailTXT += leadEmail.primary;
+        leadEmailTXT += leadEmail.primary.trim();
     }
 
     if(leadEmail.secondary != ''){
-        leadEmailTXT += ';'+leadEmail.secondary;
+        leadEmailTXT += ';'+leadEmail.secondary.trim();
     }
 
     if(leadEmail.tertiary != ''){
-        leadEmailTXT += ';'+leadEmail.tertiary;
+        leadEmailTXT += ';'+leadEmail.tertiary.trim();
     }
 
     return leadEmailTXT;
@@ -165,21 +165,38 @@ const allieController = {
             let {logo} = request.files;
 
             let email = CHECK_EMAIL(data.leadEmail);
-            let contactExist = await getContactByEmail(email.split(";")[0]);
+            let emailSplitted = email.split(";");
+            let someContactExist = false;
+            let emailExist = [];
 
-            if(contactExist){
+            const checkingEmailOnHubspot = emailSplitted.map(async(e) => {
+                let exist = await getContactByEmail(e);
+                if(exist && exist.hasOwnProperty('vid')){
+                    someContactExist = true;
+                    emailExist.push(e);
+                }
+            });
+
+            await Promise.all(checkingEmailOnHubspot);
+
+            if(someContactExist){
                 return response.json({ 
                     code: 500,
-                    msg: `El correo electrónico ya existe: ${email.split(";")[0]}`
+                    msg: `Uno o más correos electrónicos ya existen: ${emailExist.toString()}`
                 });
             }
 
-            let contactStored = await storeContact({
-                email: email.split(";")[0],
-                allieName: data.allieName.trim(),
-                nameMainContact: data.nameMainContact.trim()
+            let contactsVid = [];
+            const storingContactsOnHubspot = emailSplitted.map(async(e) => {
+                let contactStored = await storeContact({
+                    email: e,
+                    allieName: data.allieName.trim(),
+                    nameMainContact: data.nameMainContact.trim()
+                });
+                contactsVid.push(contactStored.vid);
             });
-            data.hubspotContactId = contactStored.vid;
+
+            await Promise.all(storingContactsOnHubspot);
 
             let alianza = data.allieName.replace(/ /g, "");
             let fileName = `${new Date().getTime()}-${alianza}.${logo.mimetype.split("/")[1]}`;
@@ -187,9 +204,7 @@ const allieController = {
 
             let dealParams = {
                 "associations": {
-                    "associatedVids": [
-                        data.hubspotContactId,
-                    ],
+                    "associatedVids": contactsVid,
                 },
                 "properties": [
                     //Información del negocio
