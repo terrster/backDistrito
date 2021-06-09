@@ -166,37 +166,49 @@ const allieController = {
 
             let email = CHECK_EMAIL(data.leadEmail);
             let emailSplitted = email.split(";");
-            let someContactExist = false;
-            let emailExist = [];
 
-            const checkingEmailOnHubspot = emailSplitted.map(async(e) => {
-                let exist = await getContactByEmail(e);
-                if(exist && exist.hasOwnProperty('vid')){
-                    someContactExist = true;
-                    emailExist.push(e);
-                }
-            });
+            const checkingEmailOnHubspot = async() => {
+                let emailsFounded = [];
 
-            await Promise.all(checkingEmailOnHubspot);
+                const checkingEmails = emailSplitted.map(async(e) => {
+                    let exist = await getContactByEmail(e);
+                    if(exist && exist.hasOwnProperty('vid')){
+                        emailsFounded.push(e);
+                    }
+                });
 
-            if(someContactExist){
+                await Promise.all(checkingEmails);
+
+                return emailsFounded;
+            };
+
+            let emailExist = await checkingEmailOnHubspot();
+
+            if(emailExist.length > 0){
                 return response.json({ 
                     code: 500,
                     msg: `Uno o más correos electrónicos ya existen: ${emailExist.toString()}`
                 });
             }
 
-            let contactsVid = [];
-            const storingContactsOnHubspot = emailSplitted.map(async(e) => {
-                let contactStored = await storeContact({
-                    email: e,
-                    allieName: data.allieName.trim(),
-                    nameMainContact: data.nameMainContact.trim()
-                });
-                contactsVid.push(contactStored.vid);
-            });
+            const storingContactsOnHubspot = async({allieName, nameMainContact}) => {
+                let storedContacts = [];
 
-            await Promise.all(storingContactsOnHubspot);
+                const storingContacts = emailSplitted.map(async(e) => {
+                    let contactStored = await storeContact({
+                        email: e,
+                        allieName: allieName.trim(),
+                        nameMainContact: nameMainContact.trim()
+                    });
+                    storedContacts.push(contactStored.vid);
+                });
+
+                await Promise.all(storingContacts);
+
+                return storedContacts;
+            };
+
+            let contactsVid = await storingContactsOnHubspot(data);
 
             let alianza = data.allieName.replace(/ /g, "");
             let fileName = `${new Date().getTime()}-${alianza}.${logo.mimetype.split("/")[1]}`;
@@ -273,8 +285,12 @@ const allieController = {
                     },
                     //Flexibilidad en buró
                     {
-                        "value": FLEXIBILITY[data.flexibilityCreditBureau],
+                        "value": FLEXIBILITY[data.flexibilityCreditBureau] + ";" + data.score,
                         "name": "respuesta_unykoo_1"
+                    },
+                    {
+                        "value": data.geographicLocationsRejected.trim(),
+                        "name": "estado_de_la_rep_del_negocio"
                     },
                     //CIEC obligatoria para proceso de crédito
                     {
