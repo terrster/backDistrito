@@ -3,17 +3,16 @@
 const axios = require("axios");
 const fileManager = require("../services/fileManager");
 
-// #Hubspot - Alianzas DP
-const hubspotAllie = {
+const hubspot = {
     baseURL: 'https://api.hubapi.com/',
-    pipeline: '9491843',
-    dealstage: '9491847',
+    pipeline: '9491843',// Alianzas DP
+    dealstage: '9491847',// Implementación
     hapiKey: '?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3'
-};
+}
 
 const getContactByEmail = async(email) => {
     try{
-        const response = await axios.get(hubspotAllie.baseURL + 'contacts/v1/contact/email/' + email + '/profile' + hubspotAllie.hapiKey);
+        const response = await axios.get(hubspot.baseURL + 'contacts/v1/contact/email/' + email + '/profile' + hubspot.hapiKey);
 
         if(response.status == 200){
             return response.data;
@@ -43,7 +42,7 @@ const storeContact = async(request) => {
             ]
         };
 
-        const {data} = await axios.post(hubspotAllie.baseURL + 'contacts/v1/contact' + hubspotAllie.hapiKey, contactParams);
+        const {data} = await axios.post(hubspot.baseURL + 'contacts/v1/contact' + hubspot.hapiKey, contactParams);
         return data;
     }
     catch(error){
@@ -318,24 +317,22 @@ const allieController = {
                         "name": "n9_1_id"
                     },
                     {
-                        "value": hubspotAllie.dealstage,
+                        "value": hubspot.dealstage,
                         "name": "dealstage" 
                     },
                     {
-                        "value": hubspotAllie.pipeline,
+                        "value": hubspot.pipeline,
                         "name": "pipeline"
                     }
                 ]
             };
 
-            let hubspotResponse = await axios.post(hubspotAllie.baseURL + 'deals/v1/deal' + hubspotAllie.hapiKey, dealParams);
+            await axios.post(hubspot.baseURL + 'deals/v1/deal' + hubspot.hapiKey, dealParams);
             
-            if(hubspotResponse.status == 200){
-                return response.json({ 
-                    code: 200,
-                    msg: 'Alianza dada de alta exitosamente' 
-                });
-            }
+            return response.json({ 
+                code: 200,
+                msg: 'Alianza dada de alta exitosamente' 
+            });
         }
         catch(error){
             console.log(error);

@@ -15,6 +15,7 @@ const counterController = require("../app/http/controllers/counterController");
 const finerioController = require("../app/http/controllers/finerioController");
 const impulsoMxController = require("../app/http/controllers/impulsoMxController");
 const allieController = require("../app/http/controllers/allieController");
+const brokerController = require("../app/http/controllers/brokerController");
 
 route.post('/signin', authController.sigin);
 route.post('/login', authController.login);
@@ -37,5 +38,7 @@ route.post("/impmx/store", impulsoMxController.store);
 route.put("/impmx/update", impulsoMxController.update);
 
 route.post("/allie", allieController.store);
+
+route.post("/broker", brokerController.store);
 
 module.exports = route;
