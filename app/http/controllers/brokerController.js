@@ -37,6 +37,10 @@ const storeContact = async(request) => {
                 },
                 {
                     "value": request.mobilephone,
+                    "property": "phone"
+                },
+                {
+                    "value": request.mobilephone,
                     "property": "mobilephone"
                 },
                 {
@@ -44,7 +48,7 @@ const storeContact = async(request) => {
                     "property": "message"
                 }
             ]
-        };
+        }
 
         const {data} = await axios.post(hubspot.baseURL + 'contacts/v1/contact' + hubspot.hapiKey, contactParams);
         return data;
@@ -79,10 +83,14 @@ const brokerController = {
             let dealParams = {
                 "associations": {
                     "associatedVids": [
-                        contact.hubspotContactId
+                        contact.vid
                     ],
                 },
                 "properties": [
+                    {
+                        "value": data.name.trim(),
+                        "name": "dealname"
+                    },
                     {
                         "value": data.name.trim(),
                         "name": "nombre_comercial"
