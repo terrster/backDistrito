@@ -66,7 +66,7 @@ class Server{
                 else if(allowedIPS.includes(request.headers['x-forwarded-for'])){
                     next();
                 }
-                else{
+                else{console.log(origin);
                     return response.json({
                         status: 403,
                         msg: `You don´t have permissions. Only specific domains are allowed to access.`
