@@ -25,15 +25,15 @@ class Server{
         this.app.use(fileUpload());
 
         this.app.use((request, response, next) => {
-            const allowedOrigins = ['https://distritopyme.com', 'https://www.distritopyme.com', 'https://dev.distritopyme.com', 'https://www.dev.distritopyme.com', 'https://impmx.com', 'https://dev.impmx.com', 'https://api-v2.finerio.mx', 'https://distritopyme.netlify.app'];
-            const origin = request.headers.origin;console.log(origin);
+            const allowedOrigins = ['https://distritopyme.com', 'https://www.distritopyme.com', 'https://dev.distritopyme.com', 'https://www.dev.distritopyme.com', 'https://impmx.com', 'https://dev.impmx.com', 'https://api-v2.finerio.mx'];
+            const origin = request.headers.origin;
             
             response.header('Access-Control-Allow-Origin', '*');
             response.header('Access-Control-Allow-Headers', '*');
             response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
             response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
                     
-            if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
+            if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && (allowedOrigins.includes(origin) || origin.search("distritopyme.netlify.app"))){
                 next();
             }
             else if(process.env.APP_ENV === 'local'){
@@ -66,7 +66,7 @@ class Server{
                 else if(allowedIPS.includes(request.headers['x-forwarded-for'])){
                     next();
                 }
-                else{console.log(origin);
+                else{
                     return response.json({
                         status: 403,
                         msg: `You don´t have permissions. Only specific domains are allowed to access.`
