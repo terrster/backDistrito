@@ -26,7 +26,7 @@ class Server{
 
         this.app.use((request, response, next) => {
             const allowedOrigins = ['https://distritopyme.com', 'https://www.distritopyme.com', 'https://dev.distritopyme.com', 'https://www.dev.distritopyme.com', 'https://impmx.com', 'https://dev.impmx.com', 'https://api-v2.finerio.mx'];
-            const origin = request.headers.origin;console.log(origin.search("distritopyme.netlify.app") > 0);
+            const origin = request.headers.origin;
             
             response.header('Access-Control-Allow-Origin', '*');
             response.header('Access-Control-Allow-Headers', '*');
