@@ -33,7 +33,7 @@ class Server{
             response.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
             response.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
                     
-            if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && allowedOrigins.includes(origin)){
+            if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'production') && (allowedOrigins.includes(origin) || origin.search("distritopyme.netlify.app") > 0)){
                 next();
             }
             else if(process.env.APP_ENV === 'local'){
