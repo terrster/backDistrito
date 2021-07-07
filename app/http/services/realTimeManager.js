@@ -7,9 +7,9 @@ const realTimeManager = {
         let notificationTI = await mailManager.sendToTI({
             to: "miguelwayas@distritopyme.com",
             subject: "Notificación de servicio en tiempo real",
-            message: request
+            message: JSON.stringify(request.body)
         });
-        console.log(request);
+        
         return response.json(notificationTI);
     }
 }
