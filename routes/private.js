@@ -15,6 +15,7 @@ const finerioController = require("../app//http/controllers/finerioController");
 const pdfController = require("../app/http/controllers/pdfController");
 const circuloCreditoController = require("../app/http/controllers/circuloCreditoController");
 const smsController = require("../app/http/controllers/smsController");
+const realTimeManager = require("../app/http/services/realTimeManager");
 
 // route.use((request, response, next) => {
 //     if(!request.query.tokensecret){
@@ -56,5 +57,8 @@ route.group("/impmx", (impmx) => {
 //SMS
 route.post("/sms_internal_notify", smsController.internalNotify);
 route.post("/sms_external_notify", smsController.externalNotify);
+
+//Real time hubspot
+route.post("/real-time-hubspot-info", realTimeManager.hubspotInfo);
 
 module.exports = route;

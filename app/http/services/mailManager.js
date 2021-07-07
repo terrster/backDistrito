@@ -103,7 +103,30 @@ const mailManager = {
                 msg: "No se pudo enviar el correo de reactivación"
             }
         }
-    }  
+    },
+    sendToTI: async(request) => {
+        let mailOptions = {
+            from: 'Distrito Pyme <contacto@distritopyme.com>',
+            to: request.to,
+            subject: request.subject,
+            html: templates.notify(request.message)
+        };
+
+        try{
+            await service.sendMail(mailOptions);
+            
+            return {
+                code: 200,
+                msg: "Correo de notificación enviado correctamente a TI!"
+            }
+        }
+        catch(error){console.log(error)
+            return {
+                code: 500,
+                msg: "No se pudo enviar el correo de notificación"
+            }
+        }
+    } 
 }
 
 module.exports = mailManager;
