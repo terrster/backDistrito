@@ -22,24 +22,30 @@ class SocketService {
 
           // console.log("New user connected!");
 
-          let userExist = this.users.find(user => user.idU == socket.handshake.query.idU);
+          if(socket.handshake.query.idU){
+            let userExist = this.users.find(user => user.idU == socket.handshake.query.idU);
 
-          if(userExist){
-            this.io.to(userExist.socketId).emit('forceDisconnect', {});
+            if(userExist){
+              this.io.to(userExist.socketId).emit('forceDisconnect', {});
+            }
+
+            this.users.push({
+                idU : socket.handshake.query.idU,
+                socketId: socket.id
+            });
+            // console.log(this.users);
+
+            socket.on('disconnect', () => {
+                // console.log("One user disconnected!");
+                this.users = this.users.filter(user => user.socketId != socket.id);
+        
+                // console.log(this.users);
+            });
           }
-
-          this.users.push({
-              idU : socket.handshake.query.idU,
-              socketId: socket.id
-          });
-          // console.log(this.users);
-
-          socket.on('disconnect', () => {
-              // console.log("One user disconnected!");
-              this.users = this.users.filter(user => user.socketId != socket.id);
-      
-              // console.log(this.users);
-          })
+          else if(socket.handshake.query.origin == 'hubspotInfo'){
+            let hubpostInfo = JSON.parse(require('fs').readFileSync(require('path').resolve('config/hubspotInfo.json')));
+            socket.emit('hubspotInfo', hubpostInfo);
+          }
       });
 
       console.log(`Socket service initialized successfully`);
@@ -71,6 +77,11 @@ class SocketService {
   emitToSocket(socketId, event, data){
     if(socketId && data)
       this.io.to(socketId).emit(event, data);
+  }
+
+  emitToAll(event, data){
+    if(event, data)
+    this.io.emit(event, data);
   }
 
 }

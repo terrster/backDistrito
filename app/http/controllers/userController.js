@@ -1,6 +1,5 @@
 'user strict'
 
-const { response } = require("express");
 const User = require("../models/User");
 const mailManager = require("../services/mailManager");
 
