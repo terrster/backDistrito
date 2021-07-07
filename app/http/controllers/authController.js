@@ -63,6 +63,11 @@ const authController = {
                     _id: clientStored._id
                 }
             }, { new: true });
+
+            let hubpostInfo = JSON.parse(require('fs').readFileSync(require('path').resolve('config/hubspotInfo.json')));
+            hubpostInfo.Solicitudes = user.idDistrito;
+
+            global.io.emitToAll("hubspotInfo", hubpostInfo);
  
             return response.json({ 
                  code: 200, 

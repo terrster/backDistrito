@@ -54,7 +54,7 @@ const counterController = {
             });
         }
     },
-    total: (request, response) => {
+    total: (_, response) => {
         try{
             let counter = JSON.parse(fs.readFileSync(counterPath));
 
