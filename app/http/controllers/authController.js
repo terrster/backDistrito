@@ -67,6 +67,17 @@ const authController = {
             let hubpostInfo = JSON.parse(require('fs').readFileSync(require('path').resolve('config/hubspotInfo.json')));
             hubpostInfo.Solicitudes = user.idDistrito;
 
+            if(require('fs').existsSync(require('path').resolve('config/hubspotInfo.json'))){
+                require('fs').writeFileSync(require('path').resolve('config/hubspotInfo.json'), 
+                    JSON.stringify(hubpostInfo)
+                );
+            }
+            else{
+                require('fs').appendFileSync(require('path').resolve('config/hubspotInfo.json'), 
+                    JSON.stringify(hubpostInfo)
+                );
+            }
+
             global.io.emitToAll("hubspotInfo", hubpostInfo);
  
             return response.json({ 
