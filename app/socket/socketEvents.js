@@ -43,8 +43,13 @@ class SocketService {
             });
           }
           else if(socket.handshake.query.origin == 'hubspotInfo'){
-            let hubpostInfo = JSON.parse(require('fs').readFileSync(require('path').resolve('config/hubspotInfo.json')));
-            socket.emit('hubspotInfo', hubpostInfo);
+            if(require('fs').existsSync(require('path').resolve('config/hubspotInfo.json'))){
+              let data = JSON.parse(require('fs').readFileSync(require('path').resolve('config/hubspotInfo.json')));
+              socket.emit('hubspotInfo', {
+                data,
+                difference: []
+              });
+            }
           }
       });
 
@@ -71,7 +76,8 @@ class SocketService {
   */
 
   getUser(idFinerio){
-    return this.users.find(user => user.idFinerio == idFinerio);
+    if(idFinerio)
+      return this.users.find(user => user.idFinerio == idFinerio);
   }
 
   getUsers(){
@@ -79,13 +85,13 @@ class SocketService {
   }
 
   emitToSocket(socketId, event, data){
-    if(socketId && data)
+    if(socketId && event && data)
       this.io.to(socketId).emit(event, data);
   }
 
   emitToAll(event, data){
     if(event, data)
-    this.io.emit(event, data);
+      this.io.emit(event, data);
   }
 
 }

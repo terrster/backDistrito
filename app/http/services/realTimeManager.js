@@ -1,6 +1,6 @@
 'use strict'
 
-const mailManager = require("./mailManager");
+// const mailManager = require("./mailManager");
 const User = require("../models/User");
 const fs = require("fs");
 const path = require("path");
@@ -22,22 +22,51 @@ const realTimeManager = {
             data.Solicitudes = user.idDistrito;
 
             if(fs.existsSync(hubspotInfoPath)){
-                fs.writeFileSync(hubspotInfoPath, 
-                    JSON.stringify(data)
-                );
+                let hubpostInfo = JSON.parse(fs.readFileSync(hubspotInfoPath));
+                let difference = [];
+                
+                Object.keys(hubpostInfo).map((key) => {
+                    if(data[key] != hubpostInfo[key]){
+                        difference.push(key);
+                    }
+                });
+
+                if(difference.length){
+                    fs.writeFileSync(hubspotInfoPath, 
+                        JSON.stringify(data)
+                    );
+
+                    global.io.emitToAll("hubspotInfo", {
+                        data,
+                        difference
+                    });
+
+                    return response.json({ 
+                        code: 200,
+                        msg: "Información de Hubspot actualizada en tiempo real exitosamente"
+                    });
+                }
+
+                return response.json({ 
+                    code: 200,
+                    msg: "No hay nueva información de Hubspot que actualizar"
+                });
             }
             else{
                 fs.appendFileSync(hubspotInfoPath, 
                     JSON.stringify(data)
                 );
+
+                global.io.emitToAll("hubspotInfo", {
+                    data,
+                    difference: []
+                });
+
+                return response.json({ 
+                    code: 200,
+                    msg: "Información de Hubspot actualizada en tiempo real exitosamente"
+                });
             }
-
-            global.io.emitToAll("hubspotInfo", data);
-
-            return response.json({ 
-                code: 200,
-                msg: "Información de Hubspot actualizada en tiempo real exitosamente"
-            });
         }
         catch(error){
             console.log(error);
@@ -49,18 +78,26 @@ const realTimeManager = {
     },
     getHubpostInfo: (_, response) => {
         try{
-            let hubpostInfo = JSON.parse(fs.readFileSync(hubspotInfoPath));
+            if(fs.existsSync(hubspotInfoPath)){
+                let hubpostInfo = JSON.parse(fs.readFileSync(hubspotInfoPath));
 
-            return response.json({ 
-                code: 200,
-                hubpostInfo
-            });
+                return response.json({ 
+                    code: 200,
+                    hubpostInfo
+                });
+            }
+            else{
+                return response.json({ 
+                    code: 404,
+                    msg: "No existe información de Hubspot en tiempo real"
+                });
+            }
         }
         catch(error){
+            console.log(error);
             return response.json({
                 code: 500,
-                msg: "Algo salió mal tratando de obtener la información de Hubspot en tiempo real",
-                error: error
+                msg: "Algo salió mal tratando de obtener la información de Hubspot en tiempo real"
             });
         }
     }

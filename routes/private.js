@@ -59,6 +59,7 @@ route.post("/sms_internal_notify", smsController.internalNotify);
 route.post("/sms_external_notify", smsController.externalNotify);
 
 //Real time hubspot
+route.get("/real-time-hubspot-info", realTimeManager.getHubpostInfo);
 route.post("/real-time-hubspot-info", realTimeManager.hubspotInfo);
 
 module.exports = route;
