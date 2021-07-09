@@ -672,12 +672,12 @@ const deal = {
                             }
                         }
 
-                        if(request.acomplishOpinion){
-                            data.push({
-                                "value": request.acomplishOpinion,
-                                "name": "n9_6_opini_n_de_cumplimiento"
-                            });
-                        }
+                        // if(request.acomplishOpinion){
+                        //     data.push({
+                        //         "value": request.acomplishOpinion,
+                        //         "name": "n9_6_opini_n_de_cumplimiento"
+                        //     });
+                        // }
 
                         if(request.facturacion){
                             data.push({

@@ -48,10 +48,10 @@ const getNameProperty = (key) => {
                 'n9_5_2_declaraci_n',
                 'n9_5_3_declaraci_n',
             ];
-        case "acomplishOpinion":
-            return [
-                'n9_6_opini_n_de_cumplimiento'
-            ];
+        // case "acomplishOpinion":
+        //     return [
+        //         'n9_6_opini_n_de_cumplimiento'
+        //     ];
         case "constitutiveAct":
             return [
                 'n9_9_acta_constitutiva'
@@ -187,7 +187,7 @@ const missingFiles = async(user, idDocs) => {
                     }
                 }
                 else{
-                    if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 && docs.acomplishOpinion.length > 0 && docs.others.length > 0){
+                    if(docs.oficialID.length > 0 && docs.rfc.length > 0 && docs.proofAddress.length > 0 && docs.bankStatements.length > 0 && docs.lastDeclarations.length > 0 /*&& docs.acomplishOpinion.length > 0*/ && docs.others.length > 0){
                         statusValue = true;
                     }
                 }
