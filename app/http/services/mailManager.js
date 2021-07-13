@@ -129,11 +129,9 @@ const mailManager = {
     },
     contact: async(request) => {
         let recipients = [
-            // 'mayrarocha@distritopyme.com', 
-            // 'javieruribe@impmx.com', 
-            // 'roayala@distritopyme.com'
-            'jose291@live.com.mx',
-            'wayasmiguel@outlook.com'
+            'luistirador@distritopyme.com', 
+            'contacto@distritopyme.com',
+            'miguelwayas@distritopyme.com'
         ];
 
         let mailOptions = {
