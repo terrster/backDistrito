@@ -92,6 +92,10 @@ const brokerController = {
                         "name": "dealname"
                     },
                     {
+                        "value": "Online",
+                        "name": "canal_de_entrada"
+                    },
+                    {
                         "value": data.name.trim(),
                         "name": "nombre_comercial"
                     },
