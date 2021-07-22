@@ -19,7 +19,7 @@ const realTimeManager = {
         try{
             let data = request.body;
             let user = await User.findOne().sort({ _id: -1 });
-            data.Solicitudes = user.idDistrito;
+            data.Solicitudes = new Intl.NumberFormat().format(user.idDistrito).toString().replace('.', ',');
 
             if(fs.existsSync(hubspotInfoPath)){
                 let hubpostInfo = JSON.parse(fs.readFileSync(hubspotInfoPath));
