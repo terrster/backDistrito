@@ -20,7 +20,7 @@ class SocketService {
     try{
       this.io.on('connection', socket => {
 
-          console.log("New user connected!");
+          // console.log("New user connected!");
 
           if(socket.handshake.query.idU){
             let userExist = this.users.find(user => user.idU == socket.handshake.query.idU);
