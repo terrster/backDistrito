@@ -20,7 +20,7 @@ class SocketService {
     try{
       this.io.on('connection', socket => {
 
-          // console.log("New user connected!");
+          console.log("New user connected!");
 
           if(socket.handshake.query.idU){
             let userExist = this.users.find(user => user.idU == socket.handshake.query.idU);
@@ -51,6 +51,16 @@ class SocketService {
               });
             }
           }
+
+          socket.on('getHubspotInfo', () => {
+            if(require('fs').existsSync(require('path').resolve('config/hubspotInfo.json'))){
+              let data = JSON.parse(require('fs').readFileSync(require('path').resolve('config/hubspotInfo.json')));
+              socket.emit('hubspotInfo', {
+                data,
+                difference: []
+              });
+            }
+          });
       });
 
       console.log(`Socket service initialized successfully`);
