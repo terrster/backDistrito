@@ -65,7 +65,7 @@ const authController = {
             }, { new: true });
 
             let hubpostInfo = JSON.parse(require('fs').readFileSync(require('path').resolve('config/hubspotInfo.json')));
-            hubpostInfo.Solicitudes = user.idDistrito;
+            hubpostInfo.Solicitudes = new Intl.NumberFormat().format(user.idDistrito).toString().replace('.', ',');
 
             if(require('fs').existsSync(require('path').resolve('config/hubspotInfo.json'))){
                 require('fs').writeFileSync(require('path').resolve('config/hubspotInfo.json'), 
@@ -78,7 +78,10 @@ const authController = {
                 );
             }
 
-            global.io.emitToAll("hubspotInfo", hubpostInfo);
+            global.io.emitToAll("hubspotInfo", {
+                hubpostInfo,
+                difference: ['Solicitudes']
+            });
  
             return response.json({ 
                  code: 200, 
