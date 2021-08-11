@@ -7,6 +7,7 @@ const amountSchema = new Schema({
   idClient: { type: Schema.Types.ObjectId, ref: 'Client' },
   howMuch: Number,
   whyNeed: String,
+  whyNeedDetails: String,
   whenNeed: String,
   term: Number,
   yearSales: Number,
