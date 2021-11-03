@@ -6,6 +6,7 @@ var utc = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString(
 const generalInfoSchema = new Schema({
     idClient: { type: Schema.Types.ObjectId, ref: 'Client' },
     civilStatus: String,
+    curp: String,
     rfcPerson: String,
     bankAccount: Number,
     name: String,

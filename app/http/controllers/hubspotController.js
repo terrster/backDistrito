@@ -297,6 +297,12 @@ const deal = {
                                     "value": format.CIVIL_STATUS[request.civilStatus],
                                     "name": "n4_4_estado_civil"
                                 },
+
+                                {
+                                    "value": request.curp,
+                                    "name": "curp"
+                                },
+
                                 {
                                     "value": request.birthDate,
                                     "name": "n4_5_fecha_de_nacimiento"

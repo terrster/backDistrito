@@ -36,6 +36,7 @@ const generalInfoController = {
                 lastname,
                 secondLastname,
                 civilStatus,
+                curp,
                 rfcPerson,
                 bankAccount, //Except PM
                 phone,
@@ -66,6 +67,7 @@ const generalInfoController = {
                     lastname,
                     secondLastname,
                     civilStatus,
+                    curp,
                     rfcPerson,
                     bankAccount, //Except PM
                     phone,
@@ -124,6 +126,7 @@ const generalInfoController = {
                 lastname,
                 secondLastname,
                 civilStatus,
+                curp,
                 rfcPerson,
                 bankAccount, //Except PM
                 phone,
@@ -228,6 +231,7 @@ const generalInfoController = {
                 lastname,
                 secondLastname,
                 civilStatus,
+                curp,
                 rfcPerson,
                 bankAccount, //Except PM
                 phone,
@@ -258,6 +262,7 @@ const generalInfoController = {
                     lastname,
                     secondLastname,
                     civilStatus,
+                    curp,
                     rfcPerson,
                     bankAccount, //Except PM
                     phone,
@@ -316,6 +321,7 @@ const generalInfoController = {
                 lastname,
                 secondLastname,
                 civilStatus,
+                curp,
                 rfcPerson,
                 bankAccount, //Except PM
                 phone,

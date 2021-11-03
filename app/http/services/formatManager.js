@@ -69,7 +69,7 @@ const EMPRESARIAL_CREDIT_CARD = {
     0: "No"
 };
 
-//General info
+//General info, DATOS PERSONALES
 
 const CIVIL_STATUS = {//civilStatus
     SINGLE: "Soltero",   
