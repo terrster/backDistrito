@@ -130,8 +130,7 @@ const mailManager = {
     contact: async(request) => {
         let recipients = [
             'luistirador@distritopyme.com', 
-            'contacto@distritopyme.com',
-            'miguelwayas@distritopyme.com'
+            'contacto@distritopyme.com'
         ];
 
         let mailOptions = {

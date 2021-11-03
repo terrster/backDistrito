@@ -16,7 +16,8 @@ const amountController = {
 
             let { 
                 howMuch, 
-                whyNeed, 
+                whyNeed,
+                whyNeedDetails, 
                 whenNeed, 
                 term, 
                 yearSales,
@@ -26,7 +27,8 @@ const amountController = {
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'amount', { 
                     howMuch, 
-                    whyNeed, 
+                    whyNeed,
+                    whyNeedDetails, 
                     whenNeed, 
                     term, 
                     yearSales,
@@ -51,6 +53,7 @@ const amountController = {
             let amountParams = {
                 howMuch,
                 whyNeed,
+                whyNeedDetails,
                 whenNeed,
                 term,
                 yearSales,
@@ -120,7 +123,8 @@ const amountController = {
         try{
             let { 
                 howMuch, 
-                whyNeed, 
+                whyNeed,
+                whyNeedDetails, 
                 whenNeed, 
                 term, 
                 yearSales,
@@ -131,7 +135,8 @@ const amountController = {
             if(_user){
                 let dealUpdated = await hubspotController.deal.update(_user.hubspotDealId, 'amount', { 
                     howMuch, 
-                    whyNeed, 
+                    whyNeed,
+                    whyNeedDetails, 
                     whenNeed, 
                     term, 
                     yearSales,
@@ -156,6 +161,7 @@ const amountController = {
             let amountParams = {
                 howMuch,
                 whyNeed,
+                whyNeedDetails,
                 whenNeed,
                 term,
                 yearSales,

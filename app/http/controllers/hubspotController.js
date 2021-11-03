@@ -164,10 +164,6 @@ const deal = {
                                     "name": "n2_2_tiempo_para_pago"
                                 },
                                 {
-                                    "value": format.REASON[request.whyNeed],
-                                    "name": "necesidad_de_financiamiento"
-                                },
-                                {
                                     "value": request.whenNeed,
                                     "name": "n2_4_urgencia_de_financiamiento"
                                 },
@@ -178,6 +174,14 @@ const deal = {
                                 {
                                     "value": format.OLD[request.old],
                                     "name": "n2_6_antig_edad_del_negocio"
+                                },
+                                {
+                                    "value": format.REASON[request.whyNeed],
+                                    "name": "necesidad_de_financiamiento"
+                                },
+                                {
+                                    "value": request.whyNeedDetails,
+                                    "name": "n9_1_03_destino_especifico_del_credito"
                                 }
                             ]
                         }

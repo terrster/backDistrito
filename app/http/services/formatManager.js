@@ -38,12 +38,19 @@ const OLD = {//old
 //Comercial info
 
 const GYRE = {//gyre
-    COMERCE: "Comercio",
-    SERVICE: "Servicios",
-    PRODUCTS: "Productos",
-    CONSTRUCTION: "Construcción",
-    PRIMARY: "Sector primario",
-    OTROS: "Otro"
+	RETAILCOMMERCE: "Comercio Minorista",
+	WHOLESALETRADE: "Comercio Mayorista",
+	ELECTRONICCOMMERCE: "Comercio Electrónico",
+	CONSTRUCTION : "Construcción",
+	MANUFACTURE: "Manufactura",
+	PROFESSIONALSERVICES: "Servicios Profesionales, Agencias, Consultoría, Despachos.",
+	RESTAURANT: "Restaurante, Cafetería, Eventos.",
+	MEDICALSERVICES: "Servicios Médicos, Salud, Hospitales, Laboratorios.",
+	EDUCATIONALSERVICES: "Servicios Educativos",
+	TECHONOLOGY: "Tecnología, Software, Servicios Web.",
+	TRANSPORT: "Transporte, Logística, Mensajería.",
+	PRIMARY: "Sector Primario (Agricultura, Ganadería, Pesca, Mineria, etc.)",
+	OTROS : "Otros"
 };
 
 const WARRANTY = {
@@ -109,7 +116,7 @@ const CAR_CREDIT = {//carCredit
 
 const RELATIVE = {//relative
     FAMILY: "Familiar",
-    FRIEND: "Amigo",
+    // FRIEND: "Amigo",
     CLIENT: "Cliente" ,
     PROVIDER: "Proveedor" 
 };

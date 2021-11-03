@@ -51,6 +51,16 @@ class SocketService {
               });
             }
           }
+
+          socket.on('getHubspotInfo', () => {
+            if(require('fs').existsSync(require('path').resolve('config/hubspotInfo.json'))){
+              let data = JSON.parse(require('fs').readFileSync(require('path').resolve('config/hubspotInfo.json')));
+              socket.emit('hubspotInfo', {
+                data,
+                difference: []
+              });
+            }
+          });
       });
 
       console.log(`Socket service initialized successfully`);
