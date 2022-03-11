@@ -47,9 +47,8 @@ const mailManager = {
     reactivate: async(request) => {
 
         let recipients = [
-            'mayrarocha@distritopyme.com', 
-            'luistirador@distritopyme.com', 
-            'roayala@distritopyme.com'
+            'karlahernandez@distritopyme.com', 
+            'luistirador@distritopyme.com'
         ];
 
         let mailOptions = {
