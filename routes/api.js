@@ -17,6 +17,7 @@ const tokenManager = require("../app/http/services/tokenManager");
 //Controllers
 const userController = require("../app/http/controllers/userController");
 const hubspotController = require("../app/http/controllers/hubspotController");
+const ciecController = require("../app/http/controllers/ciecController");
 const clientController = require("../app/http/controllers/clientController");
 const applianceController = require("../app/http/controllers/applianceController");
 const amountController = require("../app/http/controllers/amountController");
@@ -28,6 +29,7 @@ const documentsController = require("../app/http/controllers/documentsController
 const finerioController = require("../app//http/controllers/finerioController");
 const openBankingController = require("../app//http/controllers/openBankingController");
 const kykoyaController = require("../app/http/controllers/kykoyaController");
+
 
 route.use(verifyToken);
 route.use(async(request, response, next) => {
@@ -73,6 +75,11 @@ route.group("/info-comercial", (comercial) => {
     comercial.post('/:id', comercialInfoController.store);
     comercial.get('/:id', comercialInfoController.show);
     comercial.put('/:id', comercialInfoController.update);
+});
+
+route.group("/ciec" , (ciec) => {
+    ciec.put('/:id', ciecController.update);
+    ciec.get('/:id', ciecController.show);
 });
 
 //Info general routes
