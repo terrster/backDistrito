@@ -79,7 +79,7 @@ route.group("/info-comercial", (comercial) => {
 
 route.group("/ciec" , (ciec) => {
     ciec.put('/:id', ciecController.update);
-    ciec.get('/:id', ciecController.show);
+    ciec.get('/:rfc', ciecController.show);
 });
 
 //Info general routes

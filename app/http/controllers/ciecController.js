@@ -3,6 +3,7 @@
 const hubspotController = require("../controllers/hubspotController");
 const ComercialInfo = require("../models/ComercialInfo");
 const User = require("../models/User");
+const GeneralInfo = require("../models/GeneralInfo");
 const Address = require("../models/Address");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
@@ -10,17 +11,18 @@ const Client = require("../models/Client");
 const ciecController = {
 
     show: async(request, response) => {
-		let id = request.params.id;//info comercial
-        let idUser = request.headers.tokenDecoded.data.id;
         try{
-            let comercial = await ComercialInfo.findById(id);
-            let user = await User.findById(idUser);
-
-            if(user){
+            let comercial = await ComercialInfo.findOne({ rfc: {$eq: request.params.rfc} });
+            let generalInfo = await GeneralInfo.findOne({ rfcPerson: {$eq: request.params.rfc} });
+            if(comercial || generalInfo !== null){
+                let client;
+                comercial !== null ? client  = await Client.findOne({ idComercialInfo: {$in: [comercial]} }) 
+                : client = await Client.findOne({ idGeneralInfo: {$in: [generalInfo]} });
                 return response.json({ 
                     code: 200,
-                    user: user,
-                    comercial: comercial 
+                    rfc: comercial,
+                    rfcPerson: generalInfo,
+                    client: client
                 });
             }else{
                 return response.json({
@@ -41,24 +43,21 @@ const ciecController = {
     update: async(request, response) => {
         let id = request.params.id;//id de info comercial
         let ciec = request.body.ciec;
+        let idUser = request.body.idUser;
         let rfc = request.body.rfc;
         let n4_93_ciec = ciec;
         n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
-        let idUser = request.headers.tokenDecoded.data.id;
+        // let idUser = request.headers.tokenDecoded.data.id;
 
         try{
             let comercial = await ComercialInfo.findById(id);
             let user = await User.findById(idUser);
-
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
                     { name: 'n4_93_ciec', value: n4_93_ciec }
                 );
-                let dealUpdated2 = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
-                    { name: 'n3_rfc', value: rfc }
-                );
 
-                let err = dealUpdated.error || dealUpdated2.error;
+                let err = dealUpdated.error;
 
                 if(err){
                     return response.json({
@@ -91,7 +90,7 @@ const ciecController = {
             });
 
         } 
-        catch(error){console.log(error)
+        catch(error){
             return response.json({
                 code: 500,
                 msg: "Algo salió mal tratando de actualizar la información comercial",
