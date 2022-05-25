@@ -17,7 +17,7 @@ const tokenManager = require("../app/http/services/tokenManager");
 //Controllers
 const userController = require("../app/http/controllers/userController");
 const hubspotController = require("../app/http/controllers/hubspotController");
-const ciecController = require("../app/http/controllers/ciecController");
+const ciec = require("../app/http/controllers/ciecController");
 const clientController = require("../app/http/controllers/clientController");
 const applianceController = require("../app/http/controllers/applianceController");
 const amountController = require("../app/http/controllers/amountController");
@@ -29,6 +29,9 @@ const documentsController = require("../app/http/controllers/documentsController
 const finerioController = require("../app//http/controllers/finerioController");
 const openBankingController = require("../app//http/controllers/openBankingController");
 const kykoyaController = require("../app/http/controllers/kykoyaController");
+
+const ciecController = ciec.ciecController;
+const brokerData = ciec.brokerDataController;
 
 
 route.use(verifyToken);
@@ -80,6 +83,10 @@ route.group("/info-comercial", (comercial) => {
 route.group("/ciec" , (ciec) => {
     ciec.put('/:id', ciecController.update);
     ciec.get('/:rfc', ciecController.show);
+});
+route.group("/bdata" , (ciec) => {
+    // ciec.put('/:id', ciecController.update);
+    ciec.get('/:brokercode', brokerData.show);
 });
 
 //Info general routes

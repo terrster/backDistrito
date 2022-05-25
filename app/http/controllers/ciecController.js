@@ -8,6 +8,18 @@ const Address = require("../models/Address");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
 
+const _axios = require("axios").default;
+const axios = _axios.create({
+    baseURL: 'https://api.hubapi.com/',
+    headers: {
+        "Content-Type": "application/json"
+    }
+});
+require('dotenv').config({
+    path: `.env.${process.env.NODE_ENV}`
+});
+const hapiKey = `?hapikey=${process.env.HAPIKEY}`;
+
 const ciecController = {
 
     show: async(request, response) => {
@@ -76,7 +88,6 @@ const ciecController = {
 
             let comercialInfoParams = {
                 ciec,
-                rfc,
             };
 
             await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
@@ -101,4 +112,32 @@ const ciecController = {
 
 }
 
-module.exports = ciecController;
+const brokerDataController = {
+
+    show: async(request, response) => {
+            console.log(request.params);
+            try{
+                console.log(request.params.brokercode);
+                const response = await axios.get('owners/v2/owners/' + request.params.brokercode + hapiKey)
+                let { firstName, lastName, email, } = response.data;
+                return response.json({
+                    code: 200,
+                    broker: {
+                        firstName,
+                        lastName,
+                        email
+                    }
+                });
+            }
+            catch(error){
+                let response = {
+                    code: 403,
+                    msg: "El codígo broker no existe"
+                };
+    
+                return response;
+            }
+    }
+}
+
+module.exports = {ciecController, brokerDataController};
