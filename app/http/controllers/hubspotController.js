@@ -62,6 +62,7 @@ const deal = {
             if(request.brokercode){
                 try{
                     const response = await axios.get('owners/v2/owners/' + request.brokercode + hapiKey);
+        
                     if(response.status == 200){
                         dealParams.properties.push({
                             "value": request.brokercode,
