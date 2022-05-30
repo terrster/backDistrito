@@ -11,8 +11,6 @@ const comercialInfoController = {
 
     store: async(request, response) => {
         let id = request.params.id;//id de user
-        let ciec = request.body.ciec;
-        ciec = Buffer.from(ciec).toString('base64');
         try{
             let user = await User.findById(id);
 
@@ -38,8 +36,13 @@ const comercialInfoController = {
                 facebook,
                 terminal,
                 exportation,
+                ciec,
                 warranty,
             } = request.body;
+
+            if(ciec){
+                ciec = Buffer.from(ciec).toString('base64');
+            }
 
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'comercial', { 
