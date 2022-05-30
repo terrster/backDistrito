@@ -40,10 +40,6 @@ const comercialInfoController = {
                 warranty,
             } = request.body;
 
-            if(ciec){
-                ciec = Buffer.from(ciec).toString('base64');
-            }
-
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'comercial', { 
                     state,//info address 
@@ -172,8 +168,6 @@ const comercialInfoController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de info comercial
-        let ciec = request.body.ciec;
-        ciec = Buffer.from(ciec).toString('base64');
         let idUser = request.headers.tokenDecoded.data.id;
 
         try{
@@ -202,6 +196,7 @@ const comercialInfoController = {
                 facebook,
                 terminal,
                 exportation,
+                ciec,
                 warranty
             } = request.body;
 
