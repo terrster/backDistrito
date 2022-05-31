@@ -28,6 +28,7 @@ const documentsController = require("../app/http/controllers/documentsController
 const finerioController = require("../app//http/controllers/finerioController");
 const openBankingController = require("../app//http/controllers/openBankingController");
 const kykoyaController = require("../app/http/controllers/kykoyaController");
+const ciecController = require("../app/http/controllers/ciecController");
 
 route.use(verifyToken);
 route.use(async(request, response, next) => {
@@ -145,6 +146,12 @@ route.group("/kykoya", (kykoya) => {
     kykoya.get("/bureau-reports", kykoyaController.listBureauReports);
     kykoya.post("/prospector", kykoyaController.createProspector);
     kykoya.get("/prospector/:id", kykoyaController.getProspector);
+});
+
+//ciec
+route.group("/ciec" , (ciec) => {
+    ciec.put('/:id', ciecController.update);
+    ciec.get('/:rfc', ciecController.show);
 });
 
 module.exports = route;
