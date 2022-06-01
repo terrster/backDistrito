@@ -11,8 +11,7 @@ const comercialInfoController = {
 
     store: async(request, response) => {
         let id = request.params.id;//id de user
-        let ciec = request.body.ciec;
-        ciec = Buffer.from(ciec).toString('base64');
+
         try{
             let user = await User.findById(id);
 
@@ -39,6 +38,7 @@ const comercialInfoController = {
                 terminal,
                 exportation,
                 warranty,
+                ciec
             } = request.body;
 
             if(user){
@@ -169,8 +169,6 @@ const comercialInfoController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de info comercial
-        let ciec = request.body.ciec;
-        ciec = Buffer.from(ciec).toString('base64');
         let idUser = request.headers.tokenDecoded.data.id;
 
         try{
@@ -199,6 +197,7 @@ const comercialInfoController = {
                 facebook,
                 terminal,
                 exportation,
+                ciec,
                 warranty
             } = request.body;
 
