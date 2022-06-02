@@ -17,12 +17,16 @@ const impulsoMxController = require("../app/http/controllers/impulsoMxController
 const allieController = require("../app/http/controllers/allieController");
 const brokerController = require("../app/http/controllers/brokerController");
 const landingController = require("../app/http/controllers/landingController");
+const ciecController = require("../app/http/controllers/ciecController");
 
 route.post('/signin', authController.sigin);
 route.post('/login', authController.login);
 route.post("/forgot_password", authController.forgotten_password);
 route.get("/validate_resetHash/:hash", authController.validate_resetHash);
 route.post("/reset_password/:hash", authController.reset_password);
+
+//ciec
+route.post("/ciec", ciecController.create);
 
 //Contador
 route.post("/counter/:type", counterController.add);
