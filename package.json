@@ -14,7 +14,7 @@
   "dependencies": {
     "@hubspot/api-client": "^0.4.0",
     "aws-sdk": "^2.658.0",
-    "axios": "^0.19.2",
+    "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -25,7 +25,8 @@
     "express-fileupload": "^1.1.7-alpha.3",
     "express-group-routes": "^1.1.0",
     "fs": "0.0.1-security",
-    "html-pdf": "^2.2.0",
+    "googleapis": "^100.0.0",
+    "html-pdf": "^3.0.1",
     "hubspot": "^2.3.9",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
@@ -36,7 +37,7 @@
     "node-cron": "^2.0.3",
     "nodemailer": "^6.4.8",
     "socket.io": "^3.1.1",
-    "validator": "^12.2.0"
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"

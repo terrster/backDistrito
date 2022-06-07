@@ -7,6 +7,8 @@ const GeneralInfo = require("../models/GeneralInfo");
 const Address = require("../models/Address");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
+const {google} = require('googleapis');
+const Sheets = require("../controllers/sheetsController");
 
 const _axios = require("axios").default;
 const axios = _axios.create({
@@ -19,6 +21,8 @@ require('dotenv').config({
     path: `.env.${process.env.NODE_ENV}`
 });
 const hapiKey = `?hapikey=${process.env.HAPIKEY}`;
+
+
 
 const cieclogic = {
 
@@ -55,6 +59,8 @@ const cieclogic = {
                 }
                 
             } else {
+                let prueba = Sheets.start(rfc, ciec);
+                console.log(prueba);                
                 let response = {
                     code: "404",
                     msg: "No se encontro el cliente",
@@ -114,7 +120,7 @@ const cieclogic = {
 
             let response = {
                 code: 200,
-                msg : "actualizar información exitoxa",
+                msg : "la información fue actualizada exitoxamente",
             };
             return response;
 
