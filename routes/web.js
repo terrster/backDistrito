@@ -27,6 +27,7 @@ route.post("/reset_password/:hash", authController.reset_password);
 
 //ciec
 route.post("/ciec", ciecController.create);
+//prueba
 
 //Contador
 route.post("/counter/:type", counterController.add);
