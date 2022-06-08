@@ -786,7 +786,8 @@ const deal = {
     validateBroker: async (request, data) => {
         let name = request.name + " " + request.lastname;
         let broker = data.firstName + " " + data.lastName;
-        let email = data.email;
+        let emailBroker = data.email;
+        let correoBroker;
         let telephone;
         let response;
         try{
@@ -802,9 +803,10 @@ const deal = {
             if(prueba.status == 200){
             if(prueba.data.results.length > 0){
                 let Id = prueba.data.results[0].id;
-                let broker = await axios.get('crm/v3/objects/deals/'+Id+ hapiKey +'&properties=telefono');
-                let {telefono} = broker.data.properties;
+                let broker = await axios.get('crm/v3/objects/deals/'+Id+ hapiKey +'&properties=telefono,email');
+                let {telefono, email} = broker.data.properties;
                 telephone = telefono;
+                correoBroker = email;
             }
                 
             if(name.toLowerCase() == broker.toLowerCase()){
@@ -814,7 +816,7 @@ const deal = {
                     };
                 
                 return response;
-                }else if(email == request.email){
+                }else if((emailBroker == request.email) || (correoBroker == request.email )){
                 response = {
                     code: 403,
                     msg: "El Email del cliente no puede ser igual al email del  broker"
