@@ -64,13 +64,21 @@ const deal = {
                     const response = await axios.get('owners/v2/owners/' + request.brokercode + hapiKey);
         
                     if(response.status == 200){
+                        let prueba = await deal.validateBroker(request, response.data);
+                        let res;
+                        if(prueba.code == 403){
+                            res = prueba;
+                            return res;
+                        } else{
                         dealParams.properties.push({
                             "value": request.brokercode,
                             "name": "hubspot_owner_id"
                         });
 
                         const {data} = await axios.post('deals/v1/deal' + hapiKey, dealParams);
-                        return data;
+                        res = data;
+                        return res;
+                        }
                     }
                 }
                 catch(error){
@@ -773,6 +781,67 @@ const deal = {
 
             // console.log(response);
             return response;
+        }
+    },
+    validateBroker: async (request, data) => {
+        let name = request.name + " " + request.lastname;
+        let broker = data.firstName + " " + data.lastName;
+        let email = data.email;
+        let telephone;
+        let response;
+        try{
+            let prueba = await axios.post('crm/v3/objects/deals/search' + hapiKey, {
+                "filters": [
+                    {
+                        "value": request.brokercode,
+                        "propertyName": "numeroderegistro",
+                        "operator":"EQ"
+                        },
+                    ]
+            });
+            if(prueba.status == 200){
+            if(prueba.data.results.length > 0){
+                let Id = prueba.data.results[0].id;
+                let broker = await axios.get('crm/v3/objects/deals/'+Id+ hapiKey +'&properties=telefono');
+                let {telefono} = broker.data.properties;
+                telephone = telefono;
+            }
+                
+            if(name.toLowerCase() == broker.toLowerCase()){
+                response = {
+                    code: 403,
+                    msg: "El Nombre del broker no puede ser igual al nombre del cliente"
+                    };
+                
+                return response;
+                }else if(email == request.email){
+                response = {
+                    code: 403,
+                    msg: "El Email del cliente no puede ser igual al email del  broker"
+                };
+                
+                return response;
+                } else if(telephone == request.phone){
+                    response = {
+                        code: 403,
+                        msg: "El telefono tiene que ser diferente al del broker",}
+                    return response;
+                }else {
+                response = {
+                code: 200,
+                msg: "Todo ok"
+                };
+                }
+                return response;
+            }
+        }catch(error){
+            console.log(error);
+            response = {
+                code: 403,
+                msg: "ERR"
+                };
+            return response;
+            
         }
     }
 
