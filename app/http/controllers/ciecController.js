@@ -59,8 +59,7 @@ const cieclogic = {
                 }
                 
             } else {
-                let prueba = Sheets.start(rfc, ciec);
-                console.log(prueba);                
+                await Sheets.start(rfc, ciec);            
                 let response = {
                     code: "404",
                     msg: "No se encontro el cliente",

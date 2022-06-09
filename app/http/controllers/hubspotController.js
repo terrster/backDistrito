@@ -812,7 +812,7 @@ const deal = {
             if(name.toLowerCase() == broker.toLowerCase()){
                 response = {
                     code: 403,
-                    msg: "El Nombre del broker no puede ser igual al nombre del cliente"
+                    msg: "El nombre del  cliente no debe ser el nombre del broker"
                     };
                 
                 return response;

@@ -43,7 +43,6 @@ authorize: (credentials, callback, rfc, ciec) => {
     if (err) return shhets.getNewToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
     let prueba = callback(oAuth2Client, rfc, ciec);
-    console.log(prueba);
   });
 },
 
@@ -89,26 +88,34 @@ append: async (auth, rfc, ciec) => {
     const sheets = google.sheets({version: 'v4', auth});
     let resource = {};
     let SID;
+    let time = new Date();
+    let date = time.getDate();
+    let month = time.getMonth() + 1;
+    let year = time.getFullYear();
+    let hour = time.getHours();
+    let minute = time.getMinutes();
+    let second = time.getSeconds();
+    let date_time = `${date}/${month}/${year} ${hour}:${minute}:${second}`;
+
     if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'local')){
       resource = {values: [
-        [rfc, n4_93_ciec, 'dev'],
+        [rfc, n4_93_ciec, 'dev', date_time],
       ]
     }
     SID = '1K64BTeT-zCDKQ9pcMrIilcPMGNn8xk7a9ghRg7kMxIo';
   }else {
     resource = {values: [
-      [rfc, n4_93_ciec],
+      [rfc, n4_93_ciec, date_time],
     ]}
     SID = '1GD4cJZAlX5u4wJpLIS0tS9omxZQbnyP0IkfRiJ7gkY8'
   }
 
   let request = {
     spreadsheetId: SID,
-    range: 'A1:C3',
+    range: 'A1:D1',
     valueInputOption: 'USER_ENTERED',
     insertDataOption: 'INSERT_ROWS',
     resource: resource,
-
   };
     
     try {
