@@ -19,6 +19,7 @@ const userSchema = new Schema({
     recoverPassHash: String,
     idDistrito: Number,
     ipV4: String,
+    brokercode: String,
     createdAt: { type: Date, default: utc }
 }, { collection: 'User' });
 

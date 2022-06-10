@@ -103,6 +103,14 @@ const authController = {
         let { email, password } = request.body;
 
         let user = await User.findOne({ email: email.trim() });
+        let Brokertelefono;
+        if(user.brokercode !== undefined){
+            let broker = await hubspotController.deal.broker(user.brokercode);
+            Brokertelefono = broker.telefono;
+        } else{
+            console.log("no existe");
+            Brokertelefono = '';
+        }
 
         if(!user){
             return response.status(200).json({ 
@@ -128,7 +136,8 @@ const authController = {
             return response.json({
                 code: 200,
                 user: user,
-                token: token
+                token: token,
+                Brokertelefono: Brokertelefono,
             });
         } 
         else{

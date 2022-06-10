@@ -845,7 +845,34 @@ const deal = {
             return response;
             
         }
-    }
+    },
+    broker: async (brokercode, data) => {
+        try{
+            let prueba = await axios.post('crm/v3/objects/deals/search' + hapiKey, {
+                "filters": [
+                    {
+                        "value": brokercode,
+                        "propertyName": "numeroderegistro",
+                        "operator":"EQ"
+                        },
+                    ]
+            });
+            if(prueba.status == 200){
+                if(prueba.data.results.length > 0){
+                    let Id = prueba.data.results[0].id;
+                    let broker = await axios.get('crm/v3/objects/deals/'+Id+ hapiKey +'&properties=telefono,email');
+                    let {telefono, email} = broker.data.properties;
+                    return {telefono, email};
+                }
+            } else {
+                return false;
+            }
+
+        } catch(error){
+            console.log(error);
+            return false;
+        }
+    },
 
 };
 
