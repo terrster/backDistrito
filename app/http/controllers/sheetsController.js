@@ -88,24 +88,31 @@ append: async (auth, rfc, ciec) => {
     const sheets = google.sheets({version: 'v4', auth});
     let resource = {};
     let SID;
-    let time = new Date();
-    let date = time.getDate();
-    let month = time.getMonth() + 1;
-    let year = time.getFullYear();
-    let hour = time.getHours();
-    let minute = time.getMinutes();
-    let second = time.getSeconds();
-    let date_time = `${date}/${month}/${year} ${hour}:${minute}:${second}`;
+    let dateUTC = new Date();
+    let date = dateUTC.toLocaleString(
+        'es-MX',
+        {
+            timeZone: 'America/Mexico_City',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            // timeZoneName: 'short'
+        }
+    );
 
     if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'local')){
       resource = {values: [
-        [rfc, n4_93_ciec, 'dev', date_time],
+        [rfc, n4_93_ciec, 'dev', date],
       ]
     }
     SID = '1K64BTeT-zCDKQ9pcMrIilcPMGNn8xk7a9ghRg7kMxIo';
   }else {
     resource = {values: [
-      [rfc, n4_93_ciec, date_time],
+      [rfc, n4_93_ciec, date],
     ]}
     SID = '1GD4cJZAlX5u4wJpLIS0tS9omxZQbnyP0IkfRiJ7gkY8'
   }
