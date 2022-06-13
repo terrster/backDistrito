@@ -8,74 +8,19 @@ const { env } = require('process');
   // The file token.json stores the user's access and refresh tokens, and is
   // created automatically when the authorization flow completes for the first
   // time.
-  let TOKEN_PATH;
-  if((process.env.APP_ENV === 'dev' || process.env.APP_ENV === 'local')){
-     TOKEN_PATH = 'tokenDev.json';
-  } else {
-    TOKEN_PATH = 'token.json';
-  }
+  const TOKEN_PATH = process.env.tokenPath;
+
+  const auth = new google.auth.GoogleAuth({
+    keyFile: TOKEN_PATH,
+    scopes: SCOPES,
+  });
   
   
 
 const shhets = {
   start: (rfc, ciec) => {
-    // Load client secrets from a local file.
-    fs.readFile('credentials.json', (err, content) => {
-      if (err) return console.log('Error loading client secret file:', err);
-      // Authorize a client with credentials, then call the Google Sheets API.
-      shhets.authorize(JSON.parse(content), shhets.append, rfc, ciec);
-    });
+    shhets.append( auth, rfc, ciec);
   },
-
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
-authorize: (credentials, callback, rfc, ciec) => {
-  let {client_secret, client_id, redirect_uris} = credentials.installed;
-  let oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
-
-  // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return shhets.getNewToken(oAuth2Client, callback);
-    oAuth2Client.setCredentials(JSON.parse(token));
-    let prueba = callback(oAuth2Client, rfc, ciec);
-  });
-},
-
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
-getNewToken: (oAuth2Client, callback) => {
-  let authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
-  console.log('Authorize this app by visiting this url:', authUrl);
-  let rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close();
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error(err);
-      oAuth2Client.setCredentials(token);
-      // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) return console.error(err);
-        console.log('Token stored to', TOKEN_PATH);
-      });
-      callback(oAuth2Client);
-    });
-  });
-},
 
 /**
  * Prints the rfc and ciec not found in a sample spreadsheet:
@@ -129,7 +74,7 @@ append: async (auth, rfc, ciec) => {
         await new Promise((resolve, reject) => {
          return sheets.spreadsheets.values.append(request, (err, response) => {
           if (err) {
-            functions.logger.log(`The API returned an error: ${err}`);
+            console.log(`The API returned an error: ${err}`);
             return reject(err);
           }
           return resolve(response.data);

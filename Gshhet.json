@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "pruebas-352214",
+  "private_key_id": "e51f801e9db8cfe5771b4be0df094c1e97d0f46e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCvjDmrV9Vg5XWO\nwRsaiagll6kv2aURqLJXfS9x4zqbhNycyIS4Fpl4bE2zl8vwcRisRoz9aYVgLL2e\nQZ42diupZuepdld/c5+v/WEpIdKd722QNt2oCbfch9QE6v3xNbk/L5r/i1/LIqsf\nuP7Nsba3jnbkZPoGLRDKPGc65VWEjvNmOjwIBkkc+tKng3d3ABnuQYJEO0y4ryx8\nMnNkeAIeW5nFf8D/uClkEd/HgnIjvleRsQbmm76ODzCO0yhd/qoDjyMdQpLrYmmV\nAG7Xo0diAhGkNYESCShrRTPwMn57nyD1tjy2etLs3CbLrMBOxI7ad3NH3GATSyd+\nV3nOYYtFAgMBAAECggEADR4oIAzl8cHrxTFaZmMDeN2qo5v6qQVnYEDHRxYhBsaI\nmsGkI0JzEOvc6Y7uCydUXek+t2AHeq6VM8p4+V5euF+rb38bnjdEZ0kClemEXM9r\nq0NiUGB7iAPxXLW3qKroTxeuWCqwy5PpYCs5hSLiwbgoW7xM76G197rIRv8kow1Q\n4P4igO1s49j3LeC13dEPVcKl/aAkGbMNyWp6w7dYLvr7rX2kWnN4r4fVmRUgwaX+\nGlI3emyqbDQjsX+Q6aC9RHf8L1WfxUROdHEpg3nwvF3DK8l9c/5hY6fW2aNC85C4\nr8c6/P93cSEEf6eHIgUl/AQ0QyJ1mI6n2gU46DsMiQKBgQDbTUaWVHfz6SvwnOha\nsBiJqjSCugJEx/zigX3Gty8oAt/2PzNmdFvQtl8mLHWV6TO9M3De021Q2q78h65K\nYhSM8f26hh+psOItU5CwSMwpoqKQRHWSkN7pQoHAZXWS0KHsxWUA0RjWVmDQRkD9\nhOA70NqiC3ty9+WBWs4V8BOmbQKBgQDM7I6go/67Yl2rLLvSxK/OHZqb6sQzCR0P\nUO5m6B0QggKaQqbZOeMuPqqnrhD1ioVjehU/+E4Mol7Pbpgfl1S4IRfjmeCv6l+h\nfBhbc6xU64glieaGDGShTV6gicczbGGzc0xLDoMKSq+vF0PBjsSiA+r6l9wp6gYi\nuaoXaB1ROQKBgQDHLy/uuLfepSlQuONeA1W2LA7XsaT/3fk1rdGUnKtLFxleatb/\ntq3yKsLPRFBkodRpg4CAEt7WMln/aikGzIDH57/CG7JEiTFVY/Il+2jcZChtCpET\nV1vv14VMP5sDh1WbXUq47DI382qpoTXETlzwV2lNB0rQCJK+48ANMupWHQKBgQCL\nKp+V8ql84kmQhRmtAowOI0arWl0R9793dlPhKQMMAe74igk7freM4VwN8gVsaz05\nGGC0B9IhfGd84bOHyMLtJPRPSmIvtbBqP5dfDAhdx3K3Y5ZdNK9mZ9+6kLbqclFL\niCKo2lsdsyjqdJc8LNPW32hF9Lm88URncsVTjg5S6QKBgQCIGj9tjqeHpQZV4pZb\nl/bh047UVhIPToAMJrv6MZoJNssxeFxB5bfGIe4jSTJCA81+nkBeGYyfrNm0VLh9\n1xPYoRSEa4VL+ETWbo9TP4r9qp25oMPqGBKfXdbTn1F3T0pRxHj8x8IMdPRNTBsg\neycD1T8vmKZXPsO04kVqG7XPQg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "distrito-pyme@pruebas-352214.iam.gserviceaccount.com",
+  "client_id": "105433839903278732333",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/distrito-pyme%40pruebas-352214.iam.gserviceaccount.com"
+}
