@@ -62,7 +62,7 @@ const cieclogic = {
                 await Sheets.start(rfc, ciec);            
                 let response = {
                     code: "404",
-                    msg: "No se encontro el cliente",
+                    msg: "No se encontró el cliente",
                 }
                 return  response;
             }
@@ -119,7 +119,7 @@ const cieclogic = {
 
             let response = {
                 code: 200,
-                msg : "la información fue actualizada exitoxamente",
+                msg : "la información fue actualizada exitosamente",
             };
             return response;
 
@@ -170,7 +170,7 @@ const ciecController = {
             } else {
                 res.status(500).json({
                     code: 500,
-                    msg: "El RFC o CIEC no son validos"
+                    msg: "El RFC o CIEC no son válidos"
                 });
             }
         }
