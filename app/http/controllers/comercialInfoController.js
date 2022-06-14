@@ -64,11 +64,17 @@ const comercialInfoController = {
                     facebook,
                     terminal,
                     exportation,
-                    ciec,
                     warranty
                 });
 
-                if(dealUpdated.error){
+                let n4_93_ciec = ciec;
+                n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
+
+                let CiecUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
+                    { name: 'n4_93_ciec', value: n4_93_ciec }
+                );
+
+                if(dealUpdated.error || CiecUpdated.error){
                     return response.json({
                         code: 500,
                         msg : "Algo salió mal tratando de guardar información | Hubspot: comercial",
@@ -224,11 +230,17 @@ const comercialInfoController = {
                     facebook,
                     terminal,
                     exportation,
-                    ciec,
                     warranty
                 });
 
-                if(dealUpdated.error){
+                let n4_93_ciec = ciec;
+                n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
+
+                let CiecUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
+                    { name: 'n4_93_ciec', value: n4_93_ciec }
+                );
+
+                if(dealUpdated.error || CiecUpdated.error){
                     return response.json({
                         code: 500,
                         msg : "Algo salió mal tratando de actualizar información | Hubspot: comercial",
