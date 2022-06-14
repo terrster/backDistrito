@@ -67,12 +67,16 @@ const comercialInfoController = {
                     warranty
                 });
 
-                let n4_93_ciec = ciec;
-                n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
+                let CiecUpdated;
 
-                let CiecUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
+                if(ciec){
+                    let n4_93_ciec = ciec;
+                    n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
+
+                    CiecUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
                     { name: 'n4_93_ciec', value: n4_93_ciec }
                 );
+                }
 
                 if(dealUpdated.error || CiecUpdated.error){
                     return response.json({
@@ -233,12 +237,16 @@ const comercialInfoController = {
                     warranty
                 });
 
-                let n4_93_ciec = ciec;
-                n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
+                let CiecUpdated;
 
-                let CiecUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
+                if(ciec){
+                    let n4_93_ciec = ciec;
+                    n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
+
+                    CiecUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
                     { name: 'n4_93_ciec', value: n4_93_ciec }
                 );
+                }
 
                 if(dealUpdated.error || CiecUpdated.error){
                     return response.json({
