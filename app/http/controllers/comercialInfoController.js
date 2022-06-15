@@ -78,13 +78,23 @@ const comercialInfoController = {
                 );
                 }
 
-                if(dealUpdated.error || CiecUpdated.error){
-                    return response.json({
-                        code: 500,
-                        msg : "Algo salió mal tratando de guardar información | Hubspot: comercial",
-                        error: dealUpdated.error
-                    });
-                }
+                if(CiecUpdated !== undefined){
+                    if(dealUpdated.error || CiecUpdated.error){
+                        return response.json({
+                            code: 500,
+                            msg : "Algo salió mal tratando de actualizar información | Hubspot: comercial",
+                            error: dealUpdated.error
+                        });
+                    }
+                } else {
+                    if(dealUpdated.error){
+                        return response.json({
+                            code: 500,
+                            msg : "Algo salió mal tratando de actualizar información | Hubspot: comercial",
+                            error: dealUpdated.error
+                        });
+                    }
+                } 
              }
              else{
                  return response.json({
@@ -248,13 +258,23 @@ const comercialInfoController = {
                 );
                 }
 
-                if(dealUpdated.error || CiecUpdated.error){
-                    return response.json({
-                        code: 500,
-                        msg : "Algo salió mal tratando de actualizar información | Hubspot: comercial",
-                        error: dealUpdated.error
-                    });
-                }
+                if(CiecUpdated !== undefined){
+                    if(dealUpdated.error || CiecUpdated.error){
+                        return response.json({
+                            code: 500,
+                            msg : "Algo salió mal tratando de actualizar información | Hubspot: comercial",
+                            error: dealUpdated.error
+                        });
+                    }
+                } else {
+                    if(dealUpdated.error){
+                        return response.json({
+                            code: 500,
+                            msg : "Algo salió mal tratando de actualizar información | Hubspot: comercial",
+                            error: dealUpdated.error
+                        });
+                    }
+                } 
             }
             else{
                 return response.json({

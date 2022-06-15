@@ -108,7 +108,7 @@ const authController = {
             let broker = await hubspotController.deal.broker(user.brokercode);
             Brokertelefono = broker.telefono;
         } else{
-            console.log("no existe");
+            // console.log("no existe");
             Brokertelefono = '';
         }
 
