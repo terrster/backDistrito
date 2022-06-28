@@ -103,22 +103,12 @@ const authController = {
         let { email, password } = request.body;
 
         let user = await User.findOne({ email: email.trim() });
-        let Brokertelefono;
-        if(user.brokercode !== undefined){
-            let broker = await hubspotController.deal.broker(user.brokercode);
-            Brokertelefono = broker.telefono;
-        } else{
-            // console.log("no existe");
-            Brokertelefono = '';
-        }
-
         if(!user){
             return response.status(200).json({ 
                 code: 500,
                 msg: "Correo electrónico incorrecto" 
             });
         }
-
         let validPassword = await user.validatePassword(password);
 
         if(!validPassword) {
@@ -129,6 +119,14 @@ const authController = {
         }
 
         if(user && validPassword){
+            let Brokertelefono;
+            if(user.brokercode !== undefined){
+                let broker = await hubspotController.deal.broker(user.brokercode);
+                Brokertelefono = broker.telefono;
+            } else{
+                // console.log("no existe");
+                Brokertelefono = '';
+            }
             let payload = {
                 id : user._id
             };
