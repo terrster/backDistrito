@@ -68,7 +68,12 @@ const brokerController = {
     store: async(request, response) => {
         try{
             let data = request.body;
-
+            let canal;
+            if(data.canal){
+                canal = data.canal;
+            } else {
+                canal = "Online";
+            }
             let exist = await getContactByEmail(data.email);
 
             if(exist){
@@ -92,7 +97,7 @@ const brokerController = {
                         "name": "dealname"
                     },
                     {
-                        "value": "Online",
+                        "value": canal,
                         "name": "canal_de_entrada"
                     },
                     {
