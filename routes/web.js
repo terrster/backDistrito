@@ -21,6 +21,7 @@ const ciecController = require("../app/http/controllers/ciecController");
 
 route.post('/signin', authController.sigin);
 route.post('/login', authController.login);
+route.post('/delete', authController.eliminate_user);
 route.post("/forgot_password", authController.forgotten_password);
 route.get("/validate_resetHash/:hash", authController.validate_resetHash);
 route.post("/reset_password/:hash", authController.reset_password);

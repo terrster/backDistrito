@@ -157,8 +157,9 @@ const authController = {
 
         try{
             let userNormal = await User.findOne({ email: email.trim() }, {}, { autopopulate: false });
+            // console.log(userNormal);
             let userMin = await User.findOne({ email: email.toLowerCase().trim() }, {}, { autopopulate: false });
-
+            // console.log(userMin, 'userMin');
             if(!userNormal && !userMin){
                 return response.status(200).json({ 
                     code: 500,
@@ -178,6 +179,8 @@ const authController = {
                 hash: hash
             });
 
+            // console.log(emailSent);
+
             if(emailSent.code == 200){
                 await User.findByIdAndUpdate(user._id, { recoverPassHash: hash }, { autopopulate: false });
 
@@ -188,6 +191,7 @@ const authController = {
             }
         }
         catch(error){
+            // console.log(error);
             return response.json({
                 code: 500,
                 msg: "Ha ocurrido un error al crear el hash de recuperación de contraseña"
@@ -283,6 +287,46 @@ const authController = {
                 code: 500,
                 msg: "Ha ocurrido un error al cambiar la contraseña"
             });
+        }  
+    },  
+    eliminate_user: async(request, response) => {
+        let { email, token } = request.body;
+
+        
+        if( token !== 't8StB9D6mnUz9M3' ){
+            return response.status(200).json({
+                code: 500,
+                msg: "token no proveído"
+            });
+        }
+
+        try{
+            let _user = await User.findOne({ email: email });
+            let contact = _user.hubspotContactId
+            let deal = _user.hubspotDealI
+            let user = await User.findOneAndDelete({email: email.trim()}, { autopopulate: false });
+            await hubspotController.contact.delete(contact);
+            await hubspotController.deal.delete(deal);
+            
+            if(!user){
+                return response.status(200).json({ 
+                    code: 500,
+                    msg: "El usuario no existe" 
+                });
+            }
+
+            return response.json({
+                code: 200,
+                msg: "Usuario eliminado exitosamente"
+            });
+        }
+        catch(error){
+            console.log(error)
+            return response.json({
+                code: 500,
+                msg: "Ha ocurrido un error al eliminar el usuario"
+            });
+            
         }  
     }
 

@@ -136,6 +136,23 @@ const deal = {
             return response;
         }
     },
+    delete: async(request, response) => {
+        let id = request;
+
+        try{
+            const {data} = await axios.delete('deals/v1/deal/' + id + hapiKey);
+            
+            return data;
+        }
+        catch(error){
+            let response = {
+                msg: "Hubspot: Algo salió mal tratando de eliminar un deal",
+                error: error
+            };
+
+            return response;
+        }
+    },
     update: async(hubspotDealId, stage, request) => {
         try{
             let dealParams = getParams(stage);
