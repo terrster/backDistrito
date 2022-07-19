@@ -70,9 +70,22 @@ const brokerController = {
             let data = request.body;
             let canal;
             if(data.canal){
-                canal = data.canal;
+                switch(data.canal){
+                    case 'pyme-brokers-campaña':
+                        canal = 'campañabrokersdp';
+                        break;
+                    case 'pyme-brokers':
+                        canal = 'onlinepyme';
+                        break;
+                    case 'Campaña Julio 2022':
+                        canal = 'campañabrokersdc';
+                        break;
+                    default:
+                        canal = 'onlinecasa';
+                        break;
+                }
             } else {
-                canal = "Online";
+                canal = "onlinecasa";
             }
             let exist = await getContactByEmail(data.email);
 
