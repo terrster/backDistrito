@@ -785,6 +785,65 @@ const deal = {
                                 }
                             ]
                         }
+                    case 'buro' : //buro
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.score,
+                                    "name": "score_bc"
+                                },
+                                {
+                                    "value": request.idConsulta,
+                                    "name": "n10_1_id_unykoo"
+                                },
+                                {
+                                    "value": request.status,
+                                    "name": "estatus_workflow_unykoo"
+                                }
+                            ]
+                        }
+                        case 'generalBuro'://información general
+                        return {
+                            "properties": [
+                                {
+                                    "value": request.name,
+                                    "name": "n4_1_nombre"
+                                },
+                                {
+                                    "value": request.lastname,
+                                    "name": "n4_2_apellido_paterno"
+                                },
+                                {
+                                    "value": request.secondLastname,
+                                    "name": "n4_3_apellido_materno"
+                                },
+
+                                {
+                                    "value": request.curp,
+                                    "name": "curp"
+                                },
+                                {
+                                    "value": request.rfcPerson,
+                                    "name": "n3_15_rfc_pm"
+                                },
+                                {
+                                    "value": format.YES_NO_QUESTION[request.mortgageCredit],
+                                    "name": "n6_1_cr_dito_hipotecario"
+                                },
+                                {
+                                    "value": format.CAR_CREDIT[request.carCredit],
+                                    "name": "n6_2_cr_dito_automotriz"
+                                },
+                                {
+                                    "value": format.YES_NO_QUESTION[request.creditCard],
+                                    "name": "n6_3_tarjeta_de_cr_dito"
+                                },
+                                {
+                                    "value": request.last4 ? request.last4 : '',
+                                    "name": "n6_4_tdc_4_d_gitos"
+                                },
+                            ]
+                        }
                 }
             }
             const {data} = await axios.put('deals/v1/deal/' + hubspotDealId + hapiKey, dealParams);

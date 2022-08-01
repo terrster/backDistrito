@@ -19,6 +19,7 @@ const userController = require("../app/http/controllers/userController");
 const hubspotController = require("../app/http/controllers/hubspotController");
 const clientController = require("../app/http/controllers/clientController");
 const applianceController = require("../app/http/controllers/applianceController");
+const buroController = require("../app/http/controllers/buroController");
 const amountController = require("../app/http/controllers/amountController");
 const comercialInfoController = require("../app/http/controllers/comercialInfoController");
 const generalInfoController = require("../app/http/controllers/generalInfoController");
@@ -100,6 +101,11 @@ route.group("/documents", (documents) => {
     documents.put('/:id', documentsController.update);
     documents.delete('/:id', documentsController.delete);
 });
+
+//Consulta de buro
+route.group("/buro", (buro) => {
+    buro.post('/:id', buroController.inicio);
+  });
 
 //Finerio routes
 route.group("/finerio", (finerio) => {
