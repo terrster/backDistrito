@@ -431,6 +431,14 @@ const buroController = {
               user: userUpdate,
             });
 
+      } else if (errorCode !== 500) {
+        console.log(errorCode, "error de worfloo")
+        return res.status(400).json({
+          success: false,
+          message: "Error en el server",
+          user: user,
+          error: errorCode,
+        });
       }
 
       console.log(error, "Error interno no controlado");
