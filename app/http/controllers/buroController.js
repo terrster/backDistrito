@@ -5,6 +5,7 @@ const GeneralInfo = require("../models/GeneralInfo");
 const hubspotController = require("../controllers/hubspotController");
 const axios = require("axios");
 const Client = require("../models/Client");
+const { response } = require("express");
 require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 });
@@ -57,7 +58,8 @@ const buroController = {
       if (update) {
         try {
           let generalKey = user.idClient.idComercialInfo;
-          let generalInfo = await GeneralInfo.findByIdAndUpdate(generalKey, {
+
+          await GeneralInfo.findByIdAndUpdate(generalKey, {
             name: name,
             lastname: lastname,
             secondLastname: secondLastname,
@@ -67,6 +69,8 @@ const buroController = {
             last4: last4,
             rfcPerson: rfcPerson,
           });
+          let generalInfo = await GeneralInfo.findById(generalKey);
+
           /*descomentar solo para pruebas*/
           // let userUpdatePrueba = await User.findById(req.params.id);
           let dealUpdated = await hubspotController.deal.update(
@@ -354,85 +358,40 @@ const buroController = {
       }
     } catch (error) {
 
-      let errorCode = error.response ? error.response : false;
-      switch (errorCode.data) {
-        case undefined:
-          console.log(error, "Error interno");
-          return res.status(500).json({
-            success: false,
-            message: "Error interno",
-            user: user,
-          });
-        case errorCode.data !== undefined:
-          if (errorCode.data.errorCode === 8) {
-            let paramsHub = {
-              score: "",
-              status: "ERROR_AUTENTICACION",
-              idConsulta: error.response.data.data.idUnykoo,
-            };
+      let response = "response" in error ? error.response : 500;
+      if (response === 500) {
+        console.log(error);
+        return res.status(500).json({
+          success: false,
+          message: "Error en el servidor",
+          user: user,
+          error: error,
+        });
+      }
+      let code = "data" in response ? error.response.data : 500;
+      if (code === 500) {
+        console.log(error);
+        return res.status(500).json({
+          success: false,
+          message: "Error en el server",
+          user: user,
+          error: response,
+        });
+      }
+      let errorCode = "errorCode" in code ? code.errorCode : 500;
 
-            let buroHub = await hubspotController.deal.update(
-              hubspotDealId,
-              "buro",
-              paramsHub
-            );
-
-            const clienteError = await Client.findById(user.idClient._id);
-            const { score } = clienteError;
-            let scoreError = "";
-
-            switch (score) {
-              case null || undefined:
-                scoreError = "ERROR";
-                break;
-              case "":
-                scoreError = "ERROR";
-                break;
-              case "ERROR":
-                scoreError = "ERROR 1";
-                break;
-              case "ERROR 1":
-                scoreError = "ERROR 2";
-                break;
-              case "ERROR 2":
-                scoreError = "ERROR 3";
-                break;
-              case "ERROR 3":
-                scoreError = "ERROR 3";
-                break;
-              default:
-                scoreError = score;
-                break;
-            }
-
-            await Client.findByIdAndUpdate(user.idClient._id, {
-              score: scoreError,
-            });
-
-            let userUpdate = await User.findById(req.params.id);
-
-            return res.status(400).json({
-              success: false,
-              message: "Error Autenticación",
-              user: userUpdate,
-            });
-          }
-          break;
-        default:
-          if (errorCode.data.errorCode === 8) {
-            let paramsHub = {
-              score: "",
-              status: "ERROR_AUTENTICACION",
-              idConsulta: error.response.data.data.idUnykoo,
-            };
-
-            let buroHub = await hubspotController.deal.update(
-              hubspotDealId,
-              "buro",
-              paramsHub
-            );
-
-            const clienteError = await Client.findById(user.idClient._id);
+      if (errorCode === 8){
+        let paramsHub = {
+          score: "",
+          status: "ERROR_AUTENTICACION",
+          idConsulta: error.response.data.data.idUnykoo,
+        };
+        let buroHub = await hubspotController.deal.update(
+          hubspotDealId,
+          "buro",
+          paramsHub
+        );
+        const clienteError = await Client.findById(user.idClient._id);
             const { score } = clienteError;
             let scoreError = "";
             let statusCode = 400;
@@ -460,7 +419,6 @@ const buroController = {
                 scoreError = score;
                 break;
             }
-
             await Client.findByIdAndUpdate(user.idClient._id, {
               score: scoreError,
             });
@@ -472,10 +430,10 @@ const buroController = {
               message: "Error Autenticación",
               user: userUpdate,
             });
-          }
-          break;
+
       }
-      console.log(error, "Error no tomado en cuenta");
+
+      console.log(error, "Error interno no controlado");
       return res.status(500).json({
         code: 500,
         msg: "Error al Iniciar el workflow",
