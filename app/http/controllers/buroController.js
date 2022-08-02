@@ -20,6 +20,7 @@ const headers = {
 
 const buroController = {
   async inicio(req, res) {
+
     const data = JSON.stringify({
       login: "PROSPECTOR",
       workflowName: "DP",
@@ -47,7 +48,7 @@ const buroController = {
         rfcPerson,
         update,
       } = req.body;
-
+      
       let rfc = "";
       let comercialRFC = "";
       let razonSocial = "";
@@ -57,7 +58,7 @@ const buroController = {
 
       if (update) {
         try {
-          let generalKey = user.idClient.idComercialInfo;
+          let generalKey = user.idClient.idGeneralInfo;
 
           await GeneralInfo.findByIdAndUpdate(generalKey, {
             name: name,
@@ -70,6 +71,7 @@ const buroController = {
             rfcPerson: rfcPerson,
           });
           let generalInfo = await GeneralInfo.findById(generalKey);
+
 
           /*descomentar solo para pruebas*/
           // let userUpdatePrueba = await User.findById(req.params.id);
@@ -95,7 +97,7 @@ const buroController = {
             });
           }
           // documentar para usar en local
-          // return res.status(200).json({
+          // return res.status(400).json({
           //   success: true,
           //   message: "prueba",
           //   buro: {
@@ -130,7 +132,10 @@ const buroController = {
       } else {
         rfc = comercial.rfc;
       }
-      //descomentar para pruebas en local
+
+      const { street, zipCode } = address;
+
+            //descomentar para pruebas en local
       // if (process.env.NODE_ENV !== "production") {
       //   return res.status(400).json({
       //     success: true,
@@ -143,8 +148,6 @@ const buroController = {
       //     user: user,
       //   });
       // }
-
-      const { street, zipCode } = address;
       const response = await axios(configLogin);
 
       const { data } = response;
@@ -162,7 +165,7 @@ const buroController = {
             formName: nextComponentName,
             data: {
               7: "0002",
-              8: person,
+              8: "PF",
               9: "10000000",
               10: "3 años",
               11: "40",
@@ -437,7 +440,7 @@ const buroController = {
           success: false,
           message: "Error en el server",
           user: user,
-          error: errorCode,
+          error: code,
         });
       }
 
