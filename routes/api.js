@@ -29,11 +29,19 @@ const documentsController = require("../app/http/controllers/documentsController
 const finerioController = require("../app//http/controllers/finerioController");
 const openBankingController = require("../app//http/controllers/openBankingController");
 const kykoyaController = require("../app/http/controllers/kykoyaController");
+const rateLimit = require("express-rate-limit");
 
 route.use(verifyToken);
 route.use(async(request, response, next) => {
     request.headers.tokenDecoded = await tokenManager.decode(request.headers.token);
     next();
+});
+
+const limit = rateLimit({
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    max: 3, // limit each IP to 100 requests per windowMs
+    message: "Too many accounts created from this IP, please try again after an hour",
+    keyGenerator: (req) => req.params.id
 });
 
 
@@ -104,7 +112,8 @@ route.group("/documents", (documents) => {
 
 //Consulta de buro
 route.group("/buro", (buro) => {
-    buro.post('/:id', buroController.inicio);
+    buro.post('/:id', [limit], buroController.inicio);
+    buro.post('/limit/:id', [limit], buroController.limit);
   });
 
 //Finerio routes

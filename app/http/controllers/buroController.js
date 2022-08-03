@@ -6,17 +6,21 @@ const hubspotController = require("../controllers/hubspotController");
 const axios = require("axios");
 const Client = require("../models/Client");
 const { response } = require("express");
+const rateLimit = require("express-rate-limit");
 require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 });
 const HAPIKEY_UNYKOO = process.env.HAPIKEY_UNYKOO;
 const UNYKOO_URL = process.env.UNYKOO_URL;
 
+
 const headers = {
   "Content-Type": "application/json",
   api_key: HAPIKEY_UNYKOO,
   company_code: "P2VXMnh",
 };
+
+
 
 const buroController = {
   async inicio(req, res) {
@@ -136,18 +140,18 @@ const buroController = {
       const { street, zipCode } = address;
 
             //descomentar para pruebas en local
-      // if (process.env.NODE_ENV !== "production") {
-      //   return res.status(400).json({
-      //     success: true,
-      //     message: "prueba",
-      //     buro: {
-      //       nombreScore: "Prueba",
-      //       valorScore: 600,
-      //       status: "SUCCESS",
-      //     },
-      //     user: user,
-      //   });
-      // }
+      if (process.env.NODE_ENV === "localhost") {
+        return res.status(400).json({
+          success: true,
+          message: "prueba",
+          buro: {
+            nombreScore: "Prueba",
+            valorScore: 450,
+            status: "SUCCESS",
+          },
+          user: user,
+        });
+      }
       const response = await axios(configLogin);
 
       const { data } = response;
@@ -453,6 +457,20 @@ const buroController = {
       });
     }
   },
-  async cuentaBuro(req, res) {},
+  async limit(req, res) {
+    let limit  = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 3, // limit each IP to 100 requests per windowMs
+      message: "Too many accounts created from this IP, please try again after an hour",
+    });
+    return limit(req, res, () => {
+      return res.status(200).json({
+        success: true,
+        message: "Limit",
+      });
+    }
+    );
+
+  },
 };
 module.exports = buroController;

@@ -7,3 +7,4 @@ environment.env
 counter.json
 test.js
 hubspotInfo.json
+package-lock.json
