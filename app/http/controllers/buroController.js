@@ -124,9 +124,9 @@ const buroController = {
         user.idClient.idComercialInfo
       );
 
-      person = user.idClient.type === "PM" ? "PM" : "PF";
+      person = user.idClient.type === "PM" ? "P.Moral" : user.idClient.type === "PF" ? "PF" : "PFAE";
 
-      if (person === "PM") {
+      if (person === "P.Moral") {
         rfc = rfcPerson;
         comercialRFC = comercial.rfc;
         razonSocial = comercial.businessName;
@@ -140,18 +140,18 @@ const buroController = {
       const { street, zipCode } = address;
 
             //descomentar para pruebas en local
-      if (process.env.NODE_ENV === "localhost") {
-        return res.status(400).json({
-          success: true,
-          message: "prueba",
-          buro: {
-            nombreScore: "Prueba",
-            valorScore: 450,
-            status: "SUCCESS",
-          },
-          user: user,
-        });
-      }
+      // if (process.env.NODE_ENV === "localhost") {
+      //   return res.status(429).json({
+      //     success: true,
+      //     message: "prueba",
+      //     buro: {
+      //       nombreScore: "Prueba",
+      //       valorScore: 450,
+      //       status: "SUCCESS",
+      //     },
+      //     user: user,
+      //   });
+      // }
       const response = await axios(configLogin);
 
       const { data } = response;
@@ -162,14 +162,14 @@ const buroController = {
         let { idUnykoo, nextComponentName } = data.data;
         let params = null;
 
-        if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV !== "localhost") {
           params = JSON.stringify({
             login: "PROSPECTOR",
             idUnykoo: idUnykoo,
             formName: nextComponentName,
             data: {
               7: "0002",
-              8: "PF",
+              8: person,
               9: "10000000",
               10: "3 años",
               11: "40",
@@ -233,13 +233,14 @@ const buroController = {
 
           let datos = null;
 
-          let tarjeta = creditCard ? "V" : "F";
-          let hipotecario = mortgageCredit ? "V" : "F";
+          let tarjeta = creditCard === true ? "V" : "F";
+          let hipotecario = mortgageCredit === true ? "V" : "F";
           let carro = carCredit === "YES" ? "V" : "F";
+          let last4N = last4 !== null ? last4 : "";
 
           let idForm = resForm.data.data.idUnykoo;
 
-          if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "development") {
+          if (process.env.NODE_ENV !== "localhost") {
             datos = JSON.stringify({
               login: "PROSPECTOR",
               idUnykoo: idForm,
@@ -259,7 +260,7 @@ const buroController = {
                 269: carro,
                 271: hipotecario,
                 273: tarjeta,
-                276: last4,
+                276: last4N,
                 tipo_autenticacion: "AUTENTICACION",
               },
             });
@@ -440,6 +441,7 @@ const buroController = {
 
       } else if (errorCode !== 500) {
         console.log(errorCode, "error de worfloo")
+        console.log(code);
         return res.status(400).json({
           success: false,
           message: "Error en el server",
