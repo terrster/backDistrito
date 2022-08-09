@@ -113,7 +113,7 @@ route.group("/documents", (documents) => {
 //Consulta de buro
 route.group("/buro", (buro) => {
     buro.post('/:id', [limit], buroController.inicio);
-    buro.post('/limit/:id', [limit], buroController.limit);
+    buro.post('/update/:id', buroController.update);
   });
 
 //Finerio routes

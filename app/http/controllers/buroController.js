@@ -140,18 +140,18 @@ const buroController = {
       const { street, zipCode } = address;
 
             //descomentar para pruebas en local
-      // if (process.env.NODE_ENV === "localhost") {
-      //   return res.status(429).json({
-      //     success: true,
-      //     message: "prueba",
-      //     buro: {
-      //       nombreScore: "Prueba",
-      //       valorScore: 450,
-      //       status: "SUCCESS",
-      //     },
-      //     user: user,
-      //   });
-      // }
+      if (process.env.NODE_ENV === "localhost") {
+        return res.status(200).json({
+          success: true,
+          message: "prueba",
+          buro: {
+            nombreScore: "Prueba",
+            valorScore: 450,
+            status: "SUCCESS",
+          },
+          user: user,
+        });
+      }
       const response = await axios(configLogin);
 
       const { data } = response;
@@ -459,19 +459,42 @@ const buroController = {
       });
     }
   },
-  async limit(req, res) {
-    let limit  = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 3, // limit each IP to 100 requests per windowMs
-      message: "Too many accounts created from this IP, please try again after an hour",
-    });
-    return limit(req, res, () => {
-      return res.status(200).json({
-        success: true,
-        message: "Limit",
+  async update(req, res) {
+    let id = req.params.id;
+    let user = await User.findById(id); //busca el usuario por id
+    let hubspotDealId = user.hubspotDealId;
+    try {
+      let params = {
+        value: "Inmobiliaria",
+        name: "n3_14_garant_a"
+      }
+      let update = await hubspotController.deal.update(hubspotDealId, "single_field", params);
+      if (update) {
+        await ComercialInfo.findByIdAndUpdate(user.idClient.idComercialInfo, {
+          warranty : 1 
+        })
+        let userUpdate = await User.findById(req.params.id);
+        return res.status(200).json({
+          success: true,
+          message: "Se actualizo correctamente",
+          user: userUpdate,
+        });
+      } else {
+        return res.status(500).json({
+          success: false,
+          message: "Error al actualizar",
+          user: user,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Error al actualizar",
+        user: user,
+        error: error,
       });
     }
-    );
 
   },
 };
