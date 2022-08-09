@@ -141,7 +141,7 @@ const buroController = {
 
             //descomentar para pruebas en local
       if (process.env.NODE_ENV === "localhost") {
-        return res.status(200).json({
+        return res.status(400).json({
           success: true,
           message: "prueba",
           buro: {
@@ -232,6 +232,8 @@ const buroController = {
           //Si el formulario se envio correctamente
 
           let datos = null;
+          creditCard === true ? (creditCard = true) : crecreditCard === "1" ? (creditCard = true) : (creditCard = false);
+          mortgageCredit === true ? (mortgageCredit = true) : mortgageCredit === "1" ? (mortgageCredit = true) : (mortgageCredit = false);
 
           let tarjeta = creditCard === true ? "V" : "F";
           let hipotecario = mortgageCredit === true ? "V" : "F";
