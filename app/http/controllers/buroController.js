@@ -233,10 +233,10 @@ const buroController = {
           //Si el formulario se envio correctamente
           
           let datos = null;
-          
+
           let tarjeta = "";
           let hipotecario = "";
-          creditCard === true ? (tarjeta = "V") : crecreditCard === "1" ? (tarjeta = "V") : (tarjeta = "F");
+          creditCard === true ? (tarjeta = "V") : creditCard === "1" ? (tarjeta = "V") : (tarjeta = "F");
           mortgageCredit === true ? (hipotecario = "V") : mortgageCredit === "1" ? (hipotecario = "V") : (hipotecario = "F");
 
           
