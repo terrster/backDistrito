@@ -50,10 +50,11 @@ const buroController = {
         mortgageCredit,
         last4,
         rfcPerson,
+        rfc,
         update,
       } = req.body;
       
-      let rfc = "";
+      let rfcConsulta = "";
       let comercialRFC = "";
       let razonSocial = "";
       let calleComercial = "";
@@ -79,15 +80,12 @@ const buroController = {
               rfc: rfc,
             });
             await hubspotController.deal.update(user.hubspotDealId, "single_field",{
-              vale: rfc,
+              value: rfc,
               name: "n3_rfc"
             });
           }
           let generalInfo = await GeneralInfo.findById(generalKey);
-
-
-          /*descomentar solo para pruebas*/
-          // let userUpdatePrueba = await User.findById(req.params.id);
+          
           let dealUpdated = await hubspotController.deal.update(
             user.hubspotDealId,
             "generalBuro",
@@ -110,7 +108,9 @@ const buroController = {
               user: user,
             });
           }
+
           /*descomentar solo para pruebas*/
+          // let userUpdatePrueba = await User.findById(req.params.id);
           // return res.status(400).json({
           //   success: true,
           //   message: "prueba",
@@ -118,6 +118,8 @@ const buroController = {
           //     nombreScore: "Prueba",
           //     valorScore: 425,
           //     status: "SUCCESS",
+          //     rfc: rfc,
+          //     rfcPerson: rfcPerson
           //   },
           //   user: userUpdatePrueba,
           // });
@@ -137,19 +139,19 @@ const buroController = {
       person = user.idClient.type === "PM" ? "P.Moral" : user.idClient.type === "PF" ? "PF" : "PFAE";
 
       if (person === "P.Moral") {
-        rfc = rfcPerson;
+        rfcConsulta = rfcPerson;
         comercialRFC = comercial.rfc;
         razonSocial = comercial.businessName;
         calleComercial =
           comercial.address.street + " " + comercial.address.extNumber;
         zipCodeComercial = comercial.address.zipCode;
       } else {
-        rfc = comercial.rfc;
+        rfcConsulta = comercial.rfc;
       }
 
       const { street, zipCode } = address;
 
-            //descomentar para pruebas en local
+            //para pruebas en local
       if (process.env.NODE_ENV === "localhost") {
         return res.status(400).json({
           success: true,
@@ -187,7 +189,7 @@ const buroController = {
               14: name,
               15: lastname,
               16: secondLastname,
-              17: rfc,
+              17: rfcConsulta,
               18: street,
               19: "50000",
               20: "48",
@@ -260,7 +262,7 @@ const buroController = {
               idUnykoo: idForm,
               profileName: "Prospector",
               data: {
-                6: rfc,
+                6: rfcConsulta,
                 22: "107",
                 27: "I",
                 28: "CL",
