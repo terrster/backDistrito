@@ -74,6 +74,15 @@ const buroController = {
             last4: last4,
             rfcPerson: rfcPerson,
           });
+          if (rfc) {
+            await ComercialInfo.findByIdAndUpdate(user.idClient.idComercialInfo, {
+              rfc: rfc,
+            });
+            await hubspotController.deal.update(user.hubspotDealId, "single_field",{
+              vale: rfc,
+              name: "n3_rfc"
+            });
+          }
           let generalInfo = await GeneralInfo.findById(generalKey);
 
 
