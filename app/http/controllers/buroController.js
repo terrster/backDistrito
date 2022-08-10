@@ -453,6 +453,7 @@ const buroController = {
               success: false,
               message: "Error Autenticación",
               user: userUpdate,
+              error: error,
             });
 
       } else if (errorCode !== 500) {
