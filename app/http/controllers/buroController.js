@@ -93,6 +93,7 @@ const buroController = {
               last4,
             }
           );
+          
           if (dealUpdated.error) {
             return res.status(400).json({
               success: false,
@@ -100,7 +101,7 @@ const buroController = {
               user: user,
             });
           }
-          // documentar para usar en local
+          /*descomentar solo para pruebas*/
           // return res.status(400).json({
           //   success: true,
           //   message: "prueba",
@@ -230,13 +231,15 @@ const buroController = {
         const resForm = await axios(configForm);
         if (resForm.data.success === true) {
           //Si el formulario se envio correctamente
-
+          
           let datos = null;
-          creditCard === true ? (creditCard = true) : crecreditCard === "1" ? (creditCard = true) : (creditCard = false);
-          mortgageCredit === true ? (mortgageCredit = true) : mortgageCredit === "1" ? (mortgageCredit = true) : (mortgageCredit = false);
+          
+          let tarjeta = "";
+          let hipotecario = "";
+          creditCard === true ? (tarjeta = "V") : crecreditCard === "1" ? (tarjeta = "V") : (tarjeta = "F");
+          mortgageCredit === true ? (hipotecario = "V") : mortgageCredit === "1" ? (hipotecario = "V") : (hipotecario = "F");
 
-          let tarjeta = creditCard === true ? "V" : "F";
-          let hipotecario = mortgageCredit === true ? "V" : "F";
+          
           let carro = carCredit === "YES" ? "V" : "F";
           let last4N = last4 !== null ? last4 : "";
 
