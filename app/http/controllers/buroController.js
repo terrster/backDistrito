@@ -5,6 +5,7 @@ const GeneralInfo = require("../models/GeneralInfo");
 const hubspotController = require("../controllers/hubspotController");
 const axios = require("axios");
 const Client = require("../models/Client");
+const format = require("../services/formatManager");
 const { response } = require("express");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config({
@@ -153,7 +154,7 @@ const buroController = {
 
             //para pruebas en local
       if (process.env.NODE_ENV === "localhost") {
-        return res.status(400).json({
+        return res.status(200).json({
           success: true,
           message: "prueba",
           buro: {
@@ -479,16 +480,38 @@ const buroController = {
   async update(req, res) {
     let id = req.params.id;
     let user = await User.findById(id); //busca el usuario por id
+    let comercialId = user.idClient.idComercialInfo; //obtiene el id del comercial
     let hubspotDealId = user.hubspotDealId;
+    let comercial = await ComercialInfo.findById(comercialId); //busca el comercial por id
+    let warranty = comercial.warranty; //obtiene el valor de la garantia
+
+    switch (warranty) {
+      case 1:
+        warranty = warranty;
+        break;
+      case 2:
+        warranty = 3;
+        break;
+      case 3:
+        warranty = warranty;
+        break;
+      case 4:
+        warranty = 1;
+        break;
+        default:
+          warranty = 1;
+          break;
+    }
+
     try {
       let params = {
-        value: "Inmobiliaria",
+        value: format.WARRANTY[warranty],
         name: "n3_14_garant_a"
       }
       let update = await hubspotController.deal.update(hubspotDealId, "single_field", params);
       if (update) {
         await ComercialInfo.findByIdAndUpdate(user.idClient.idComercialInfo, {
-          warranty : 1 
+          warranty : warranty 
         })
         let userUpdate = await User.findById(req.params.id);
         return res.status(200).json({
