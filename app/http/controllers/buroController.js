@@ -154,12 +154,12 @@ const buroController = {
 
             //para pruebas en local
       if (process.env.NODE_ENV === "localhost") {
-        return res.status(200).json({
+        return res.status(500).json({
           success: true,
           message: "prueba",
           buro: {
             nombreScore: "Prueba",
-            valorScore: 450,
+            valorScore: 750,
             status: "SUCCESS",
           },
           user: user,

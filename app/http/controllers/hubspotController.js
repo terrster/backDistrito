@@ -817,11 +817,6 @@ const deal = {
                                     "value": request.secondLastname,
                                     "name": "n4_3_apellido_materno"
                                 },
-
-                                {
-                                    "value": request.curp,
-                                    "name": "curp"
-                                },
                                 {
                                     "value": request.rfcPerson,
                                     "name": "n3_15_rfc_pm"
