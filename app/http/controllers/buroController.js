@@ -97,6 +97,7 @@ const buroController = {
               rfcPerson,
               mortgageCredit,
               carCredit,
+              curp: generalInfo.curp,
               creditCard,
               last4,
             }
@@ -154,7 +155,7 @@ const buroController = {
 
             //para pruebas en local
       if (process.env.NODE_ENV === "localhost") {
-        return res.status(500).json({
+        return res.status(400).json({
           success: true,
           message: "prueba",
           buro: {

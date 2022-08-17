@@ -329,7 +329,7 @@ const deal = {
 
                                 {
                                     "value": request.curp,
-                                    "name": "curp"
+                                    "name": "n3_16_curp"
                                 },
 
                                 {
@@ -820,6 +820,10 @@ const deal = {
                                 {
                                     "value": request.rfcPerson,
                                     "name": "n3_15_rfc_pm"
+                                },
+                                {
+                                    "value": request.curp,
+                                    "name": "curp"
                                 },
                                 {
                                     "value": format.YES_NO_QUESTION[request.mortgageCredit],
