@@ -39,6 +39,23 @@ const buroController = {
     };
     let user = await User.findById(req.params.id);
     let hubspotDealId = user.hubspotDealId;
+    // si se consulta el buro de un usuario en hubspot se actuliza en la base de datos el buro y regreso la calificacion de la persona
+    let pruebaScore = await hubspotController.deal.getScore(hubspotDealId);
+    if(!isNaN(pruebaScore)){
+      await Client.findByIdAndUpdate(user.idClient._id, {
+        score: pruebaScore,
+      });
+
+      let userUpdateHub = await User.findById(req.params.id);
+      return res.status(200).json({
+        success: true,
+        buro: {
+          valorScore : pruebaScore,
+          status: "success",
+        },
+        user: userUpdateHub,
+      });
+    }
 
     try {
       let {

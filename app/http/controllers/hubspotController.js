@@ -948,6 +948,18 @@ const deal = {
             return false;
         }
     },
+    getScore: async (request) => {
+        try{
+            const {data} = await axios.get('crm/v3/objects/deals/' + request + hapiKey + '&properties=score_bc');
+            let score = data.properties.score_bc;
+            score = score === undefined ? "no" : score === "" ? "no" : parseInt(score);
+            return score;
+
+        } catch(error){
+            console.log(error);
+            return false;
+        }
+    },
 
 };
 
