@@ -38,7 +38,7 @@ route.use(async(request, response, next) => {
 });
 
 const limit = rateLimit({
-    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    windowMs: 14 * 60 * 60 * 1000, // 12 hours
     max: 3, // limit each IP to 100 requests per windowMs
     message: "Too many accounts created from this IP, please try again after an hour",
     keyGenerator: (req) => req.params.id
