@@ -329,7 +329,7 @@ const deal = {
 
                                 {
                                     "value": request.curp,
-                                    "name": "n3_16_curp"
+                                    "name": "curp"
                                 },
 
                                 {
