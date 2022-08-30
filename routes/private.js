@@ -16,6 +16,7 @@ const pdfController = require("../app/http/controllers/pdfController");
 const circuloCreditoController = require("../app/http/controllers/circuloCreditoController");
 const smsController = require("../app/http/controllers/smsController");
 const realTimeManager = require("../app/http/services/realTimeManager");
+const metamapController = require("../app/http/controllers/metamapController");
 
 // route.use((request, response, next) => {
 //     if(!request.query.tokensecret){
@@ -61,5 +62,11 @@ route.post("/sms_external_notify", smsController.externalNotify);
 //Real time hubspot
 route.get("/real-time-hubspot-info", realTimeManager.getHubpostInfo);
 route.post("/real-time-hubspot-info", realTimeManager.hubspotInfo);
+
+//Consulta de metamap 
+route.group("/metamap", (meta) => {
+    meta.post('/ine', metamapController.inicio);
+    meta.get('/ine', metamapController.consulta);
+});
 
 module.exports = route;

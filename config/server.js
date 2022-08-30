@@ -50,7 +50,11 @@ class Server{
                     - IP's -
                     Finerio: 3.21.17.42
                 */
-                const allowedIPS = ['3.21.17.42'];
+                const allowedIPS = ['3.21.17.42', "52.55.16.54"];
+
+                if(allowedIPS.includes(request.ip)){
+                    next();
+                }
         
                 if(request.headers.hasOwnProperty('tokensecret')){                    
                     if(request.headers.tokensecret === 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){
