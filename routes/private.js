@@ -65,8 +65,7 @@ route.post("/real-time-hubspot-info", realTimeManager.hubspotInfo);
 
 //Consulta de metamap 
 route.group("/metamap", (meta) => {
-    meta.post('/ine', metamapController.inicio);
-    meta.get('/ine', metamapController.consulta);
+    meta.post('/v1', metamapController.listener);
 });
 
 module.exports = route;

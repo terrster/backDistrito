@@ -95,8 +95,13 @@ class SocketService {
   }
 
   emitToSocket(socketId, event, data){
+    console.log(`Socket event ${event} emitted to socket ${socketId}`);
     if(socketId && event && data)
-      this.io.to(socketId).emit(event, data);
+      try{
+        this.io.to(socketId).emit(event, data);
+      } catch(error){
+        console.log(error);
+      }
   }
 
   emitToAll(event, data){
