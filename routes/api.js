@@ -29,6 +29,8 @@ const documentsController = require("../app/http/controllers/documentsController
 const finerioController = require("../app//http/controllers/finerioController");
 const openBankingController = require("../app//http/controllers/openBankingController");
 const kykoyaController = require("../app/http/controllers/kykoyaController");
+const updateDataController = require("../app/http/controllers/updateDataController");
+const metamapController = require("../app/http/controllers/metamapController");
 const rateLimit = require("express-rate-limit");
 
 route.use(verifyToken);
@@ -115,6 +117,14 @@ route.group("/buro", (buro) => {
     buro.post('/:id', [limit], buroController.inicio);
     buro.post('/update/:id', buroController.update);
   });
+
+route.group("/v1", (v1) => {
+    v1.post("/update", updateDataController.updateData);
+});
+route.group("/meta", (meta) => {
+    meta.post("/consulta", metamapController.listener);
+    meta.post("/update", metamapController.updateSate);
+});
 
 //Finerio routes
 route.group("/finerio", (finerio) => {

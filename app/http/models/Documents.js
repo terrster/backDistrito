@@ -17,7 +17,9 @@ const documentsSchema = new Schema({
     cventerprise:Array,
     proofAddressMainFounders: Array,
     collectionReportSaleTerminals: Array,
-    localContractLease: Array
+    localContractLease: Array,
+    guaranteeStatement: Array,
+    guaranteeFixedAssets: Array
 }, { collection: 'Documents' });
   
 var collectionName = 'Documents';
