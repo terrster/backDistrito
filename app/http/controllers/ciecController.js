@@ -180,6 +180,102 @@ const ciecController = {
         }
     },
 
+    validate: async (req, res) => {
+        let {
+            rfc,
+            ciec,
+            newCiec,
+            id
+        } = req.body;
+        let Data = {
+            type: "ciec",
+            rfc: rfc,
+            password: ciec,
+            slug: "b39d75"
+        }
+
+        try{
+        let sat = await axios.post("/b39d75", Data);
+        let idSat = sat.data.id;
+        let espera = setInterval(async () => {
+            let sat = await axios.get("/b39d75/" + idSat);
+            if(sat.data.status !== "pending"){
+                let response = sat.data.status
+                let mensaje = response === "invalid" ? "El RFC o CIEC no son válidos" : "la información fue actualizada exitosamente";
+                if(newCiec){
+                    let user = await User.findById(id);
+                    let n4_93_ciec = Buffer.from(ciec).toString('base64');
+                    await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
+                    { name: 'n4_93_ciec', value: n4_93_ciec }
+                    ).catch(err => {
+                        console.log(err);
+                        clearInterval(espera);
+                        return res.status(500).json({
+                            code: 500,
+                            msg: "Algo salió mal tratando de actualizar información",
+                            error: err});
+                    });
+                    let comercialInfoStored = await ComercialInfo.create(user.idClient.idComercialInfo, {
+                        ciecstatus: response,
+                        ciec: ciec
+                    });
+                    await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+                        idComercialInfo : {
+                            _id : comercialInfoStored._id
+                        }
+                    });
+        
+                    await Client.findByIdAndUpdate(user.idClient._id, {
+                        idComercialInfo: {
+                            _id: comercialInfoStored._id
+                        }
+                    });
+                    clearInterval( espera);
+                    return res.status(200).json({
+                    code: 200,
+                    status: sat.data.status,
+                    msg: mensaje
+                    });
+                } else {
+                    await ComercialInfo.findByIdAndUpdate(id, {
+                        ciecstatus: response
+                    });
+                    clearInterval( espera);
+                    return res.status(200).json({
+                    code: 200,
+                    status: sat.data.status,
+                    msg: mensaje
+                    });
+                }
+
+                
+            } 
+                setTimeout(() => {}, 1000);
+        }, 5000);
+        } catch(error){
+            console.log(error, "error catch");
+            return res.status(500).json({
+                code: 500,
+                msg: "Algo salió mal tratando de validar la información"
+            });
+        }
+    }, 
+
+    search: async (req, res) => {
+        try{
+            let {
+                rfc,
+                ciec,
+            } = req.body;
+            let userExistMin = await cieclogic.serch(rfc,ciec);
+            return res.status(200).json(userExistMin);
+        }
+        catch(error){
+            console.log(error);
+            return res.status(500).json(error);
+        }
+    }
+
 }
 
 
