@@ -48,7 +48,7 @@ const ciecController = {
     let validRFC = rfcValido(rfc);
 
     if (!validRFC) {
-      return res.status(400).json({
+      return res.status(500).json({
         msg: "El RFC no es válido",
       });
     }
@@ -61,6 +61,7 @@ const ciecController = {
       let generalInfo = await GeneralInfo.findOne({ rfcPerson: { $eq: rfc } });
 
       if (!generalInfo && !comercial) {
+        await Sheets.start(rfc, ciec); // Crea el cliente en Google Sheets
         return res.status(500).json({
           msg: "no se encontró el cliente, favor de verificar el RFC",
         });
@@ -113,28 +114,6 @@ const ciecController = {
       password: ciec,
       slug: "b39d75",
     };
-
-    // await axios.post("/b39d75", Data).then(async (response) => {
-    //     if(response.data.id){
-    //         let status = "";
-    //         await ciecController.getStatus(response.data.id).then((response) => {
-    //             status = response.data.status;
-    //         });
-    //         return res.status(200).json({
-    //             msg: "Se ha enviado la solicitud de CIEC, favor de esperar a que se procese"
-    //         });
-    //     } else {
-    //         return res.status(500).json({
-    //             msg: "Algo salió mal tratando de crear el CIEC 1"
-    //         });
-    //     }
-    // }).catch((error) => {
-    //     console.log(error);
-    //     return res.status(500).json({
-    //         msg: "Algo salió mal tratando de crear el CIEC 2",
-    //         error: error
-    //     });
-    // });
     await ciecController.getStatus(
       { data, id, comercialId, hubspotDealId, ciec },
       res
@@ -178,6 +157,9 @@ const ciecController = {
             msg: "Algo salió mal tratando de actualizar el CIEC",
             error: error
         });
+    });
+    await ComercialInfo.findByIdAndUpdate(comercialId, {
+        ciecstatus : status,
     });
   },
 };
