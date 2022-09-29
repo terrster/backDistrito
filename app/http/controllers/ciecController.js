@@ -17,7 +17,19 @@ const axios = _axios.create({
 require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 });
-const hapiKey = `?hapikey=${process.env.HAPIKEY}`;
+
+/*
+    * @desc    validacion y guardado de la CIEC
+    * @Author  Jonathan
+    * @route   POST /ciec
+    * @access  Public
+    * @params  RFC, CIEC, ID
+    * @return  json
+    * @return  status
+    * @return  message
+    * @return  user
+    * @return  error
+*/
 
 const rfcValido = (rfc, aceptarGenerico = true) => {
   let _rfc_pattern_pm =
@@ -36,6 +48,39 @@ const rfcValido = (rfc, aceptarGenerico = true) => {
   } else {
     return false;
   }
+};
+
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+const until = (cond, time) =>
+  cond().then((result) => result || delay(time).then(() => until(cond, time)));
+
+const getUpdate = async (Accion, id, params) => {
+  return await until(
+    () => {
+      return Accion.findByIdAndUpdate(id, params).then((res) => {
+        if (res) {
+          return res;
+        }
+        return false;
+      });
+    },
+    1000,
+    10
+  );
+};
+const getPro = async (Accion, id) => {
+  return await until(
+    () => {
+      return Accion.findById(id).then((acc) => {
+        if (acc) {
+          return acc;
+        }
+        return false;
+      });
+    },
+    1000,
+    10
+  );
 };
 
 const ciecController = {
@@ -72,6 +117,12 @@ const ciecController = {
           : generalInfo.idClient !== undefined
           ? generalInfo.idClient
           : false;
+
+      if (!idClient) {
+        return res.status(500).json({
+          msg: "no se encontró el cliente, favor de verificar el RFC",
+        });
+      }
 
       let user = await User.findOne({ idClient: { $eq: idClient } });
       if (comercialId === "") {
@@ -139,7 +190,6 @@ const ciecController = {
       }
     }, refreshInterval);
   },
-
   updateStatus: async (req, res) => {
     let { status, id, comercialId, hubspotDealId, ciec } = req;
     if (status === "invalid") {
@@ -148,18 +198,26 @@ const ciecController = {
       });
     }
     let n4_93_ciec = Buffer.from(ciec).toString("base64");
-    await hubspotController.deal.update(hubspotDealId, "single_field", {
-      name: "n4_93_ciec",
-      value: n4_93_ciec,
-    }).catch((error) => {
+    await hubspotController.deal
+      .update(hubspotDealId, "single_field", {
+        name: "n4_93_ciec",
+        value: n4_93_ciec,
+      })
+      .catch((error) => {
         console.log(error);
         return res.status(500).json({
-            msg: "Algo salió mal tratando de actualizar el CIEC",
-            error: error
+          msg: "Algo salió mal tratando de actualizar el CIEC",
+          error: error,
         });
-    });
+      });
     await ComercialInfo.findByIdAndUpdate(comercialId, {
-        ciecstatus : status,
+      ciecstatus: true,
+    });
+
+    let user = await getPro(User, id);
+    return res.status(200).json({
+      msg: "la CIEC se actualizó correctamente",
+      user,
     });
   },
 };
