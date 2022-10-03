@@ -80,8 +80,11 @@ const brokerController = {
                     case 'Campaña Julio 2022':
                         canal = 'campañabrokersdc';
                         break;
+                    case 'brokers-crediexpo':
+                        canal = 'crediexpo';
+                        break;
                     default:
-                        canal = 'onlinecasa';
+                        canal = data.canal;
                         break;
                 }
             } else {
@@ -106,7 +109,7 @@ const brokerController = {
                 },
                 "properties": [
                     {
-                        "value": data.name.trim(),
+                        "value": data.prefix ? data.prefix + " " + data.name.trim() : data.name.trim(),
                         "name": "dealname"
                     },
                     {
@@ -151,7 +154,6 @@ const brokerController = {
                     }
                 ]
             }
-
             await axios.post(hubspot.baseURL + 'deals/v1/deal' + hubspot.hapiKey, dealParams);
             
             return response.json({ 
