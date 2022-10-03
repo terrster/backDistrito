@@ -47,7 +47,9 @@ const getNameProperty = (key) => {
         "n9_3_11_estados_de_cuenta",
       ];
     case "rfc":
-      return ["n9_4_rfc", "n7_08_csf_socio"];
+      return ["n9_4_rfc"];
+    case "rfcSocio":
+      return ["n7_08_csf_socio"];
     case "lastDeclarations":
       return [
         "n9_5_declaraci_n",
@@ -322,7 +324,7 @@ const metamapController = {
               break;
             case "lastDeclarations":
               if (type === "custom-csf") {
-                accName = "rfc";
+                accName = "rfcSocio";
               } else {
                 accName = "lastDeclarations";
               }
@@ -461,12 +463,12 @@ const metamapController = {
     console.log("updateSate");
     const { metadata, status } = request.body;
     const { docID, socketId, uid } = metadata;
-    const Document = await Documents.findByIdAndUpdate(docID, {
-      status: status,
-    });
-    const user = await User.findById(uid);
-    global.io.emitToSocket(metadata.socketId, "updateUser", user);
-    return response.status(200).json({ message: "user updated" });
+    // const Document = await Documents.findByIdAndUpdate(docID, {
+    //   status: status,
+    // });
+    await getUpdate(Documents, docID, { status: status }); //update status
+    const user = await getPro(User, uid);
+    return response.status(200).json({ message: "user updated", user });
   },
 };
 
