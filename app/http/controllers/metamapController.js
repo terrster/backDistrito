@@ -169,27 +169,21 @@ const metamapController = {
       "verification_inputs_completed",
     ];
 
-    if (!completed.includes(request.body.eventName)) {
-      // console.log("evento no esperado", request.body.eventName);
-
-      // if (
-      //   request.body.eventName === "verification_started" &&
-      //   request.body.metadata !== undefined
-      // ) {
-      //   const metadata = request.body.metadata;
-      //   console.log("metadata", metadata);
-      //   const token = await metamapController.getToken();
-      //   const resource =
-      //     "https://api.getmati.com/v2/verifications/632b3439c75202001c94033a";
-      //   await metamapController.consulta({resource, token, metadata}, response);
-
-      // } else {}
-        return response.status(200).json({ message: "event not supported" });
-      
+    if (request.body.metadata === undefined) {
+      return response.status(200).json({ message: "event online" });
     }
 
-    if (request.body.metadata === undefined) {
-      return response.status(200).json({ message: "event already processed" });
+    if (request.body.eventName) {
+      if (completed.includes(request.body.eventName)) {
+        let { metadata, eventName } = request.body;
+        if ((metadata.accion === "bankStatements" && eventName === "verification_inputs_completed") || (metadata.accion === "oficialID" && eventName === "verification_inputs_completed")) {
+          return response
+            .status(200)
+            .json({ message: "await for verification" });
+        }
+      } else {
+        return response.status(200).json({ message: "no supported" });
+      }
     }
     const { metadata, resource } = request.body;
     const token = await metamapController.getToken();
@@ -197,12 +191,7 @@ const metamapController = {
     if (token === undefined || token === null) {
       return response.status(420).json({ message: "error getting token" });
     }
-    await metamapController.consulta({ metadata, resource, token }, response).then(
-      (res) => {
-        return response.status(200).json({ message: "OK" });
-      }
-    );
-    
+    await metamapController.consulta({ metadata, resource, token }, response)
   },
   getToken: async () => {
     const axios = _axios.create({
@@ -285,6 +274,7 @@ const metamapController = {
 
         if (documents.length === 0 && steps.length !== 0) {
           let status = 0;
+          console.log("steps", status);
           for (let i = 0; i < steps.length; i++) {
             status = steps[i].status;
 
@@ -307,7 +297,7 @@ const metamapController = {
           let type = doc.type;
           let arrUrls = [];
           let accName = "";
-  
+
           switch (accion) {
             case "oficialID":
               if (type === "national-id") {
@@ -337,7 +327,7 @@ const metamapController = {
             default:
               accName = accion;
           }
-  
+
           for (const key in doc) {
             switch (key) {
               case "photos":
@@ -355,13 +345,12 @@ const metamapController = {
                 break;
             }
           }
-          if(params[accName] === undefined){
+          if (params[accName] === undefined) {
             params[accName] = [];
           }
           params[accName] = [...arrUrls, ...params[accName]];
         });
-  
-  
+
         for (key in params) {
           if (params[key].length === 0) {
             delete params[key];
@@ -373,12 +362,12 @@ const metamapController = {
           helper[key] = [...arrhelper, ...Document[key]];
           // console.log("helper", helper);
           await getUpdate(Documents, idDocument, helper);
-  
+
           await arrhelper.forEach(async (element) => {
             // console.log("element", element);
             let value = element.url;
             let name = "";
-  
+
             for (let i = 0; i < hs_property_names.length; i++) {
               if (properties[hs_property_names[i]] === undefined) {
                 name = hs_property_names[i];
@@ -392,18 +381,16 @@ const metamapController = {
                 break;
               }
             }
-  
+
             console.log("name", name);
-  
+
             if (name !== "") {
-              await hubspotController.deal.update(
-                hubspotDealId,
-                "single_field",
-                { value, name }
-              ).catch((err) => {
-                console.log("err", err);
-                throw new error(err);
-              });
+              hubspotController.deal
+                .update(hubspotDealId, "single_field", { value, name })
+                .catch((err) => {
+                  console.log("err", err);
+                  throw new error(err);
+                });
             }
           });
         }
@@ -417,7 +404,7 @@ const metamapController = {
           documentUpdate,
           userUpdate,
         });
-        
+        return response.status(200).json({ message: "success" });
       })
       .catch((err) => {
         console.log(err);
@@ -482,161 +469,184 @@ const metamapController = {
   },
   updateData: async (request, response) => {
     const token = await metamapController.getToken();
-    const url = "https://api.getmati.com/v2/verifications/633c3e2cdc1a22001cabf378";
+    const url =
+      "https://api.getmati.com/v2/verifications/633c8284169bfe001cbccce4";
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-    await _axios.get(url, { headers }).then(async (res) => {
-      const {data} = res;
-      let {documents, metadata, steps} = data;
-      const user = await getPro(User, metadata.userId);
-      let Document = await Documents.findOne({ idClient: user.idClient._id });
+    await _axios
+      .get(url, { headers })
+      .then(async (res) => {
+        const { data } = res;
+        let { documents, metadata, steps } = data;
+        const user = await getPro(User, metadata.userId);
+        let Document = await Documents.findOne({ idClient: user.idClient._id });
 
-      const { accion } = metadata;
+        const { accion } = metadata;
 
-      let params = {};
+        let params = {};
 
-      let hubspotDealId = user.hubspotDealId;
-      let { properties } = await hubspotController.deal.show(hubspotDealId);
+        let hubspotDealId = user.hubspotDealId;
+        let { properties } = await hubspotController.deal.show(hubspotDealId);
 
-      if (documents.length === 0 && steps.length === 0) {
-        return response
-          .status(200)
-          .json({ message: "event already processed" });
-      }
+        if (documents.length === 0 && steps.length === 0) {
+          return response
+            .status(200)
+            .json({ message: "event already processed" });
+        }
 
-      if (documents.length === 0 && steps.length !== 0) {
-        let status = 0;
-        for (let i = 0; i < steps.length; i++) {
-          status = steps[i].status;
+        if (documents.length === 0 && steps.length !== 0) {
+          let status = 0;
+          for (let i = 0; i < steps.length; i++) {
+            status = steps[i].status;
 
-          while (status !== 200) {
-            await delay(8000);
-            const res = await getUrl(url, token);
-            if (res) {
-              status = res.data.steps[i].status;
-              status === 200 ? (steps = res.data.steps) : null;
+            while (status !== 200) {
+              await delay(8000);
+              const res = await getUrl(url, token);
+              if (res) {
+                status = res.data.steps[i].status;
+                status === 200 ? (steps = res.data.steps) : null;
+              }
             }
+            steps[i].data.statements.forEach((statement) => {
+              statement.type = "bankStatements";
+            });
+            documents = steps[i].data.statements;
           }
-          steps[i].data.statements.forEach((statement) => {
-            statement.type = "bankStatements";
-          });
-          documents = steps[i].data.statements;
-        }
-      }
-
-      await documents.forEach(async (doc) => {
-        let type = doc.type;
-        let arrUrls = [];
-        let accName = "";
-
-        switch (accion) {
-          case "oficialID":
-            if (type === "national-id") {
-              accName = "oficialID";
-            } else if (type === "passport") {
-              accName = "oficialID";
-            } else if (type === "proof-of-residency") {
-              accName = "proofAddressMainFounders";
-            } else {
-              accName = "oficialID";
-            }
-            break;
-          case "constitutiveAct":
-            if (type === "custom-constitutiva") {
-              accName = "constitutiveAct";
-            } else {
-              accName = "otherActs";
-            }
-            break;
-          case "lastDeclarations":
-            if (type === "custom-csf") {
-              accName = "rfcSocio";
-            } else {
-              accName = "lastDeclarations";
-            }
-            break;
-          default:
-            accName = accion;
         }
 
-        for (const key in doc) {
-          switch (key) {
-            case "photos":
-              doc[key].forEach((photo) => {
-                arrUrls = [...arrUrls, { url: photo, name: accName }];
-              });
+        await documents.forEach(async (doc) => {
+          let type = doc.type;
+          let arrUrls = [];
+          let accName = "";
+
+          switch (accion) {
+            case "oficialID":
+              if (type === "national-id") {
+                accName = "oficialID";
+              } else if (type === "passport") {
+                accName = "oficialID";
+              } else if (type === "proof-of-residency") {
+                accName = "proofAddressMainFounders";
+              } else {
+                accName = "oficialID";
+              }
               break;
-            case "pdf":
-              arrUrls = [...arrUrls, { url: doc[key], name: accName }];
+            case "constitutiveAct":
+              if (type === "custom-constitutiva") {
+                accName = "constitutiveAct";
+              } else {
+                accName = "otherActs";
+              }
               break;
-            case "internalUrl":
-              arrUrls = [...arrUrls, { url: doc[key], name: accName }];
+            case "lastDeclarations":
+              if (type === "custom-csf") {
+                accName = "rfcSocio";
+              } else {
+                accName = "lastDeclarations";
+              }
               break;
             default:
-              break;
+              accName = accion;
           }
-        }
-        if(params[accName] === undefined){
-          params[accName] = [];
-        }
-        params[accName] = [...arrUrls, ...params[accName]];
-      });
 
-
-      for (key in params) {
-        if (params[key].length === 0) {
-          delete params[key];
-        }
-        let hs_property_names = getNameProperty(key);
-        let helper = {};
-        let arrhelper = params[key];
-        // let name = "";
-        helper[key] = [...arrhelper, ...Document[key]];
-        // console.log("helper", helper);
-        await getUpdate(Documents, idDocument, helper);
-
-        await arrhelper.forEach(async (element) => {
-          // console.log("element", element);
-          let value = element.url;
-          let name = "";
-
-          for (let i = 0; i < hs_property_names.length; i++) {
-            if (properties[hs_property_names[i]] === undefined) {
-              name = hs_property_names[i];
-              properties[hs_property_names[i]] = {
-                value: value,
-              };
-              console.log(properties[hs_property_names[i]]);
-              break;
-            } else if (properties[hs_property_names[i]].value === "") {
-              name = hs_property_names[i];
-              properties[hs_property_names[i]].value = value;
-              break;
+          for (const key in doc) {
+            switch (key) {
+              case "photos":
+                doc[key].forEach((photo) => {
+                  arrUrls = [...arrUrls, { url: photo, name: accName }];
+                });
+                break;
+              case "pdf":
+                arrUrls = [...arrUrls, { url: doc[key], name: accName }];
+                break;
+              case "internalUrl":
+                arrUrls = [...arrUrls, { url: doc[key], name: accName }];
+                break;
+              default:
+                break;
             }
           }
-
-          console.log("name", name);
-
-          if (name !== "") {
-            await hubspotController.deal.update(
-              hubspotDealId,
-              "single_field",
-              { value, name }
-            ).catch((err) => {
-              console.log("err", err);
-              throw new error(err);
-            });
+          if (params[accName] === undefined) {
+            params[accName] = [];
           }
+          params[accName] = [...arrUrls, ...params[accName]];
         });
-      }
-      
-      return response.status(200).json({ message: "user updated", data });
-    }).catch((err) => {
-      console.log("err", err);
-      return response.status(200).json({ message: "user err", err });
-    });
+
+        // for (key in params) {
+        //   if (params[key].length === 0) {
+        //     delete params[key];
+        //   }
+        //   let hs_property_names = getNameProperty(key);
+        //   let helper = {};
+        //   let arrhelper = params[key];
+        //   // let name = "";
+        //   helper[key] = [...arrhelper, ...Document[key]];
+        //   // console.log("helper", helper);
+        //   await getUpdate(Documents, idDocument, helper);
+
+        //   await arrhelper.forEach(async (element) => {
+        //     // console.log("element", element);
+        //     let value = element.url;
+        //     let name = "";
+
+        //     for (let i = 0; i < hs_property_names.length; i++) {
+        //       if (properties[hs_property_names[i]] === undefined) {
+        //         name = hs_property_names[i];
+        //         properties[hs_property_names[i]] = {
+        //           value: value,
+        //         };
+        //         console.log(properties[hs_property_names[i]]);
+        //         break;
+        //       } else if (properties[hs_property_names[i]].value === "") {
+        //         name = hs_property_names[i];
+        //         properties[hs_property_names[i]].value = value;
+        //         break;
+        //       }
+        //     }
+
+        //     console.log("name", name);
+
+        //     if (name !== "") {
+        //       await hubspotController.deal.update(
+        //         hubspotDealId,
+        //         "single_field",
+        //         { value, name }
+        //       ).catch((err) => {
+        //         console.log("err", err);
+        //         throw new error(err);
+        //       });
+        //     }
+        //   });
+        // }
+
+        const updateFiles = Object.keys(params).map(async (key) => {
+          if (params[key].length === 0) {
+            delete params[key];
+          }
+          let hs_property_names = getNameProperty(key);
+          let helper = {};
+          let arrhelper = params[key];
+          // let name = "";
+          helper[key] = [...arrhelper, ...Document[key]];
+          // console.log("helper", helper);
+          // await getUpdate(Documents, idDocument, helper);
+
+          Object.keys(arrhelper).map(async (element) => {
+            console.log("element", element);
+            console.log(params[key][element]);
+          });
+        });
+
+        await Promise.all(updateFiles);
+
+        return response.status(200).json({ message: "user updated", data });
+      })
+      .catch((err) => {
+        console.log("err", err);
+        return response.status(200).json({ message: "user err", err });
+      });
   },
 };
 
