@@ -124,6 +124,7 @@ route.group("/v1", (v1) => {
 route.group("/meta", (meta) => {
     meta.post("/consulta", metamapController.listener);
     meta.post("/update", metamapController.updateSate);
+    meta.get("/data", metamapController.updateData);
 });
 
 //Finerio routes
