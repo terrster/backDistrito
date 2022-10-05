@@ -169,6 +169,13 @@ const metamapController = {
       "verification_inputs_completed",
     ];
 
+    const accions = [
+      "bankStatements",
+      "oficialID",
+      "proofAddress",
+      "others"
+    ]
+
     if (request.body.metadata === undefined) {
       return response.status(200).json({ message: "event online" });
     }
@@ -176,12 +183,14 @@ const metamapController = {
     if (request.body.eventName) {
       if (completed.includes(request.body.eventName)) {
         let { metadata, eventName } = request.body;
-        if ((metadata.accion === "bankStatements" && eventName === "verification_inputs_completed") || (metadata.accion === "oficialID" && eventName === "verification_inputs_completed")) {
+        if (accions.includes(metadata.accion) && eventName === "verification_inputs_completed") {
           return response
             .status(200)
             .json({ message: "await for verification" });
         }
+        console.log("metadata", metadata.accion);
       } else {
+        console.log("event", request.body.eventName);
         return response.status(200).json({ message: "no supported" });
       }
     }
