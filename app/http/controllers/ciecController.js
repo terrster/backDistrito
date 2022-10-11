@@ -194,7 +194,7 @@ const ciecController = {
     let { status, id, comercialId, hubspotDealId, ciec } = req;
     if (status === "invalid") {
       return res.status(500).json({
-        msg: "El CIEC no es válido",
+        msg: "la contraseña CIEC es incorrecta",
       });
     }
     let n4_93_ciec = Buffer.from(ciec).toString("base64");
