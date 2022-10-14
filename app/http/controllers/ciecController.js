@@ -132,9 +132,7 @@ const ciecController = {
       hubspotDealId = user.hubspotDealId;
     } else {
       let user = await User.findById(id);
-      let comercial = await ComercialInfo.findOne({
-        idClient: { $eq: user.idClient },
-      });
+      let comercial = await ComercialInfo.findById(user.idClient.idComercialInfo._id);
       if (!comercial) {
         let comercialInfoStored = await ComercialInfo.create({
           rfc,
