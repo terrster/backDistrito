@@ -81,9 +81,9 @@ route.group("/amount", (amount) => {
 
 //Info comercial routes
 route.group("/info-comercial", (comercial) => {
-    comercial.post('/:id', comercialInfoController.store);
+    comercial.post('/:id', comercialInfoController.update);
     comercial.get('/:id', comercialInfoController.show);
-    comercial.put('/:id', comercialInfoController.update);
+    comercial.put('/:id', comercialInfoController.store);
 });
 
 //Info general routes

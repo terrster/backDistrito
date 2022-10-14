@@ -173,7 +173,18 @@ const ciecController = {
   getStatus: async (req, res) => {
     let { data } = req;
     const refreshInterval = 4000;
-    let response = await axios.post("/b39d75", data);
+    
+    let response = await axios.post("/b39d75", data).then((res) => {
+      return res;
+    }).catch((err) => {
+      return false;
+    });
+
+    if (!response) {
+      return res.status(500).json({
+        msg: "Error al consultar el CIEC",
+      });
+    }
     let satStatus = "";
     const checkSatatus = setInterval(async () => {
       const sat = await axios.get(`/b39d75/${response.data.id}`);

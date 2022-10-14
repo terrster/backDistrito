@@ -1,6 +1,5 @@
 'use strict'
 
-const axios = require("axios");
 const { response } = require("express");
 const mailManager = require("../services/mailManager");
 require('dotenv').config({
@@ -9,18 +8,27 @@ require('dotenv').config({
 const format = require("../services/formatManager");
 const jwt = require("jsonwebtoken");
 
+const _axios = require("axios").default;
+
+const HUBSPOT_TOKEN = process.env.HUBSPOT_TOKEN; // Your Hubspot Token
+const axios = _axios.create({
+    baseURL: 'https://api.hubapi.com/',
+    headers: {
+        'Authorization': `Bearer ${HUBSPOT_TOKEN}`,
+        'Content-Type': 'application/json'
+    }
+});
+
 // #Hubspot - ImpulsoMx
 const hubspotImpMx = {
-    baseURL: 'https://api.hubapi.com/',
     pipeline: '1849306',
     dealstage: '2753634',
-    hapiKey: '?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3',
     prefix: process.env.APP_ENV == 'local' || process.env.APP_ENV == 'dev' ? 'FormImpulsoDev' : 'FormImpulso'
 };
 
 const getContactByEmail = async(email) => {
     try{
-        const response = await axios.get(hubspotImpMx.baseURL + 'contacts/v1/contact/email/' + email + '/profile' + hubspotImpMx.hapiKey);
+        const response = await axios.get('contacts/v1/contact/email/' + email + '/profile');
 
         if(response.status == 200){
             return response.data;
@@ -54,7 +62,7 @@ const storeContact = async(request) => {
             ]
         };
 
-        const {data} = await axios.post(hubspotImpMx.baseURL + 'contacts/v1/contact' + hubspotImpMx.hapiKey, contactParams);
+        const {data} = await axios.post( 'contacts/v1/contact', contactParams);
         return data;
     }
     catch(error){
@@ -70,7 +78,7 @@ const storeContact = async(request) => {
 
 const getDealById = async(id) => {
     try{
-        const data = await axios.get(hubspotImpMx.baseURL + 'deals/v1/deal/' + id + hubspotImpMx.hapiKey);
+        const data = await axios.get( 'deals/v1/deal/' + id);
         return data;
     }
     catch(error){
@@ -179,7 +187,7 @@ const storeDeal = async(request) => {
             ]
         };
 
-        const {data} = await axios.post(hubspotImpMx.baseURL + 'deals/v1/deal' + hubspotImpMx.hapiKey, dealParams);
+        const {data} = await axios.post( 'deals/v1/deal', dealParams);
         return data;
     }
     catch(error){
@@ -285,7 +293,7 @@ const updateDeal = async(request) => {
             ]
         };
 
-        const {data} = await axios.put(hubspotImpMx.baseURL + 'deals/v1/deal/' + request.hubspotDealId + hubspotImpMx.hapiKey, dealParams);
+        const {data} = await axios.put('deals/v1/deal/' + request.hubspotDealId, dealParams);
         return data;
     }
     catch(error){
@@ -329,7 +337,7 @@ const impulsoMxController = {
         let securityCode = Math.floor(100000 + Math.random() * 900000);
 
         try{
-            await axios.post('https://api.smsmasivos.com.mx/sms/send', {
+            await _axios.post('https://api.smsmasivos.com.mx/sms/send', {
                 message: 'Hola. Te damos la bienvenida a ImpulsoMx. Tu codigo de autenticacion es: ' + securityCode,
                 numbers: req.number,
                 country_code: '52'

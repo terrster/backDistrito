@@ -189,12 +189,16 @@ const comercialInfoController = {
     },
     update: async(request, response) => {
         let id = request.params.id;//id de info comercial
-        let idUser = request.headers.tokenDecoded.data.id;
+        // let idUser = request.headers.tokenDecoded.data.id;
 
         try{
-            let comercial = await ComercialInfo.findById(id);
-            let user = await User.findById(idUser);
-
+            // let comercial = await ComercialInfo.findById(id);
+            let user = await User.findById(id);
+            let comercial = await ComercialInfo.findOne({
+                idClient: { $eq: user.idClient },
+              });
+              
+            
             let {
                 state,//info address
                 municipality,
@@ -316,7 +320,7 @@ const comercialInfoController = {
 
             await ComercialInfo.findByIdAndUpdate(comercial._id, comercialInfoParams);
 
-            user = await User.findById(idUser);
+            user = await User.findById(id);
 
             return response.json({ 
                 code: 200,
