@@ -297,7 +297,17 @@ const comercialInfoController = {
                 zipCode
             };
 
-            await Address.findByIdAndUpdate(comercial.address._id, addressParams);
+            if(!comercial.address){
+                let addressStored = await Address.create(addressParams);
+
+                await ComercialInfo.findByIdAndUpdate(id, {
+                    address: {
+                        _id: addressStored._id
+                    }
+                });
+            } else {
+                await Address.findByIdAndUpdate(comercial.address._id, addressParams);
+            }
 
             let comercialInfoParams = {
                 comercialName,
