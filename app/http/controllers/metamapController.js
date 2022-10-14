@@ -468,10 +468,14 @@ const metamapController = {
   updateSate: async (request, response) => {
     console.log("updateSate");
     const { metadata, status } = request.body;
-    const { docID, socketId, uid } = metadata;
+    const { docID, socketId, uid, dealId } = metadata;
     // const Document = await Documents.findByIdAndUpdate(docID, {
     //   status: status,
     // });
+    await hubspotController.deal.update(dealId, "single_field", {
+      value: "OK",
+      name: "n8_91_validaciones_metamap",
+    });
     await getUpdate(Documents, docID, { status: status }); //update status
     const user = await getPro(User, uid);
     return response.status(200).json({ message: "user updated", user });
