@@ -190,9 +190,6 @@ const comercialInfoController = {
     update: async(request, response) => {
         let id = request.params.id;//id de info comercial
         try{
-            // let comercial = await ComercialInfo.findById(id);
-            let user = await User.findById(id);
-            let comercial = await ComercialInfo.findById(user.idClient.idComercialInfo._id);
             let {
                 state,//info address
                 municipality,
@@ -218,6 +215,35 @@ const comercialInfoController = {
                 ciec,
                 warranty
             } = request.body;
+            let user = await User.findById(id);
+
+            let comercial = "";
+            if(user.idClient.idComercialInfo !== null && user.idClient.idComercialInfo !== undefined){
+                comercial = await ComercialInfo.findById(user.idClient.idComercialInfo._id);
+            } else {
+                let comercialInfoParams = {
+                    comercialName,
+                    businessName,
+                    gyre,
+                    rfc,
+                    employeesNumber,
+                    bankAccount, //Only PM
+                    paymentsMoreThan30,
+                    empresarialCreditCard, //Only PM, PFAE
+                    specific,
+                    phone,
+                    webSite,
+                    facebook,
+                    terminal,
+                    exportation,
+                    ciec,
+                    warranty,
+                    status : true
+                };
+    
+                let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
+                comercial = comercialInfoStored;
+            }
 
             if(user){
                 let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'comercial', { 
@@ -291,15 +317,18 @@ const comercialInfoController = {
                 zipCode
             };
 
-            if(!comercial.address){
-                let addressStored = await Address.create(addressParams);
+            
 
-                await ComercialInfo.findByIdAndUpdate(id, {
+            if(comercial.address === undefined){
+                
+                let addressStored = await Address.create(addressParams);
+                await ComercialInfo.findByIdAndUpdate(comercial._id, {
                     address: {
                         _id: addressStored._id
                     }
                 });
             } else {
+                
                 await Address.findByIdAndUpdate(comercial.address._id, addressParams);
             }
 

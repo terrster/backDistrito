@@ -132,8 +132,8 @@ const ciecController = {
       hubspotDealId = user.hubspotDealId;
     } else {
       let user = await User.findById(id);
-      let comercial = await ComercialInfo.findById(user.idClient.idComercialInfo._id);
-      if (!comercial) {
+      let comercial = ""
+      if (user.idClient.idComercialInfo === null || user.idClient.idComercialInfo === undefined) {
         let comercialInfoStored = await ComercialInfo.create({
           rfc,
           ciec,
@@ -152,6 +152,7 @@ const ciecController = {
         });
         comercialId = comercialInfoStored._id;
       } else {
+        comercial = await ComercialInfo.findById(user.idClient.idComercialInfo._id);
         comercialId = comercial._id;
       }
       hubspotDealId = user.hubspotDealId;
@@ -202,8 +203,9 @@ const ciecController = {
   updateStatus: async (req, res) => {
     let { status, id, comercialId, hubspotDealId, ciec } = req;
     if (status === "invalid") {
-      return res.status(500).json({
+      return res.status(404).json({
         msg: "la contraseña CIEC es incorrecta",
+        code: 400,
       });
     }
     let n4_93_ciec = Buffer.from(ciec).toString("base64");
@@ -225,6 +227,7 @@ const ciecController = {
 
     let user = await getPro(User, id);
     return res.status(200).json({
+      code: 200,
       msg: "la CIEC se actualizó correctamente",
       user,
     });
