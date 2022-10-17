@@ -122,7 +122,7 @@ const authController = {
             let Brokertelefono;
             if(user.brokercode !== undefined){
                 let broker = await hubspotController.deal.broker(user.brokercode);
-                broker === undefined ? Brokertelefono = "" : Brokertelefono = broker.phone;
+                broker === undefined ? Brokertelefono = "" : Brokertelefono = broker.telephone;
             } else{
                 // console.log("no existe");
                 Brokertelefono = '';
