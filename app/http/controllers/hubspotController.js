@@ -867,6 +867,7 @@ const deal = {
         let correoBroker;
         let telephone;
         let response;
+        
         try{
             let prueba = await axios.post('crm/v3/objects/deals/search', {
                 "filters": [
@@ -877,13 +878,27 @@ const deal = {
                         },
                     ]
             });
+            // console.log(prueba.data);
             if(prueba.status == 200){
+
             if(prueba.data.results.length > 0){
                 let Id = prueba.data.results[0].id;
-                let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
-                let {telefono, email} = broker.data.properties;
-                telephone = telefono;
-                correoBroker = email;
+                Id = parseInt(Id);
+                // console.log(Id);
+                let deal = await axios.get('deals/v1/deal/' + Id);
+                // let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
+                // console.log(broker);
+                let {telefono, email} = deal.data.properties;
+                telephone = telefono.value;
+                correoBroker = email.value;
+                console.log(telephone);
+            } else {
+                response = {
+                    code: 403,
+                    msg: "Hubspot: El broker no existe",
+                    error: error
+                };
+                return response;
             }
                 
             if(name.toLowerCase() == broker.toLowerCase()){
@@ -937,9 +952,12 @@ const deal = {
             if(prueba.status == 200){
                 if(prueba.data.results.length > 0){
                     let Id = prueba.data.results[0].id;
-                    let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
-                    let {telefono, email} = broker.data.properties;
-                    return {telefono, email};
+                    // let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
+                    let deal = await axios.get('deals/v1/deal/' + Id);
+                    let {telefono, email} = deal.data.properties;
+                    let telephone = telefono.value;
+                    let correoBroker = email.value;
+                    return {telephone, correoBroker};
                 }
             } else {
                 return false;
@@ -952,10 +970,12 @@ const deal = {
     },
     getScore: async (request) => {
         try{
-            const {data} = await axios.get('crm/v3/objects/deals/' + request + '&properties=score_bc');
-            let score = data.properties.score_bc;
-            score = score === undefined ? "no" : score === "" ? "no" : parseInt(score);
-            return score;
+            // const {data} = await axios.get('crm/v3/objects/deals/' + request + '&properties=score_bc');
+            const deal = await axios.get('deals/v1/deal/' + request);
+            // let score = data.properties.score_bc.value;
+            let {score_bc} = deal.data.properties;
+            score_bc = score_bc === undefined ? "no" : score_bc === "" ? "no" : parseInt(score_bc);
+            return score_bc;
 
         } catch(error){
             console.log(error);
