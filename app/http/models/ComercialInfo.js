@@ -22,6 +22,7 @@ const comercialInfoSchema = new Schema({
   exportation: Boolean,
   warranty: Number,
   ciec: String,
+  ciecstatus: { type: Boolean, default: false },
   status: { type: Boolean, default: false }
 }, { collection: 'ComercialInfo' });
 

@@ -29,6 +29,8 @@ const documentsController = require("../app/http/controllers/documentsController
 const finerioController = require("../app//http/controllers/finerioController");
 const openBankingController = require("../app//http/controllers/openBankingController");
 const kykoyaController = require("../app/http/controllers/kykoyaController");
+const updateDataController = require("../app/http/controllers/updateDataController");
+const metamapController = require("../app/http/controllers/metamapController");
 const rateLimit = require("express-rate-limit");
 
 route.use(verifyToken);
@@ -38,7 +40,7 @@ route.use(async(request, response, next) => {
 });
 
 const limit = rateLimit({
-    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    windowMs: 14 * 60 * 60 * 1000, // 12 hours
     max: 3, // limit each IP to 100 requests per windowMs
     message: "Too many accounts created from this IP, please try again after an hour",
     keyGenerator: (req) => req.params.id
@@ -79,9 +81,9 @@ route.group("/amount", (amount) => {
 
 //Info comercial routes
 route.group("/info-comercial", (comercial) => {
-    comercial.post('/:id', comercialInfoController.store);
+    comercial.post('/:id', comercialInfoController.update);
     comercial.get('/:id', comercialInfoController.show);
-    comercial.put('/:id', comercialInfoController.update);
+    comercial.put('/:id', comercialInfoController.store);
 });
 
 //Info general routes
@@ -115,6 +117,15 @@ route.group("/buro", (buro) => {
     buro.post('/:id', [limit], buroController.inicio);
     buro.post('/update/:id', buroController.update);
   });
+
+route.group("/v1", (v1) => {
+    v1.post("/update", updateDataController.updateData);
+});
+route.group("/meta", (meta) => {
+    meta.post("/consulta", metamapController.listener);
+    meta.post("/update", metamapController.updateSate);
+    meta.get("/data", metamapController.updateData);
+});
 
 //Finerio routes
 route.group("/finerio", (finerio) => {

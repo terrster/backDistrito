@@ -20,6 +20,8 @@ class Server{
 
     middlewares(){
         this.app.use(express.static(path.resolve(__dirname, '../public')));
+        this.app.use(express.json({limit: "10mb", extended: true}))
+        this.app.use(express.urlencoded({limit: "10mb", extended: true, parameterLimit: 50000}))
         this.app.use(bodyParser.urlencoded( {extended:false} ));
         this.app.use(bodyParser.json());
         this.app.use(fileUpload());
@@ -50,7 +52,11 @@ class Server{
                     - IP's -
                     Finerio: 3.21.17.42
                 */
-                const allowedIPS = ['3.21.17.42'];
+                const allowedIPS = ['3.21.17.42', "52.55.16.54"];
+
+                if(allowedIPS.includes(request.ip)){
+                    next();
+                }
         
                 if(request.headers.hasOwnProperty('tokensecret')){                    
                     if(request.headers.tokensecret === 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs='){

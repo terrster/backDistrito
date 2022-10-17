@@ -1,18 +1,27 @@
 'use strict'
-
-const axios = require("axios");
+const _axios = require("axios").default;
 const fileManager = require("../services/fileManager");
 
-const hubspot = {
+require('dotenv').config({
+    path: `.env.${process.env.NODE_ENV}`
+});
+const HUBSPOT_TOKEN = process.env.HUBSPOT_TOKEN; // Your Hubspot Token
+const axios = _axios.create({
     baseURL: 'https://api.hubapi.com/',
+    headers: {
+        'Authorization': `Bearer ${HUBSPOT_TOKEN}`,
+        'Content-Type': 'application/json'
+    }
+});
+
+const hubspot = {
     pipeline: '9491843',// Alianzas DP
     dealstage: '9491847',// Implementación
-    hapiKey: '?hapikey=2c17b627-0c76-4182-b31a-6874e67d32b3'
 }
 
 const getContactByEmail = async(email) => {
     try{
-        const response = await axios.get(hubspot.baseURL + 'contacts/v1/contact/email/' + email + '/profile' + hubspot.hapiKey);
+        const response = await axios.get('contacts/v1/contact/email/' + email + '/profile');
 
         if(response.status == 200){
             return response.data;
@@ -42,7 +51,7 @@ const storeContact = async(request) => {
             ]
         };
 
-        const {data} = await axios.post(hubspot.baseURL + 'contacts/v1/contact' + hubspot.hapiKey, contactParams);
+        const {data} = await axios.post('contacts/v1/contact', contactParams);
         return data;
     }
     catch(error){
@@ -327,7 +336,7 @@ const allieController = {
                 ]
             };
 
-            await axios.post(hubspot.baseURL + 'deals/v1/deal' + hubspot.hapiKey, dealParams);
+            await axios.post('deals/v1/deal', dealParams);
             
             return response.json({ 
                 code: 200,

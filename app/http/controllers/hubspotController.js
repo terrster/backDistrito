@@ -1,13 +1,15 @@
 'use strict'
 const _axios = require("axios").default;
+require('dotenv').config({
+    path: `.env.${process.env.NODE_ENV}`
+});
+const HUBSPOT_TOKEN = process.env.HUBSPOT_TOKEN; // Your Hubspot Token
 const axios = _axios.create({
     baseURL: 'https://api.hubapi.com/',
     headers: {
-        "Content-Type": "application/json"
+        'Authorization': `Bearer ${HUBSPOT_TOKEN}`,
+        'Content-Type': 'application/json'
     }
-});
-require('dotenv').config({
-    path: `.env.${process.env.NODE_ENV}`
 });
 const hapiKey = `?hapikey=${process.env.HAPIKEY}`;
 const format = require("../services/formatManager");
@@ -61,7 +63,7 @@ const deal = {
 
             if(request.brokercode){
                 try{
-                    const response = await axios.get('owners/v2/owners/' + request.brokercode + hapiKey);
+                    const response = await axios.get('owners/v2/owners/' + request.brokercode);
         
                     if(response.status == 200){
                         let prueba = await deal.validateBroker(request, response.data);
@@ -75,7 +77,7 @@ const deal = {
                             "name": "hubspot_owner_id"
                         });
 
-                        const {data} = await axios.post('deals/v1/deal' + hapiKey, dealParams);
+                        const {data} = await axios.post('deals/v1/deal', dealParams);
                         res = data;
                         return res;
                         }
@@ -91,7 +93,7 @@ const deal = {
                 }
             }
             else{
-                const {data} = await axios.post('deals/v1/deal' + hapiKey, dealParams);
+                const {data} = await axios.post('deals/v1/deal', dealParams);
                 return data;
             }
             
@@ -119,7 +121,7 @@ const deal = {
         }
 
         try{
-            const {data} = await axios.get('deals/v1/deal/' + id + hapiKey);
+            const {data} = await axios.get('deals/v1/deal/' + id);
             if(type_response == 'web'){
                 return response.json(data);
             }
@@ -140,7 +142,7 @@ const deal = {
         let id = request;
 
         try{
-            const {data} = await axios.delete('deals/v1/deal/' + id + hapiKey);
+            const {data} = await axios.delete('deals/v1/deal/' + id);
             
             return data;
         }
@@ -817,14 +819,13 @@ const deal = {
                                     "value": request.secondLastname,
                                     "name": "n4_3_apellido_materno"
                                 },
-
-                                {
-                                    "value": request.curp,
-                                    "name": "curp"
-                                },
                                 {
                                     "value": request.rfcPerson,
                                     "name": "n3_15_rfc_pm"
+                                },
+                                {
+                                    "value": request.curp,
+                                    "name": "curp"
                                 },
                                 {
                                     "value": format.YES_NO_QUESTION[request.mortgageCredit],
@@ -846,7 +847,7 @@ const deal = {
                         }
                 }
             }
-            const {data} = await axios.put('deals/v1/deal/' + hubspotDealId + hapiKey, dealParams);
+            const {data} = await axios.put('deals/v1/deal/' + hubspotDealId, dealParams);
             return data;
         }
         catch(error){
@@ -867,7 +868,7 @@ const deal = {
         let telephone;
         let response;
         try{
-            let prueba = await axios.post('crm/v3/objects/deals/search' + hapiKey, {
+            let prueba = await axios.post('crm/v3/objects/deals/search', {
                 "filters": [
                     {
                         "value": request.brokercode,
@@ -879,7 +880,7 @@ const deal = {
             if(prueba.status == 200){
             if(prueba.data.results.length > 0){
                 let Id = prueba.data.results[0].id;
-                let broker = await axios.get('crm/v3/objects/deals/'+Id+ hapiKey +'&properties=telefono,email');
+                let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
                 let {telefono, email} = broker.data.properties;
                 telephone = telefono;
                 correoBroker = email;
@@ -924,7 +925,7 @@ const deal = {
     },
     broker: async (brokercode, data) => {
         try{
-            let prueba = await axios.post('crm/v3/objects/deals/search' + hapiKey, {
+            let prueba = await axios.post('crm/v3/objects/deals/search', {
                 "filters": [
                     {
                         "value": brokercode,
@@ -936,13 +937,25 @@ const deal = {
             if(prueba.status == 200){
                 if(prueba.data.results.length > 0){
                     let Id = prueba.data.results[0].id;
-                    let broker = await axios.get('crm/v3/objects/deals/'+Id+ hapiKey +'&properties=telefono,email');
+                    let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
                     let {telefono, email} = broker.data.properties;
                     return {telefono, email};
                 }
             } else {
                 return false;
             }
+
+        } catch(error){
+            console.log(error);
+            return false;
+        }
+    },
+    getScore: async (request) => {
+        try{
+            const {data} = await axios.get('crm/v3/objects/deals/' + request + '&properties=score_bc');
+            let score = data.properties.score_bc;
+            score = score === undefined ? "no" : score === "" ? "no" : parseInt(score);
+            return score;
 
         } catch(error){
             console.log(error);
@@ -981,7 +994,7 @@ const contact = {
                 ]
             };
 
-            const {data} = await axios.post('contacts/v1/contact' + hapiKey, contactParams);
+            const {data} = await axios.post('contacts/v1/contact', contactParams);
             return data;
         }
         catch(error){
@@ -996,7 +1009,7 @@ const contact = {
     },
     getByEmail: async(email) => {
         try{
-            const response = await axios.get('contacts/v1/contact/email/' + email + '/profile' + hapiKey);
+            const response = await axios.get('contacts/v1/contact/email/' + email + '/profile');
 
             if(response.status == 200){
                 return response.data;
@@ -1008,7 +1021,7 @@ const contact = {
     },
     show: async(hubspotContactId) => {
         try{
-            const {data} = await axios.get('contacts/v1/contact/vid/' + hubspotContactId + '/profile' + hapiKey);
+            const {data} = await axios.get('contacts/v1/contact/vid/' + hubspotContactId + '/profile');
             return data;
         }
         catch(error){
@@ -1040,7 +1053,7 @@ const contact = {
                     }
                 ]
             };
-            const {data} = await axios.post('contacts/v1/contact/vid/' + hubspotContactId + '/profile' + hapiKey, contactParams);
+            const {data} = await axios.post('contacts/v1/contact/vid/' + hubspotContactId + '/profile', contactParams);
             return data;
         }
         catch(error){
@@ -1054,7 +1067,7 @@ const contact = {
     },
     delete: async(hubspotContactId) => {
         try{
-            const response = await axios.delete('contacts/v1/contact/vid/' + hubspotContactId + hapiKey);
+            const response = await axios.delete('contacts/v1/contact/vid/' + hubspotContactId);
 
             if(response.status == 200){
                 return response.data;
