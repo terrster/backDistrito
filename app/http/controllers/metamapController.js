@@ -173,7 +173,9 @@ const metamapController = {
       "bankStatements",
       "oficialID",
       "proofAddress",
-      "others"
+      "others",
+      "guaranteeStatement",
+      "guaranteeFixedAssets",
     ]
 
     if (request.body.metadata === undefined) {
