@@ -171,18 +171,18 @@ const buroController = {
       const { street, zipCode } = address;
 
             //para pruebas en local
-      if (process.env.NODE_ENV === "localhost") {
-        return res.status(400).json({
-          success: true,
-          message: "prueba",
-          buro: {
-            nombreScore: "Prueba",
-            valorScore: 750,
-            status: "SUCCESS",
-          },
-          user: user,
-        });
-      }
+      // if (process.env.NODE_ENV === "localhost") {
+      //   return res.status(400).json({
+      //     success: true,
+      //     message: "prueba",
+      //     buro: {
+      //       nombreScore: "Prueba",
+      //       valorScore: 750,
+      //       status: "SUCCESS",
+      //     },
+      //     user: user,
+      //   });
+      // }
       const response = await axios(configLogin);
 
       const { data } = response;
@@ -316,10 +316,10 @@ const buroController = {
                 33: "Rio nilo n 74",
                 39: "55070",
                 716: "MX",
-                269: "V",
-                271: "V",
+                269: "F",
+                271: "F",
                 273: "V",
-                276: "1234",
+                276: "9919",
                 tipo_autenticacion: "AUTENTICACION",
               },
             });

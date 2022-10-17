@@ -242,6 +242,17 @@ const comercialInfoController = {
                 };
     
                 let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
+                await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+                    idComercialInfo : {
+                        _id : comercialInfoStored._id
+                    }
+                });
+    
+                await Client.findByIdAndUpdate(user.idClient._id, {
+                    idComercialInfo: {
+                        _id: comercialInfoStored._id
+                    }
+                });
                 comercial = comercialInfoStored;
             }
 

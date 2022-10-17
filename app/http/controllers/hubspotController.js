@@ -970,10 +970,12 @@ const deal = {
     },
     getScore: async (request) => {
         try{
-            const {data} = await axios.get('crm/v3/objects/deals/' + request + '&properties=score_bc');
-            let score = data.properties.score_bc;
-            score = score === undefined ? "no" : score === "" ? "no" : parseInt(score);
-            return score;
+            // const {data} = await axios.get('crm/v3/objects/deals/' + request + '&properties=score_bc');
+            const deal = await axios.get('deals/v1/deal/' + request);
+            // let score = data.properties.score_bc.value;
+            let {score_bc} = deal.data.properties;
+            score_bc = score_bc === undefined ? "no" : score_bc === "" ? "no" : parseInt(score_bc);
+            return score_bc;
 
         } catch(error){
             console.log(error);
