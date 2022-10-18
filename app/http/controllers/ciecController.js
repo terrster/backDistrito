@@ -111,12 +111,15 @@ const ciecController = {
           msg: "no se encontró el cliente, favor de verificar el RFC",
         });
       }
-      let idClient =
-        comercial.idClient !== undefined
-          ? comercial.idClient
-          : generalInfo.idClient !== undefined
-          ? generalInfo.idClient
-          : false;
+      let idClient = "";
+
+          if(comercial !== undefined && comercial !== null && comercial.idClient !== undefined && comercial.idClient !== null){
+            idClient = comercial.idClient;
+          } else if(generalInfo !== undefined && generalInfo !== null && generalInfo.idClient !== undefined && generalInfo.idClient !== null){
+            idClient = generalInfo.idClient;
+          } else {
+            idClient = false;
+          }
 
       if (!idClient) {
         return res.status(500).json({
@@ -212,6 +215,18 @@ const ciecController = {
     await hubspotController.deal
       .update(hubspotDealId, "single_field", {
         name: "n4_93_ciec",
+        value: "VALID",
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).json({
+          msg: "Algo salió mal tratando de actualizar el CIEC",
+          error: error,
+        });
+      });
+    await hubspotController.deal
+      .update(hubspotDealId, "single_field", {
+        name: "datacode",
         value: n4_93_ciec,
       })
       .catch((error) => {
