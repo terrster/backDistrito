@@ -176,6 +176,7 @@ const metamapController = {
       "others",
       "guaranteeStatement",
       "guaranteeFixedAssets",
+      "constitutiveAct",
     ]
 
     if (request.body.metadata === undefined) {
