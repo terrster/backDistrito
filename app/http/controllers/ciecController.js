@@ -112,20 +112,33 @@ const ciecController = {
         });
       }
       let idClient = "";
+      let isClient = false;
 
-          if(comercial !== undefined && comercial !== null && comercial.idClient !== undefined && comercial.idClient !== null){
-            idClient = comercial.idClient;
-          } else if(generalInfo !== undefined && generalInfo !== null && generalInfo.idClient !== undefined && generalInfo.idClient !== null){
-            idClient = generalInfo.idClient;
+          if(comercial){
+            isClient = true;
+          } else if(generalInfo){
+            isClient = true;
           } else {
-            idClient = false;
+            isClient = false;
           }
 
-      if (!idClient) {
-        return res.status(500).json({
-          msg: "no se encontró el cliente, favor de verificar el RFC",
-        });
-      }
+          if (!isClient) {
+            return res.status(500).json({
+              msg: "no se encontró el cliente, favor de verificar el RFC",
+            });
+          }
+
+        if (comercial) {
+          let client = await Client.findOne({ idComercialInfo: { $eq: comercial._id } });
+          if(client){
+            idClient = client._id;
+          }
+        } else if (generalInfo) {
+          let client = await Client.findOne({ idGeneralInfo: { $eq: generalInfo._id } });
+          if(client){
+            idClient = client._id;
+          }
+        }
 
       let user = await User.findOne({ idClient: { $eq: idClient } });
       if (comercialId === "") {
