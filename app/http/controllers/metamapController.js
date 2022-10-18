@@ -173,9 +173,9 @@ const metamapController = {
       "bankStatements",
       "oficialID",
       "proofAddress",
-      "others",
-      "guaranteeStatement",
-      "guaranteeFixedAssets",
+      // "others",
+      // "guaranteeStatement",
+      // "guaranteeFixedAssets",
       // "constitutiveAct",
     ]
 
@@ -369,9 +369,12 @@ const metamapController = {
           }
           let hs_property_names = getNameProperty(key);
           let helper = {};
-          let arrhelper = params[key];
+          let arrhelper = params[key] === undefined ? [] : params[key];
           // let name = "";
-          helper[key] = [...arrhelper, ...Document[key]];
+          if (Document[key] === undefined) {
+            Document[key] = [];
+          }
+          helper[key] = [...arrhelper, ...Document[key]]; ///esperar a que se suban los documentos
           // console.log("helper", helper);
           await getUpdate(Documents, idDocument, helper);
 
