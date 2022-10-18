@@ -371,8 +371,8 @@ const metamapController = {
           let helper = {};
           let arrhelper = params[key];
           // let name = "";
-          if (Document[accName] === undefined) {
-            Document[accName] = [];
+          if (Document[key] === undefined) {
+            Document[key] = [];
           }
           helper[key] = [...arrhelper, ...Document[key]]; ///esperar a que se suban los documentos
           // console.log("helper", helper);
