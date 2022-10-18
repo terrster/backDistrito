@@ -173,7 +173,7 @@ const metamapController = {
       "bankStatements",
       "oficialID",
       "proofAddress",
-      "others",
+      // "others",
       "guaranteeStatement",
       "guaranteeFixedAssets",
       // "constitutiveAct",
