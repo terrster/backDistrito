@@ -175,7 +175,7 @@ const metamapController = {
       "proofAddress",
       // "others",
       // "guaranteeStatement",
-      "guaranteeFixedAssets",
+      // "guaranteeFixedAssets",
       // "constitutiveAct",
     ]
 
