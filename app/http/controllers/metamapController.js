@@ -369,7 +369,7 @@ const metamapController = {
           }
           let hs_property_names = getNameProperty(key);
           let helper = {};
-          let arrhelper = params[key];
+          let arrhelper = params[key] === undefined ? [] : params[key];
           // let name = "";
           if (Document[key] === undefined) {
             Document[key] = [];
