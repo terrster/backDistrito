@@ -47,9 +47,9 @@ const getNameProperty = (key) => {
         "n9_3_11_estados_de_cuenta",
       ];
     case "rfc":
-      return ["n9_4_rfc"];
-    case "rfcSocio":
       return ["n7_08_csf_socio"];
+    case "rfcSocio":
+      return ["n9_4_rfc"];
     case "lastDeclarations":
       return [
         "n9_5_declaraci_n",
