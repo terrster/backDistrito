@@ -228,7 +228,7 @@ const ciecController = {
     await hubspotController.deal
       .update(hubspotDealId, "single_field", {
         name: "n4_93_ciec",
-        value: "VALID",
+        value: "valid",
       })
       .catch((error) => {
         console.log(error);
