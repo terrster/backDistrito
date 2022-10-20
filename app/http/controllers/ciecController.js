@@ -89,6 +89,7 @@ const ciecController = {
 
     let comercialId = "";
     let hubspotDealId = "";
+    let pMoral = false;
 
     let validRFC = rfcValido(rfc);
 
@@ -117,6 +118,7 @@ const ciecController = {
           if(comercial){
             isClient = true;
           } else if(generalInfo){
+            pMoral = true;
             isClient = true;
           } else {
             isClient = false;
@@ -141,6 +143,14 @@ const ciecController = {
         }
 
       let user = await User.findOne({ idClient: { $eq: idClient } });
+      let type = user.idClient.type;
+
+      if (type === "PM" && pMoral) {
+        return res.status(500).json({
+          msg: "el cliente es persona moral, porfavor ingrese el RFC de la persona moral",
+        });
+      }
+
       if (comercialId === "") {
         comercialId = user.idClient.idComercialInfo;
       }
@@ -228,7 +238,7 @@ const ciecController = {
     await hubspotController.deal
       .update(hubspotDealId, "single_field", {
         name: "n4_93_ciec",
-        value: "VALID",
+        value: "valid",
       })
       .catch((error) => {
         console.log(error);
