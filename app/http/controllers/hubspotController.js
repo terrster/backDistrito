@@ -889,9 +889,8 @@ const deal = {
                 // let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
                 // console.log(broker);
                 let {telefono, email} = deal.data.properties;
-                telephone = telefono.value;
-                correoBroker = email.value;
-                console.log(telephone);
+                telephone = telefono.value ? telefono.value : '';
+                correoBroker = email.value ? email.value : '';
             } else {
                 response = {
                     code: 403,
