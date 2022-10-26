@@ -277,7 +277,7 @@ const deal = {
                                 },
                                 {
                                     "value": request.ciec,
-                                    "name": "n4_93_ciec"
+                                    "name": "datacode"
                                 },
                                 {//datos comerciales - domicilio negocio
                                     "value": request.state,
