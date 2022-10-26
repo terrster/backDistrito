@@ -277,7 +277,7 @@ const deal = {
                                 },
                                 {
                                     "value": request.ciec,
-                                    "name": "n4_93_ciec"
+                                    "name": "datacode"
                                 },
                                 {//datos comerciales - domicilio negocio
                                     "value": request.state,
@@ -864,8 +864,8 @@ const deal = {
         let name = request.name + " " + request.lastname;
         let broker = data.firstName + " " + data.lastName;
         let emailBroker = data.email;
-        let correoBroker;
-        let telephone;
+        let correoBroker = "";
+        let telephone = ""
         let response;
         
         try{
@@ -889,9 +889,12 @@ const deal = {
                 // let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
                 // console.log(broker);
                 let {telefono, email} = deal.data.properties;
-                telephone = telefono.value;
-                correoBroker = email.value;
-                console.log(telephone);
+                if(telefono){
+                    telephone = telefono.value;
+                } 
+                if(email){
+                    correoBroker = email.value;
+                }
             } else {
                 response = {
                     code: 403,
@@ -955,8 +958,14 @@ const deal = {
                     // let broker = await axios.get('crm/v3/objects/deals/'+Id +'&properties=telefono,email');
                     let deal = await axios.get('deals/v1/deal/' + Id);
                     let {telefono, email} = deal.data.properties;
-                    let telephone = telefono.value;
-                    let correoBroker = email.value;
+                    let telephone = "";
+                    let correoBroker = "";
+                    if(telefono){
+                        telephone = telefono.value;
+                    }
+                    if(email){
+                        correoBroker = email.value;
+                    }
                     return {telephone, correoBroker};
                 }
             } else {

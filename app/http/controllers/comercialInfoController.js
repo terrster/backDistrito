@@ -74,7 +74,7 @@ const comercialInfoController = {
                     n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
 
                     CiecUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
-                    { name: 'n4_93_ciec', value: n4_93_ciec }
+                    { name: 'datacode', value: n4_93_ciec }
                 );
                 }
 
@@ -289,7 +289,7 @@ const comercialInfoController = {
                     n4_93_ciec = Buffer.from(n4_93_ciec).toString('base64');
 
                     CiecUpdated = await hubspotController.deal.update(user.hubspotDealId, 'single_field', 
-                    { name: 'n4_93_ciec', value: n4_93_ciec }
+                    { name: 'datacode', value: n4_93_ciec }
                 );
                 }
 
