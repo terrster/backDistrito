@@ -33,6 +33,7 @@ const getContactByEmail = async(email) => {
 }
 
 const storeContact = async(request) => {
+    console.log(request);
     try{
         let contactParams = {
             "properties": [
@@ -59,7 +60,7 @@ const storeContact = async(request) => {
             ]
         }
 
-        const {data} = await axios.post(hubspot.baseURL + 'contacts/v1/contact' + hubspot.hapiKey, contactParams);
+        const {data} = await axios.post('contacts/v1/contact', contactParams);
         return data;
     }
     catch(error){
@@ -99,6 +100,9 @@ const brokerController = {
             let exist = await getContactByEmail(data.email);
 
             if(exist){
+                if(process.env.NODE_ENV !== 'production'){
+                    let deleteContact = await axios.delete('contacts/v1/contact/vid/' + exist.vid);
+                }
                 return response.json({ 
                     code: 500,
                     msg: "El correo electrónico ya existe"

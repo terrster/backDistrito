@@ -11,7 +11,6 @@ const axios = _axios.create({
         'Content-Type': 'application/json'
     }
 });
-const hapiKey = `?hapikey=${process.env.HAPIKEY}`;
 const format = require("../services/formatManager");
 
 const deal = {
