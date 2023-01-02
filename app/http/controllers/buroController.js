@@ -21,6 +21,78 @@ const headers = {
   company_code: "P2VXMnh",
 };
 
+const codigoEstado = (estado) => {
+  switch (estado) {
+    case "AGUASCALIENTES":
+      return "AGS";
+    case "BAJA CALIFORNIA":
+      return "BCN";
+    case "BAJA CALIFORNIA SUR":
+      return "BCS";
+    case "CAMPECHE":
+      return "CAM";
+    case "COAHUILA":
+      return "COA";
+    case "COLIMA":
+      return "COL";
+    case "CHIAPAS":
+      return "CHS";
+    case "CHIHUAHUA":
+      return "CHI";
+    case "CIUDAD DE MEXICO":
+      return "CDMX";
+    case "DURANGO":
+      return "DGO";
+    case "GUANAJUATO":
+      return "GTO";
+    case "GUERRERO":
+      return "GRO";
+    case "HIDALGO":
+      return "HGO";
+    case "JALISCO":
+      return "JAL";
+    case "MEXICO":
+      return "EM";
+    case "MICHOACAN":
+      return "MICH";
+    case "MORELOS":
+      return "MOR";
+    case "NAYARIT":
+      return "NAY";
+    case "NUEVO LEON":
+      return "NL";
+    case "OAXACA":
+      return "OAX";
+    case "PUEBLA":
+      return "PUE";
+    case "QUERETARO":
+      return "QRO";
+    case "QUINTANA ROO":
+      return "QR";
+    case "SAN LUIS POTOSI":
+      return "SLP";
+    case "SINALOA":
+      return "SIN";
+    case "SONORA":
+      return "SON";
+    case "TABASCO":
+      return "TAB";
+    case "TAMAULIPAS":
+      return "TAM";
+    case "TLAXCALA":
+      return "TLAX";
+    case "VERACRUZ":
+      return "VER";
+    case "YUCATAN":
+      return "YUC";
+    case "ZACATECAS":
+      return "ZAC";
+    default:
+      return "EM";
+  }
+
+};
+
 
 
 const buroController = {
@@ -554,6 +626,32 @@ const buroController = {
       });
     }
 
+  },
+  async getToken(req, res) {
+    console.log("getToken");
+    try {
+      const configToken = {
+        method: "post",
+        url: "https://apif.burodecredito.com.mx:4431/auth/oauth/v2/token",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization" : "Basic bDdmNGFiOTYxOTkyMzM0MzA2OWUzYTQ4YzMyMDliNjFlNDplZTliYTY5OWU5ZjU0Y2Q3YmJlNzk0OGUwODg0Y2NjOQ==",
+        },
+        data: {
+          grant_type: "client_credentials",
+        },
+      };
+      await axios(configToken).then((response) => {
+        console.log(response.data)
+      });
+    } catch (error) {
+      console.log("error");
+      console.log(error);
+    }
+
+    return res.status(200).json({
+      success: true,
+    });
   },
 };
 module.exports = buroController;
