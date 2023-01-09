@@ -638,27 +638,49 @@ const buroController = {
     try {
       const configToken = {
         method: "post",
-        url: "https://apigateway1.burodecredito.com.mx:8443/auth/oauth/v2/token",
+        url:"https://api.burodecredito.com.mx:4431/auth/oauth/v2/token",
         headers: {
           "Content-Type": "application/json",
         },
         data: {
-          grant_type: "client_credentials",
-          client_id:  "l7f4ab9619923343069e3a48c3209b61e4",
-          client_secret: "ee9ba699e9f54cd7bbe7948e0884ccc9"
+          client_id:  "5caad9a0-06dd-4419-b0fe-05a2cf6b9d64",
+          client_secret: "af896bc8-55ed-406a-bbff-382c2e33fcf8",
+          username: "KK89631001",
+          password: "pfWVLRGq",
+          Scope: "PFscope",
+          grant_type: "password",
         },
       };
-      await axios(configToken).then((response) => {
-        console.log(response.data)
-      });
+      // await axios(configToken).then((response) => {
+      //   console.log(response.data)
+      //   return res.status(200).json({
+      //     success: true,
+      //     token: response.data
+      //   });
+      // });
+      const data = Json.stringify({
+        client_id:  "5caad9a0-06dd-4419-b0fe-05a2cf6b9d64",
+        client_secret: "af896bc8-55ed-406a-bbff-382c2e33fcf8",
+        username: "KK89631001",
+        password: "pfWVLRGq",
+        Scope: "PFscope",
+        grant_type: "password",
+      })
+      await axios.post("https://api.burodecredito.com.mx:4431/auth/oauth/v2/token", data, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
     } catch (error) {
       console.log("error");
       console.log(error.response);
+      return res.status(200).json({
+        success: false,
+        token: error.response.data
+      });
     }
 
-    return res.status(200).json({
-      success: true,
-    });
+    
   },
   async Prospector(req, res) {
     await numeroPeticion();

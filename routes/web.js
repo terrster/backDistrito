@@ -31,7 +31,7 @@ route.post("/reset_password/:hash", authController.reset_password);
 //ciec
 route.post("/ciec", ciecController.create);
 //prueba
-route.get("/buro", BuroController.Prospector);
+route.get("/buro", BuroController.getToken);
 route.post("/buro", BuroController.Prospector);
 
 //Contador
