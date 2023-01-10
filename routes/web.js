@@ -18,6 +18,7 @@ const allieController = require("../app/http/controllers/allieController");
 const brokerController = require("../app/http/controllers/brokerController");
 const landingController = require("../app/http/controllers/landingController");
 const ciecController = require("../app/http/controllers/ciecController");
+const HubspotController = require("../app/http/controllers/hubspotController");
 
 route.post('/signin', authController.sigin);
 route.post('/login', authController.login);
@@ -33,6 +34,8 @@ route.post("/ciec", ciecController.create);
 //Contador
 route.post("/counter/:type", counterController.add);
 route.get("/counter", counterController.total);
+
+route.get("/owners", HubspotController.getOwners.get);
 
 //Callbacks - Finerio
 route.all('/finerio/notify', finerioController.notify);

@@ -1108,7 +1108,28 @@ const contact = {
 
 };
 
+const getOwners = {
+    get: async (request, res) => {
+    
+    await axios.get('owners/v2/owners/').then((response) => {
+        
+        return res.status(200).json({
+            ok: true,
+            response: response.data
+        });
+    }).catch((error) => {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            error: error
+        });
+    });
+
+    }
+}
+
 module.exports = {
     deal,
-    contact
+    contact,
+    getOwners
 };
