@@ -350,7 +350,7 @@ const metamapController = {
               case "pdf":
                 arrUrls = [...arrUrls, { url: doc[key], name: accName }];
                 break;
-              case "internalUrl":
+              case "url":
                 arrUrls = [...arrUrls, { url: doc[key], name: accName }];
                 break;
               default:
@@ -580,7 +580,7 @@ const metamapController = {
               case "pdf":
                 arrUrls = [...arrUrls, { url: doc[key], name: accName }];
                 break;
-              case "internalUrl":
+              case "url":
                 arrUrls = [...arrUrls, { url: doc[key], name: accName }];
                 break;
               default:
