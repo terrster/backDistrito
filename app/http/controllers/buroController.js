@@ -4,6 +4,8 @@ const ComercialInfo = require("../models/ComercialInfo");
 const GeneralInfo = require("../models/GeneralInfo");
 const hubspotController = require("../controllers/hubspotController");
 const axios = require("axios");
+const qs = require("qs");
+const fs = require('fs');
 const Client = require("../models/Client");
 const format = require("../services/formatManager");
 const { response } = require("express");
@@ -15,7 +17,6 @@ const HAPIKEY_UNYKOO = process.env.HAPIKEY_UNYKOO;
 const UNYKOO_URL = process.env.UNYKOO_URL;
 const shhets = require("../controllers/sheetsController");
 const userController = require("./userController");
-
 
 const headers = {
   "Content-Type": "application/json",
@@ -92,10 +93,9 @@ const codigoEstado = (estado) => {
     default:
       return "EM";
   }
-
 };
 
-const numeroPeticion = async() => {
+const numeroPeticion = async () => {
   let lastUser = await userController.lastUser();
   console.log(lastUser);
   return lastUser;
@@ -103,7 +103,6 @@ const numeroPeticion = async() => {
 
 const buroController = {
   async inicio(req, res) {
-
     const data = JSON.stringify({
       login: "PROSPECTOR",
       workflowName: "DP",
@@ -119,7 +118,7 @@ const buroController = {
     let hubspotDealId = user.hubspotDealId;
     // si se consulta el buro de un usuario en hubspot se actuliza en la base de datos el buro y regreso la calificacion de la persona
     let pruebaScore = await hubspotController.deal.getScore(hubspotDealId);
-    if(!isNaN(pruebaScore)){
+    if (!isNaN(pruebaScore)) {
       await Client.findByIdAndUpdate(user.idClient._id, {
         score: pruebaScore,
       });
@@ -128,7 +127,7 @@ const buroController = {
       return res.status(200).json({
         success: true,
         buro: {
-          valorScore : pruebaScore,
+          valorScore: pruebaScore,
           status: "success",
         },
         user: userUpdateHub,
@@ -149,7 +148,7 @@ const buroController = {
         rfc,
         update,
       } = req.body;
-      
+
       let rfcConsulta = "";
       let comercialRFC = "";
       let razonSocial = "";
@@ -172,16 +171,23 @@ const buroController = {
             rfcPerson: rfcPerson,
           });
           if (rfc) {
-            await ComercialInfo.findByIdAndUpdate(user.idClient.idComercialInfo, {
-              rfc: rfc,
-            });
-            await hubspotController.deal.update(user.hubspotDealId, "single_field",{
-              value: rfc,
-              name: "n3_rfc"
-            });
+            await ComercialInfo.findByIdAndUpdate(
+              user.idClient.idComercialInfo,
+              {
+                rfc: rfc,
+              }
+            );
+            await hubspotController.deal.update(
+              user.hubspotDealId,
+              "single_field",
+              {
+                value: rfc,
+                name: "n3_rfc",
+              }
+            );
           }
           let generalInfo = await GeneralInfo.findById(generalKey);
-          
+
           let dealUpdated = await hubspotController.deal.update(
             user.hubspotDealId,
             "generalBuro",
@@ -197,7 +203,7 @@ const buroController = {
               last4,
             }
           );
-          
+
           if (dealUpdated.error) {
             return res.status(400).json({
               success: false,
@@ -233,7 +239,12 @@ const buroController = {
         user.idClient.idComercialInfo
       );
 
-      person = user.idClient.type === "PM" ? "P.Moral" : user.idClient.type === "PF" ? "PF" : "PFAE";
+      person =
+        user.idClient.type === "PM"
+          ? "P.Moral"
+          : user.idClient.type === "PF"
+          ? "PF"
+          : "PFAE";
 
       if (person === "P.Moral") {
         rfcConsulta = rfcPerson;
@@ -248,7 +259,7 @@ const buroController = {
 
       const { street, zipCode } = address;
 
-            //para pruebas en local
+      //para pruebas en local
       // if (process.env.NODE_ENV === "localhost") {
       //   return res.status(400).json({
       //     success: true,
@@ -339,15 +350,22 @@ const buroController = {
         const resForm = await axios(configForm);
         if (resForm.data.success === true) {
           //Si el formulario se envio correctamente
-          
+
           let datos = null;
 
           let tarjeta = "";
           let hipotecario = "";
-          creditCard === true ? (tarjeta = "V") : creditCard === "1" ? (tarjeta = "V") : (tarjeta = "F");
-          mortgageCredit === true ? (hipotecario = "V") : mortgageCredit === "1" ? (hipotecario = "V") : (hipotecario = "F");
+          creditCard === true
+            ? (tarjeta = "V")
+            : creditCard === "1"
+            ? (tarjeta = "V")
+            : (tarjeta = "F");
+          mortgageCredit === true
+            ? (hipotecario = "V")
+            : mortgageCredit === "1"
+            ? (hipotecario = "V")
+            : (hipotecario = "F");
 
-          
           let carro = carCredit === "YES" ? "V" : "F";
           let last4N = last4 !== null ? last4 : "";
 
@@ -478,7 +496,6 @@ const buroController = {
         });
       }
     } catch (error) {
-
       let response = "response" in error ? error.response : 500;
       if (response === 500) {
         console.log(error);
@@ -501,7 +518,7 @@ const buroController = {
       }
       let errorCode = "errorCode" in code ? code.errorCode : 500;
 
-      if (errorCode === 8){
+      if (errorCode === 8) {
         let paramsHub = {
           score: "",
           status: "ERROR_AUTENTICACION",
@@ -513,48 +530,47 @@ const buroController = {
           paramsHub
         );
         const clienteError = await Client.findById(user.idClient._id);
-            const { score } = clienteError;
-            let scoreError = "";
-            let statusCode = 400;
-            switch (score) {
-              case null || undefined:
-                scoreError = "ERROR";
-                break;
-              case "":
-                scoreError = "ERROR";
-                break;
-              case "ERROR":
-                scoreError = "ERROR 1";
-                break;
-              case "ERROR 1":
-                scoreError = "ERROR 2";
-                break;
-              case "ERROR 2":
-                scoreError = "ERROR 3";
-                break;
-              case "ERROR 3":
-                scoreError = "ERROR 3";
-                statusCode = 401;
-                break;
-              default:
-                scoreError = score;
-                break;
-            }
-            await Client.findByIdAndUpdate(user.idClient._id, {
-              score: scoreError,
-            });
+        const { score } = clienteError;
+        let scoreError = "";
+        let statusCode = 400;
+        switch (score) {
+          case null || undefined:
+            scoreError = "ERROR";
+            break;
+          case "":
+            scoreError = "ERROR";
+            break;
+          case "ERROR":
+            scoreError = "ERROR 1";
+            break;
+          case "ERROR 1":
+            scoreError = "ERROR 2";
+            break;
+          case "ERROR 2":
+            scoreError = "ERROR 3";
+            break;
+          case "ERROR 3":
+            scoreError = "ERROR 3";
+            statusCode = 401;
+            break;
+          default:
+            scoreError = score;
+            break;
+        }
+        await Client.findByIdAndUpdate(user.idClient._id, {
+          score: scoreError,
+        });
 
-            let userUpdate = await User.findById(req.params.id);
+        let userUpdate = await User.findById(req.params.id);
 
-            return res.status(statusCode).json({
-              success: false,
-              message: "Error Autenticación",
-              user: userUpdate,
-              error: error,
-            });
-
+        return res.status(statusCode).json({
+          success: false,
+          message: "Error Autenticación",
+          user: userUpdate,
+          error: error,
+        });
       } else if (errorCode !== 500) {
-        console.log(errorCode, "error de worfloo")
+        console.log(errorCode, "error de worfloo");
         console.log(code);
         return res.status(400).json({
           success: false,
@@ -594,21 +610,25 @@ const buroController = {
       case 4:
         warranty = 1;
         break;
-        default:
-          warranty = 1;
-          break;
+      default:
+        warranty = 1;
+        break;
     }
 
     try {
       let params = {
         value: format.WARRANTY[warranty],
-        name: "n3_14_garant_a"
-      }
-      let update = await hubspotController.deal.update(hubspotDealId, "single_field", params);
+        name: "n3_14_garant_a",
+      };
+      let update = await hubspotController.deal.update(
+        hubspotDealId,
+        "single_field",
+        params
+      );
       if (update) {
         await ComercialInfo.findByIdAndUpdate(user.idClient.idComercialInfo, {
-          warranty : warranty 
-        })
+          warranty: warranty,
+        });
         let userUpdate = await User.findById(req.params.id);
         return res.status(200).json({
           success: true,
@@ -631,231 +651,239 @@ const buroController = {
         error: error,
       });
     }
-
   },
   async getToken(req, res) {
-    console.log("getToken");
-    try {
-      const configToken = {
-        method: "post",
-        url:"https://api.burodecredito.com.mx:4431/auth/oauth/v2/token",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          client_id:  "5caad9a0-06dd-4419-b0fe-05a2cf6b9d64",
-          client_secret: "af896bc8-55ed-406a-bbff-382c2e33fcf8",
-          username: "KK89631001",
-          password: "pfWVLRGq",
-          Scope: "PFscope",
-          grant_type: "password",
-        },
-      };
-      // await axios(configToken).then((response) => {
-      //   console.log(response.data)
-      //   return res.status(200).json({
-      //     success: true,
-      //     token: response.data
-      //   });
-      // });
-      const data = Json.stringify({
-        client_id:  "5caad9a0-06dd-4419-b0fe-05a2cf6b9d64",
-        client_secret: "af896bc8-55ed-406a-bbff-382c2e33fcf8",
-        username: "KK89631001",
-        password: "pfWVLRGq",
-        Scope: "PFscope",
-        grant_type: "password",
-      })
-      await axios.post("https://api.burodecredito.com.mx:4431/auth/oauth/v2/token", data, {
-        headers: {
-          "Content-Type": "application/json",
-        }
-      })
-    } catch (error) {
-      console.log("error");
-      console.log(error.response);
-      return res.status(200).json({
-        success: false,
-        token: error.response.data
-      });
-    }
 
-    
+    let data = qs.stringify({
+      client_id: "5caad9a0-06dd-4419-b0fe-05a2cf6b9d64",
+      client_secret: "af896bc8-55ed-406a-bbff-382c2e33fcf8",
+      username: "KK89631005",
+      password: "efhrt1p4",
+      Scope: "PFscope",
+      grant_type: "password",
+    });
+
+    let config = {
+      method: "post",
+      url: "https://api.burodecredito.com.mx:4431/auth/oauth/v2/token",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: data,
+    };
+
+    let success = null
+    let token = null
+
+    await axios(config)
+      .then(function (response) {
+        success = true;
+        token = response.data.access_token;
+      })
+      .catch(function (error) {
+        console.log(error);
+        success = false;
+        token = error;
+      });
+
+    return {
+      success: success,
+      token: token,
+    };
   },
   async Prospector(req, res) {
-    await numeroPeticion();
-    let prueba = (new Date()).getTime().toString(16) + Math.random().toString(16).slice(1)
-    let tipoReporte = req.body.tipoReporte ? req.body.tipoReporte : false;
-    console.log(tipoReporte)
-    const AuthConfig = {
-      method: "post",
-      url: "https://api.burodecredito.com.mx:4431/devpf/autenticador/credit-report-api/v1/autenticador",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization" : "Bearer 8c5dec8a-1d35-4bc1-ae50-107061a0b84d",
-      },
-      data: {
-        "consulta": {
-          "persona": {
-            "autentica": {
-              "ejercidoCreditoAutomotriz": "F",
-              "ejercidoCreditoHipotecario": "F",
-              "referenciaOperador": `${prueba}`,
-              "tarjetaCredito": "V",
-              "tipoReporte": "RCN",
-              "tipoSalidaAU": tipoReporte ? tipoReporte : "4",
-              "ultimosCuatroDigitos": "9919"
-            },
-            "domicilios": [
-              {
-                "ciudad": "MEXICO",
-                "codPais": "MX",
-                "coloniaPoblacion": "JARDINES DE MORELOS",
-                "cp": "55070",
-                "delegacionMunicipio": "ECATEPEC DE MORELOS",
-                "direccion1": "RIO NILO N74",
-                "direccion2": "",
-                "estado": "EM",
-              }
-            ],
-            "encabezado": {
-              "clavePais": "MX",
-              "claveUnidadMonetaria": "MX",
-              "identificadorBuro": "0000",
-              "idioma": "SP",
-              "numeroReferenciaOperador": `${prueba}`,
-              "productoRequerido": "105",
-              "tipoConsulta": "I",
-              "tipoContrato": "CL",
-            },
-            "nombre": {
-              "apellidoAdicional": "",
-              "apellidoMaterno": "SANCHEZ",
-              "apellidoPaterno": "VILLEGAS",
-              "primerNombre": "JONATHAN",
-              "rfc": "VISJ940102FY3",
-              "segundoNombre": "",
-            }
-          }
-        }
-      }
-    }
-    await axios(AuthConfig).then(async(response) => {
-      if(tipoReporte){
-        if(response.data){
-          return res.status(200).json({
-            success: true,
-            data: response.data
-          })
-        } else {
-          return res.status(500).json({
-            success: false,
-            error: "No se pudo obtener el reporte"
-          })
-        }
-      }
-      let producto = "Auth"
-      let data = response.data
-      let autentica = {
-        ejercidoCreditoAutomotriz: "F",
-        ejercidoCreditoHipotecario: "F",
-        referenciaOperador: `${prueba}`,
-        tarjetaCredito: "V",
-        tipoSalidaAU: tipoReporte ? tipoReporte : "4",
-        ultimosCuatroDigitos: "9919"
-      }
-      try {
-        await shhets.saveBuro({producto, data, ...autentica})
-        
-      } catch (error) {
-        return res.status(200).json({
-          success: false,
-          error: error
-        })
-      }
-      if(response.data){
-        const configProspector = {
-          method: "post",
-          url: "https://api.burodecredito.com.mx:4431/devpf/prospector/credit-report-api/v1/prospector",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization" : "Bearer 413eaea4-a036-4ff9-9fdd-fc193b8fdaab",
-          },
-          data: {
-            "consulta": {
-              "persona": {
-                "domicilios": [
-                  {
-                    "ciudad": "MEXICO",
-                    "codPais": "MX",
-                    "coloniaPoblacion": "JARDINES DE MORELOS",
-                    "cp": "55070",
-                    "delegacionMunicipio": "ECATEPEC DE MORELOS",
-                    "direccion1": "RIO NILO N74",
-                    "direccion2": "",
-                    "estado": "EM",
-                  }
-                ],
-                "encabezado": {
-                  "clavePais": "MX",
-                  "claveUnidadMonetaria": "MX",
-                  "idioma": "SP",
-                  "numeroReferenciaOperador": `${prueba}`,
-                  "productoRequerido": "105",
-                  "tipoConsulta": "I",
-                  "tipoContrato": "CL",
-                },
-                "nombre": {
-                  "apellidoMaterno": "SANCHEZ",
-                  "apellidoPaterno": "VILLEGAS",
-                  "primerNombre": "JONATHAN",
-                  "rfc": "VISJ940102FY3",
-                  "segundoNombre": "",
-                }
-              }
-            }
-          }
-        }
-        axios(configProspector).then(async(response) => {
-          if(response.data.respuesta.persona){
-            let {persona} = response.data.respuesta
-            let producto = "Score"
-            try {
-              await shhets.saveBuro({producto, ...persona.nombre, ...persona.encabezado, ...persona.scoreBuroCredito[0], ...persona.domicilios[0]})
-              console.log(`se guardo el reporte de ${persona.nombre.rfc}`)
-            } catch (error) {
-              console.log("error google sheets apartado prospector")
-            }
-            return res.status(200).json({
-              success: true,
-              data: response.data.respuesta.persona
-            });
-          }else{
-            return res.status(400).json({
-              success: true,
-              data: "No se encontro el reporte"
-            });}
-        }).catch((error) => {
-          console.log(`error al obtener el ProspectorBuro ${error}`)
-          return res.status(200).json({
-            success: false,
-            error: error
-          })
-        })
-      }else{
-        return res.status(400).json({
-          success: true,
-          data: "No se encontro el reporte"
-        });}
-    }).catch((error) => {
-      console.log(error)
-      console.log(`error al obtener el AuthBuro ${error}`)
+    let peticion = await numeroPeticion();
+    let token = await buroController.getToken();
+
+    if (!token.success) {
       return res.status(500).json({
         success: false,
-        data: error
+        error: token.token,
       });
-    })
-    
+    } 
+
+    let prueba =
+      new Date().getTime().toString(16) + Math.random().toString(16).slice(1);
+
+    let tipoReporte = req.body.tipoReporte ? req.body.tipoReporte : false;
+
+    console.log(token.token);
+
+    let data = {
+      consulta: {
+        persona: {
+          autentica: {
+          ejercidoCreditoAutomotriz: "F",
+          ejercidoCreditoHipotecario: "F",
+          referenciaOperador: `0000000000000000000000001`,
+          tarjetaCredito: "V",
+          tipoReporte: "RCN",
+          tipoSalidaAU: tipoReporte ? tipoReporte : "4",
+          ultimosCuatroDigitos: "9919",
+         },
+          domicilios: [
+          {
+            ciudad: "MEXICO",
+            codPais: "MX",
+            coloniaPoblacion: "JARDINES DE MORELOS",
+            cp: "55070",
+            delegacionMunicipio: "ECATEPEC DE MORELOS",
+            direccion1: "RIO NILO N74",
+            direccion2: "",
+            estado: "EM",
+          },
+          ],
+          encabezado: {
+          clavePais: "MX",
+          claveUnidadMonetaria: "MX",
+          identificadorBuro: "0000",
+          idioma: "SP",
+          numeroReferenciaOperador: `0000000000000000000000001`,
+          productoRequerido: "107",
+          tipoConsulta: "I",
+          tipoContrato: "CL",
+          },
+          nombre: {
+          apellidoAdicional: "",
+          apellidoMaterno: "SANCHEZ",
+          apellidoPaterno: "VILLEGAS",
+          primerNombre: "JONATHAN",
+          rfc: "VISJ940102FY3",
+          segundoNombre: "",
+          },
+        },
+      },
+    };
+
+    let consulta = JSON.stringify(data);
+
+    const AuthConfig = {
+      method: "post",
+      url: "https://api.burodecredito.com.mx:4431/pf/autenticador/credit-report-api/v1/autenticador",
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+        "Content-Type": "application/json",
+      },
+      data: consulta,
+    };
+
+    await axios(AuthConfig)
+      .then(async (response) => {
+        console.log(JSON.stringify(response.data));
+        let producto = "Auth";
+
+        let data = response.data;
+
+        let autentica = {
+          ejercidoCreditoAutomotriz: "F",
+          ejercidoCreditoHipotecario: "F",
+          referenciaOperador: `${prueba}`,
+          tarjetaCredito: "V",
+          tipoSalidaAU: tipoReporte ? tipoReporte : "4",
+          ultimosCuatroDigitos: "9919",
+        };
+        try {
+          await shhets.saveBuro({ producto, data, ...autentica });
+        } catch (error) {
+          return res.status(200).json({
+            success: false,
+            error: error,
+          });
+        }
+        // if (response.data) {
+        //   const configProspector = {
+        //     method: "post",
+        //     url: "https://api.burodecredito.com.mx:4431/devpf/prospector/credit-report-api/v1/prospector",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: "Bearer 413eaea4-a036-4ff9-9fdd-fc193b8fdaab",
+        //     },
+        //     data: {
+        //       consulta: {
+        //         persona: {
+        //           domicilios: [
+        //             {
+        //               ciudad: "MEXICO",
+        //               codPais: "MX",
+        //               coloniaPoblacion: "JARDINES DE MORELOS",
+        //               cp: "55070",
+        //               delegacionMunicipio: "ECATEPEC DE MORELOS",
+        //               direccion1: "RIO NILO N74",
+        //               direccion2: "",
+        //               estado: "EM",
+        //             },
+        //           ],
+        //           encabezado: {
+        //             clavePais: "MX",
+        //             claveUnidadMonetaria: "MX",
+        //             idioma: "SP",
+        //             numeroReferenciaOperador: `${prueba}`,
+        //             productoRequerido: "107",
+        //             tipoConsulta: "I",
+        //             tipoContrato: "CL",
+        //           },
+        //           nombre: {
+        //             apellidoMaterno: "SANCHEZ",
+        //             apellidoPaterno: "VILLEGAS",
+        //             primerNombre: "JONATHAN",
+        //             rfc: "VISJ940102FY3",
+        //             segundoNombre: "",
+        //           },
+        //         },
+        //       },
+        //     },
+        //   };
+        //   axios(configProspector)
+        //     .then(async (response) => {
+        //       if (response.data.respuesta.persona) {
+        //         let { persona } = response.data.respuesta;
+        //         let producto = "Score";
+        //         try {
+        //           await shhets.saveBuro({
+        //             producto,
+        //             ...persona.nombre,
+        //             ...persona.encabezado,
+        //             ...persona.scoreBuroCredito[0],
+        //             ...persona.domicilios[0],
+        //           });
+        //           console.log(`se guardo el reporte de ${persona.nombre.rfc}`);
+        //         } catch (error) {
+        //           console.log("error google sheets apartado prospector");
+        //         }
+        //         return res.status(200).json({
+        //           success: true,
+        //           data: response.data.respuesta.persona,
+        //         });
+        //       } else {
+        //         return res.status(400).json({
+        //           success: true,
+        //           data: "No se encontro el reporte",
+        //         });
+        //       }
+        //     })
+        //     .catch((error) => {
+        //       console.log(`error al obtener el ProspectorBuro ${error}`);
+        //       return res.status(200).json({
+        //         success: false,
+        //         error: error,
+        //       });
+        //     });
+        // } else {
+        //   return res.status(400).json({
+        //     success: true,
+        //     data: "No se encontro el reporte",
+        //   });
+        // }
+        console.log("se guardo el reporte de Auth", response.data);
+      })
+      .catch((error) => {
+        console.log(error.response);
+        console.log(`error al obtener el AuthBuro ${error}`);
+        return res.status(500).json({
+          success: false,
+          data: error,
+        });
+      });
   },
   async getReport(req, res) {
     console.log("getReport");
@@ -865,15 +893,15 @@ const buroController = {
         url: "https://apigateway1.burodecredito.com.mx:8443/auth/oauth/v2/token",
         headers: {
           "Content-Type": "application/json",
-          client_id:  "l7f4ab9619923343069e3a48c3209b61e4",
-          client_secret: "ee9ba699e9f54cd7bbe7948e0884ccc9"
+          client_id: "l7f4ab9619923343069e3a48c3209b61e4",
+          client_secret: "ee9ba699e9f54cd7bbe7948e0884ccc9",
         },
         data: {
           grant_type: "client_credentials",
         },
       };
       await axios(configToken).then((response) => {
-        console.log(response.data)
+        console.log(response.data);
       });
     } catch (error) {
       console.log("error");
@@ -881,6 +909,8 @@ const buroController = {
     }
   },
 };
+
+
 module.exports = buroController;
 
 //l7f4ab9619923343069e3a48c3209b61e4
