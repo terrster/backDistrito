@@ -663,6 +663,8 @@ const buroController = {
       grant_type: "password",
     });
 
+    console.log(data);
+
     let config = {
       method: "post",
       url: "https://api.burodecredito.com.mx:4431/auth/oauth/v2/token",
@@ -723,11 +725,11 @@ const buroController = {
          },
           domicilios: [
           {
-            ciudad: "MEXICO",
+            ciudad: "",
             codPais: "MX",
-            coloniaPoblacion: "JARDINES DE MORELOS",
+            coloniaPoblacion: "Jardines de Morelos Sección Ríos",
             cp: "55070",
-            delegacionMunicipio: "ECATEPEC DE MORELOS",
+            delegacionMunicipio: "Ecatepec de Morelos",
             direccion1: "RIO NILO N74",
             direccion2: "",
             estado: "EM",
@@ -763,8 +765,9 @@ const buroController = {
       headers: {
         Authorization: `Bearer ${token.token}`,
         "Content-Type": "application/json",
+        accept: "application/vdn.com.bc.pf.report.api-v1+json",
       },
-      data: consulta,
+      data: consulta
     };
 
     await axios(AuthConfig)
