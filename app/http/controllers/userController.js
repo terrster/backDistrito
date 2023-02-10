@@ -1,6 +1,7 @@
 'user strict'
 
 const User = require("../models/User");
+const Consultas = require("../models/Consultas");
 const mailManager = require("../services/mailManager");
 
 const userController = {
@@ -84,7 +85,19 @@ const userController = {
                 error: error
             });
         }
-    }
+    },
+    ultimaConsulta: async(request ) => {
+        try{
+            let consulta = await Consultas.findOne().sort({ _id: -1 });
+            return consulta;
+        } catch(error){
+            return {
+                code: 500,
+                msg: "Algo salió mal tratando de obtener la última consulta",
+                error: error
+            };
+        }
+    },
 
 }
 

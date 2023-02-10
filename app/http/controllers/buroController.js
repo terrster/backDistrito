@@ -1,22 +1,22 @@
-const path = require("path");
 const User = require("../models/User");
 const ComercialInfo = require("../models/ComercialInfo");
 const GeneralInfo = require("../models/GeneralInfo");
+const Appliance = require("../models/Appliance");
+const Buro = require("../models/Buro");
 const hubspotController = require("../controllers/hubspotController");
 const axios = require("axios");
-const qs = require("qs");
-const fs = require('fs');
+const userController = require("../controllers/userController");
 const Client = require("../models/Client");
 const format = require("../services/formatManager");
+const dataBuro = require("../services/dataBuro");
+const Consultas = require("../models/Consultas");
+const Amount = require("../models/Amount");
 const { response } = require("express");
-const rateLimit = require("express-rate-limit");
 require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 });
 const HAPIKEY_UNYKOO = process.env.HAPIKEY_UNYKOO;
 const UNYKOO_URL = process.env.UNYKOO_URL;
-const shhets = require("../controllers/sheetsController");
-const userController = require("./userController");
 
 const headers = {
   "Content-Type": "application/json",
@@ -24,81 +24,23 @@ const headers = {
   company_code: "P2VXMnh",
 };
 
-const codigoEstado = (estado) => {
-  switch (estado) {
-    case "AGUASCALIENTES":
-      return "AGS";
-    case "BAJA CALIFORNIA":
-      return "BCN";
-    case "BAJA CALIFORNIA SUR":
-      return "BCS";
-    case "CAMPECHE":
-      return "CAM";
-    case "COAHUILA":
-      return "COA";
-    case "COLIMA":
-      return "COL";
-    case "CHIAPAS":
-      return "CHS";
-    case "CHIHUAHUA":
-      return "CHI";
-    case "CIUDAD DE MEXICO":
-      return "CDMX";
-    case "DURANGO":
-      return "DGO";
-    case "GUANAJUATO":
-      return "GTO";
-    case "GUERRERO":
-      return "GRO";
-    case "HIDALGO":
-      return "HGO";
-    case "JALISCO":
-      return "JAL";
-    case "MEXICO":
-      return "EM";
-    case "MICHOACAN":
-      return "MICH";
-    case "MORELOS":
-      return "MOR";
-    case "NAYARIT":
-      return "NAY";
-    case "NUEVO LEON":
-      return "NL";
-    case "OAXACA":
-      return "OAX";
-    case "PUEBLA":
-      return "PUE";
-    case "QUERETARO":
-      return "QRO";
-    case "QUINTANA ROO":
-      return "QR";
-    case "SAN LUIS POTOSI":
-      return "SLP";
-    case "SINALOA":
-      return "SIN";
-    case "SONORA":
-      return "SON";
-    case "TABASCO":
-      return "TAB";
-    case "TAMAULIPAS":
-      return "TAM";
-    case "TLAXCALA":
-      return "TLAX";
-    case "VERACRUZ":
-      return "VER";
-    case "YUCATAN":
-      return "YUC";
-    case "ZACATECAS":
-      return "ZAC";
-    default:
-      return "EM";
-  }
-};
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+const until = (cond, time) =>
+  cond().then((result) => result || delay(time).then(() => until(cond, time)));
 
-const numeroPeticion = async () => {
-  let lastUser = await userController.lastUser();
-  console.log(lastUser);
-  return lastUser;
+const getUpdate = async (Accion, id, params) => {
+  return await until(
+    () => {
+      return Accion.findByIdAndUpdate(id, params).then((res) => {
+        if (res) {
+          return res;
+        }
+        return false;
+      });
+    },
+    1000,
+    10
+  );
 };
 
 const buroController = {
@@ -524,11 +466,6 @@ const buroController = {
           status: "ERROR_AUTENTICACION",
           idConsulta: error.response.data.data.idUnykoo,
         };
-        let buroHub = await hubspotController.deal.update(
-          hubspotDealId,
-          "buro",
-          paramsHub
-        );
         const clienteError = await Client.findById(user.idClient._id);
         const { score } = clienteError;
         let scoreError = "";
@@ -652,269 +589,557 @@ const buroController = {
       });
     }
   },
-  async getToken(req, res) {
+  async consulta({ id, type, scoreProspector }) {
+    console.log(id, type);
 
-    let data = qs.stringify({
-      client_id: "5caad9a0-06dd-4419-b0fe-05a2cf6b9d64",
-      client_secret: "af896bc8-55ed-406a-bbff-382c2e33fcf8",
-      username: "KK89631005",
-      password: "efhrt1p4",
-      Scope: "PFscope",
-      grant_type: "password",
-    });
+    let user = await User.findById(id);
+    let appliance = Appliance.findById(user.idClient.appliance[0]._id);
+    let generalKey = user.idClient.idGeneralInfo;
+    let comercialKey = user.idClient.idComercialInfo;
+    let general = await GeneralInfo.findById(generalKey);
+    let client = await Client.findById(user.idClient._id);
+    let hubspotDealId = user.hubspotDealId;
+    let comercial = await ComercialInfo.findById(comercialKey);
 
-    console.log(data);
+    let rfc = null;
+    let control = null;
+    let buro = null;
+    let referenciaOperador = null;
 
-    let config = {
+    console.log(user.idClient.type);
+
+    if (user.idClient.type !== "PM") {
+      let comercial = await ComercialInfo.findById(
+        user.idClient.idComercialInfo
+      );
+      rfc = comercial.rfc;
+    }
+
+    if (user.idClient.appliance[0].idBuro) {
+      let data = await Buro.findById(user.idClient.appliance[0].idBuro._id);
+      if (data) {
+        buro = data;
+        let consultas = data.consultas;
+        console.log(consultas);
+      }
+      if(data.status){
+        return {
+          success: true,
+          message: "Consulta buro: " + type,
+          user : user,
+          score: user.idClient.score,
+        }
+      }
+    } else {
+      let buroCreate = await Buro.create({
+        status: false,
+      });
+
+      await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+        idBuro: {
+          _id: buroCreate._id,
+        },
+      });
+
+      buro = buroCreate;
+    }
+
+    let ultimaConsulta = await userController.ultimaConsulta();
+
+    if (ultimaConsulta) {
+      referenciaOperador = ultimaConsulta.folio + 1;
+    } else {
+      referenciaOperador = 0000000000000000000000005;
+    }
+
+    let databuro = null;
+
+    // if(process.env.NODE_ENV !== "production"){
+    //   return res.status(200).json({
+    //     success: true,
+    //     message: "Consulta buro: " + type,
+    //     token: token,
+    //     url: url,
+    //     data: data,
+    //   });
+    // }
+
+    switch (type) {
+      case "prospector":
+        databuro = await dataBuro.dataBuroProspector({
+          general,
+          referenciaOperador,
+          rfc,
+        });
+        break;
+      case "buro":
+        databuro = await dataBuro.dataBuroReporte({
+          general,
+          referenciaOperador,
+          rfc,
+        });
+        break;
+      case "moral":
+        databuro = await dataBuro.dataBuroMoral({
+          general: comercial,
+          control,
+        });
+        break;
+      default:
+        databuro = await dataBuro.dataBuroProspector({
+          general,
+          referenciaOperador,
+          rfc,
+        });
+        break;
+    }
+
+    let { token, url, data } = databuro;
+
+    if (!token.success) {
+      return {
+        success: false,
+        error: "token",
+        message: "Error al generar token",
+        token: token,
+      };
+    }
+
+    // if(process.env.NODE_ENV !== "production"){
+    //   return {
+    //     success: true,
+    //     message: "Consulta buro: " + type,
+    //     token: token,
+    //     url: url,
+    //     data: data,
+    //     user: user,
+    //   };
+    // }
+
+    let config = {};
+
+    let AuthConfig = {
       method: "post",
-      url: "https://api.burodecredito.com.mx:4431/auth/oauth/v2/token",
+      url: url,
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${token.token}`,
+        "Content-Type": "application/json",
       },
       data: data,
     };
 
-    let success = null
-    let token = null
-
-    await axios(config)
-      .then(function (response) {
-        success = true;
-        token = response.data.access_token;
-      })
-      .catch(function (error) {
-        console.log(error);
-        success = false;
-        token = error;
-      });
-
-    return {
-      success: success,
-      token: token,
-    };
-  },
-  async Prospector(req, res) {
-    let peticion = await numeroPeticion();
-    let token = await buroController.getToken();
-
-    if (!token.success) {
-      return res.status(500).json({
-        success: false,
-        error: token.token,
-      });
-    } 
-
-    let prueba =
-      new Date().getTime().toString(16) + Math.random().toString(16).slice(1);
-
-    let tipoReporte = req.body.tipoReporte ? req.body.tipoReporte : false;
-
-    console.log(token.token);
-
-    let data = {
-      consulta: {
-        persona: {
-          autentica: {
-          ejercidoCreditoAutomotriz: "F",
-          ejercidoCreditoHipotecario: "F",
-          referenciaOperador: `0000000000000000000000001`,
-          tarjetaCredito: "V",
-          tipoReporte: "RCN",
-          tipoSalidaAU: tipoReporte ? tipoReporte : "4",
-          ultimosCuatroDigitos: "9919",
-         },
-          domicilios: [
-          {
-            ciudad: "",
-            codPais: "MX",
-            coloniaPoblacion: "Jardines de Morelos Sección Ríos",
-            cp: "55070",
-            delegacionMunicipio: "Ecatepec de Morelos",
-            direccion1: "RIO NILO N74",
-            direccion2: "",
-            estado: "EM",
-          },
-          ],
-          encabezado: {
-          clavePais: "MX",
-          claveUnidadMonetaria: "MX",
-          identificadorBuro: "0000",
-          idioma: "SP",
-          numeroReferenciaOperador: `0000000000000000000000001`,
-          productoRequerido: "107",
-          tipoConsulta: "I",
-          tipoContrato: "CL",
-          },
-          nombre: {
-          apellidoAdicional: "",
-          apellidoMaterno: "SANCHEZ",
-          apellidoPaterno: "VILLEGAS",
-          primerNombre: "JONATHAN",
-          rfc: "VISJ940102FY3",
-          segundoNombre: "",
-          },
-        },
-      },
-    };
-
-    let consulta = JSON.stringify(data);
-
-    const AuthConfig = {
+    let Moralconfig = {
       method: "post",
-      url: "https://api.burodecredito.com.mx:4431/pf/autenticador/credit-report-api/v1/autenticador",
+      maxBodyLength: Infinity,
+      url: url,
       headers: {
+        Accept: "application/vnd.com.bc.pm.report.api-v1+json",
         Authorization: `Bearer ${token.token}`,
         "Content-Type": "application/json",
-        accept: "application/vdn.com.bc.pf.report.api-v1+json",
       },
-      data: consulta
+      data: data,
     };
 
-    await axios(AuthConfig)
+    if (type === "moral") {
+      config = Moralconfig;
+    } else {
+      config = AuthConfig;
+    }
+
+    // console.log("config buro :", config);
+
+    console.log("consulta buro :", user.name);
+
+    // if(process.env.NODE_ENV !== "production"){
+    //   return res.status(200).json({
+    //   success: true,
+    //   message: "Consulta buro",
+    // });
+    // }
+
+    let res = await axios(config)
       .then(async (response) => {
-        console.log(JSON.stringify(response.data));
-        let producto = "Auth";
+        let Resburo = response.data;
+        console.log(Resburo);
 
-        let data = response.data;
+        if (Resburo.respuesta === undefined && type !== "moral") {
+          console.log("error buro");
+          let data = {
+            folio: referenciaOperador,
+            tipo: type,
+            fecha: new Date(),
+            status: "error",
+            error: Resburo,
+          };
 
-        let autentica = {
-          ejercidoCreditoAutomotriz: "F",
-          ejercidoCreditoHipotecario: "F",
-          referenciaOperador: `${prueba}`,
-          tarjetaCredito: "V",
-          tipoSalidaAU: tipoReporte ? tipoReporte : "4",
-          ultimosCuatroDigitos: "9919",
-        };
-        try {
-          await shhets.saveBuro({ producto, data, ...autentica });
-        } catch (error) {
-          return res.status(200).json({
+          let nuevaConsulta = await Consultas.create(data);
+          await Buro.findByIdAndUpdate(buro._id, {
+            consultas: {
+              _id: nuevaConsulta._id,
+            },
+          });
+
+          let score = client.score;
+
+          switch (score) {
+            case null:
+            case undefined:
+            case "":
+            case "ERROR 3":
+              score = "ERROR";
+              break;
+            case "ERROR":
+              score = "ERROR 1";
+              break;
+            case "ERROR 1":
+              score = "ERROR 2";
+              break;
+            case "ERROR 2":
+              score = "ERROR 3";
+              break;
+            default:
+              score = "ERROR";
+              break;
+          }
+
+          let paramsHub = {
+            score: "",
+            status: "ERROR",
+            idConsulta: nuevaConsulta._id,
+          };
+
+          let buroHub = await hubspotController.deal.update(
+            hubspotDealId,
+            "buro",
+            paramsHub
+          );
+
+          let clientUpdate = await Client.findByIdAndUpdate(client._id, {
+            score: score,
+          });
+
+          let userUpdate = await User.findById(id);
+
+          return {
             success: false,
-            error: error,
+            error: "datos",
+            consulta: nuevaConsulta,
+            message: "Error al consultar datos",
+            user: userUpdate,
+          };
+        }
+
+        if (
+          Resburo.respuesta !== undefined &&
+          Resburo.respuesta.persona.error !== undefined &&
+          Resburo.respuesta.persona.error !== null &&
+          type !== "moral"
+        ) {
+          console.log("error buro", Resburo.respuesta.persona.error);
+          let data = {
+            folio: referenciaOperador,
+            tipo: type,
+            fecha: new Date(),
+            status: "error",
+            error: Resburo.respuesta.persona.error,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+
+          await Buro.findByIdAndUpdate(buro._id, {
+            consultas: {
+              _id: nuevaConsulta._id,
+            },
+          });
+
+          let score = client.score;
+
+          switch (score) {
+            case null:
+            case undefined:
+            case "":
+            case "ERROR 3":
+              score = "ERROR";
+              break;
+            case "ERROR":
+              score = "ERROR 1";
+              break;
+            case "ERROR 1":
+              score = "ERROR 2";
+              break;
+            case "ERROR 2":
+              score = "ERROR 3";
+              break;
+            default:
+              score = "ERROR";
+              break;
+          }
+
+          let paramsHub = {
+            score: "",
+            status: "ERROR",
+            idConsulta: nuevaConsulta._id,
+          };
+
+          let buroHub = await hubspotController.deal.update(
+            hubspotDealId,
+            "buro",
+            paramsHub
+          );
+
+          let clientUpdate = await Client.findByIdAndUpdate(client._id, {
+            score: score,
+          });
+
+          let userUpdate = await User.findById(id);
+
+          return {
+            success: false,
+            error: "datos",
+            message: "Error al consultar datos",
+            consulta: nuevaConsulta,
+            user: userUpdate,
+          };
+        }
+
+        if (type === "moral") {
+          let data = {
+            folio: referenciaOperador,
+            tipo: type,
+            referencia: Resburo.encabezado
+              ? Resburo.encabezado.identificadorTransaccion
+              : "ERROR",
+            fecha: new Date(),
+            status: "success",
+            resultado: Resburo,
+          };
+
+          await ComercialInfo.findByIdAndUpdate(comercialKey, {
+            buroMoral: true,
+          });
+
+          let nuevaConsulta = await Consultas.create(data);
+          await Buro.findByIdAndUpdate(buro._id, {
+            moralStatus: true,
+            consultas: {
+              _id: nuevaConsulta._id,
+            },
+          });
+
+          let userUpdate = await User.findById(id);
+
+          return {
+            success: true,
+            message: "Consulta buro: " + type,
+            user: userUpdate,
+          };
+        }
+
+        let scoreValue = Resburo.respuesta.persona.scoreBuroCredito
+          ? Resburo.respuesta.persona.scoreBuroCredito[0].valorScore
+          : scoreProspector
+          ? scoreProspector
+          : "ERROR";
+
+        await dataBuro.resBuro(
+          Resburo,
+          referenciaOperador,
+          buro,
+          hubspotDealId,
+          client,
+          type,
+          scoreProspector
+        );
+
+        let userUpdate = await User.findById(id);
+
+        return {
+          success: true,
+          message: "Consulta buro: " + type,
+          score: scoreValue,
+          user: userUpdate,
+        };
+      })
+      .catch(async (error) => {
+        console.log(error);
+        console.log(`error al obtener el AuthBuro ${error}`);
+        let userUpdate = await User.findById(id);
+        return {
+          success: false,
+          message: "Error al actualizar",
+          error: error,
+          user: userUpdate,
+        };
+      });
+
+    return res;
+  },
+  async buroLogic(req, res) {
+    let { id } = req.body;
+    if (req.body.update) {
+      let user = await User.findById(id);
+      let appliance = Appliance.findById(user.idClient.appliance[0]._id);
+      let generalKey = user.idClient.idGeneralInfo;
+      let comercialKey = user.idClient.idComercialInfo;
+
+      await getUpdate(GeneralInfo, generalKey, req.body);
+      await getUpdate(ComercialInfo, comercialKey, req.body);
+    }
+    // return res.status(500).json({
+    //   success: true,
+    // });
+    try {
+      let prospector = await buroController.consulta({
+        id,
+        type: "prospector",
+      });
+      console.log(prospector);
+      if (!prospector.success) {
+        return res.status(412).json({
+          ...prospector,
+        });
+      }
+
+      if (prospector.score === "ERROR") {
+        return res.status(412).json({
+          ...prospector,
+        });
+      }
+
+      let scoreProspector = prospector.score;
+
+      if (scoreProspector >= 525) {
+        let buro = await buroController.consulta({
+          id,
+          type: "buro",
+          scoreProspector,
+        });
+        console.log(buro);
+        return res.status(200).json({
+          ...buro,
+        });
+      } else {
+        return res.status(200).json({
+          ...prospector,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Error al actualizar",
+        error: error,
+      });
+    }
+  },
+  async buroLogicMoral(req, res) {
+    let { id, idAmount } = req.body;
+    let user = await User.findById(id);
+    let comercialKey = user.idClient.idComercialInfo;
+    let appliance = Appliance.findById(user.idClient.appliance[0]._id);
+
+    if (user.idClient.appliance[0].idBuro) {
+      let buro = await Buro.findById(user.idClient.appliance[0].idBuro._id);
+      let data = await Buro.findById(buro._id);
+
+      if (data) {
+        let consultas = data.consultas;
+      }
+
+      if(data.moralStatus) {
+        return res.status(200).json({
+          success: true,
+          message: "Ya se ha consultado el buro moral",
+          consulta: data.consultas,
+          user : user
+        });
+      }
+    } else {
+      let buro = await Buro.create({
+        moralStatus: false,
+      });
+      // await Appliance.findByIdAndUpdate(appliance._id, {
+      //   idBuro: {
+      //     _id: buro._id,
+      //   }
+      // });
+      await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+        idBuro : {
+            _id : buro._id
+        }
+    });
+    }
+
+    let comercialInfo = await ComercialInfo.findById(comercialKey);
+
+    if(comercialInfo.firma === true){
+      let moral = await buroController.consulta({ id, type: "moral" });
+
+        if (moral.success) {
+          return res.status(200).json({
+            ...moral,
+          });
+        } else {
+          return res.status(412).json({
+            ...moral,
           });
         }
-        // if (response.data) {
-        //   const configProspector = {
-        //     method: "post",
-        //     url: "https://api.burodecredito.com.mx:4431/devpf/prospector/credit-report-api/v1/prospector",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: "Bearer 413eaea4-a036-4ff9-9fdd-fc193b8fdaab",
-        //     },
-        //     data: {
-        //       consulta: {
-        //         persona: {
-        //           domicilios: [
-        //             {
-        //               ciudad: "MEXICO",
-        //               codPais: "MX",
-        //               coloniaPoblacion: "JARDINES DE MORELOS",
-        //               cp: "55070",
-        //               delegacionMunicipio: "ECATEPEC DE MORELOS",
-        //               direccion1: "RIO NILO N74",
-        //               direccion2: "",
-        //               estado: "EM",
-        //             },
-        //           ],
-        //           encabezado: {
-        //             clavePais: "MX",
-        //             claveUnidadMonetaria: "MX",
-        //             idioma: "SP",
-        //             numeroReferenciaOperador: `${prueba}`,
-        //             productoRequerido: "107",
-        //             tipoConsulta: "I",
-        //             tipoContrato: "CL",
-        //           },
-        //           nombre: {
-        //             apellidoMaterno: "SANCHEZ",
-        //             apellidoPaterno: "VILLEGAS",
-        //             primerNombre: "JONATHAN",
-        //             rfc: "VISJ940102FY3",
-        //             segundoNombre: "",
-        //           },
-        //         },
-        //       },
-        //     },
-        //   };
-        //   axios(configProspector)
-        //     .then(async (response) => {
-        //       if (response.data.respuesta.persona) {
-        //         let { persona } = response.data.respuesta;
-        //         let producto = "Score";
-        //         try {
-        //           await shhets.saveBuro({
-        //             producto,
-        //             ...persona.nombre,
-        //             ...persona.encabezado,
-        //             ...persona.scoreBuroCredito[0],
-        //             ...persona.domicilios[0],
-        //           });
-        //           console.log(`se guardo el reporte de ${persona.nombre.rfc}`);
-        //         } catch (error) {
-        //           console.log("error google sheets apartado prospector");
-        //         }
-        //         return res.status(200).json({
-        //           success: true,
-        //           data: response.data.respuesta.persona,
-        //         });
-        //       } else {
-        //         return res.status(400).json({
-        //           success: true,
-        //           data: "No se encontro el reporte",
-        //         });
-        //       }
-        //     })
-        //     .catch((error) => {
-        //       console.log(`error al obtener el ProspectorBuro ${error}`);
-        //       return res.status(200).json({
-        //         success: false,
-        //         error: error,
-        //       });
-        //     });
-        // } else {
-        //   return res.status(400).json({
-        //     success: true,
-        //     data: "No se encontro el reporte",
-        //   });
-        // }
-        console.log("se guardo el reporte de Auth", response.data);
-      })
-      .catch((error) => {
-        console.log(error.response);
-        console.log(`error al obtener el AuthBuro ${error}`);
-        return res.status(500).json({
-          success: false,
-          data: error,
+      }
+
+    if (comercialInfo.firma === false && comercialInfo.consulta === 0) {
+      if (idAmount.yearSales >= 10000000 && (idAmount.old === "THREE" || idAmount.old === "PFOUR")) {
+        await ComercialInfo.findByIdAndUpdate(comercialKey, {
+          consulta: 1,
         });
-      });
+        let moral = await buroController.consulta({ id, type: "moral" });
+
+        if (moral.success) {
+          return res.status(200).json({
+            ...moral,
+          });
+        } else {
+          return res.status(412).json({
+            ...moral,
+          });
+        }
+      }
+
+    }
+
+    return res.status(200).json({
+      success: false,
+      message: "No se puede realizar la consulta se neceita firma o ventas mayores a 10 millones",
+      user: user,
+    });
   },
-  async getReport(req, res) {
-    console.log("getReport");
-    try {
-      const configToken = {
-        method: "post",
-        url: "https://apigateway1.burodecredito.com.mx:8443/auth/oauth/v2/token",
-        headers: {
-          "Content-Type": "application/json",
-          client_id: "l7f4ab9619923343069e3a48c3209b61e4",
-          client_secret: "ee9ba699e9f54cd7bbe7948e0884ccc9",
-        },
-        data: {
-          grant_type: "client_credentials",
-        },
-      };
-      await axios(configToken).then((response) => {
-        console.log(response.data);
+  async updateMoral(req, res) {
+    let { email, firma  } = req.body;
+    let user = await User.findOne({ email });
+    if(user) {
+      let comercialKey = user.idClient.idComercialInfo;
+      let comercialInfo = await ComercialInfo.findById(comercialKey);
+
+      if(comercialInfo.firma) {
+        await ComercialInfo.findByIdAndUpdate(comercialKey, {
+          firma: firma,
+        });
+        return res.status(200).json({
+          success: true,
+          message: "Se actualizo la firma a " + firma, 
+        });
+      } else {
+        return res.status(200).json({
+          success: false,
+          message: "No se puede actualizar la firma",
+        });
+      }
+    } else {
+      return res.status(200).json({
+        success: false,
+        message: "No se encontro el usuario",
       });
-    } catch (error) {
-      console.log("error");
-      console.log(error.response);
     }
   },
 };
 
-
 module.exports = buroController;
-
-//l7f4ab9619923343069e3a48c3209b61e4
-//ee9ba699e9f54cd7bbe7948e0884ccc9

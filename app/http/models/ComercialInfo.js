@@ -23,7 +23,10 @@ const comercialInfoSchema = new Schema({
   warranty: Number,
   ciec: String,
   ciecstatus: { type: Boolean, default: false },
-  status: { type: Boolean, default: false }
+  status: { type: Boolean, default: false },
+  firma: { type: Boolean, default: false },
+  consulta: { type: Number, default: 0 },
+  buroMoral: { type: Boolean, default: false },
 }, { collection: 'ComercialInfo' });
 
 comercialInfoSchema.plugin(require('mongoose-autopopulate'));

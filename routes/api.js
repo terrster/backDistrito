@@ -115,7 +115,13 @@ route.group("/documents", (documents) => {
 //Consulta de buro
 route.group("/buro", (buro) => {
     buro.post('/:id', [limit], buroController.inicio);
+    buro.put('/consulta', [limit],  buroController.buroLogic);
     buro.post('/update/:id', buroController.update);
+  });
+  //Consulta de buroMoral
+route.group("/buroMoral", (buro) => {
+    buro.post('/:id', buroController.buroLogicMoral);
+    // buro.get('/:id', [limit], buroController.buroLogicMoral);
   });
 
 route.group("/v1", (v1) => {
