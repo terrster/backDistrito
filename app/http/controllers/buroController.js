@@ -1114,12 +1114,20 @@ const buroController = {
   },
   async updateMoral(req, res) {
     let { email, firma  } = req.body;
+
+    if(firma === "true" ) {
+      firma = true;
+    } else {
+      firma = false;
+    }
+
     let user = await User.findOne({ email });
+
     if(user) {
       let comercialKey = user.idClient.idComercialInfo;
       let comercialInfo = await ComercialInfo.findById(comercialKey);
 
-      if(comercialInfo.firma) {
+      if(comercialInfo.firma === false && firma === true) {
         await ComercialInfo.findByIdAndUpdate(comercialKey, {
           firma: firma,
         });
@@ -1133,11 +1141,13 @@ const buroController = {
           message: "No se puede actualizar la firma",
         });
       }
+      
     } else {
       return res.status(200).json({
         success: false,
         message: "No se encontro el usuario",
       });
+      console.log("No se encontro el usuario");
     }
   },
 };

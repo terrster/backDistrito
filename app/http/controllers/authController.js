@@ -45,6 +45,13 @@ const authController = {
       }
 
       let lastUser = await userController.lastUser();
+
+      if(lastUser === false) {
+        return response.json({
+          code: 500,
+          msg: "No se pudo obtener el último usuario",
+        });
+      }
       data.idDistrito = lastUser.idDistrito + 1;
 
       let contactStored = await hubspotController.contact.store(data);
@@ -75,36 +82,38 @@ const authController = {
         { new: true }
       );
 
-      let hubpostInfo = JSON.parse(
-        require("fs").readFileSync(
-          require("path").resolve("config/hubspotInfo.json")
-        )
-      );
-      hubpostInfo.Solicitudes = new Intl.NumberFormat()
-        .format(user.idDistrito)
-        .toString()
-        .replace(".", ",");
-
-      if (
-        require("fs").existsSync(
-          require("path").resolve("config/hubspotInfo.json")
-        )
-      ) {
-        require("fs").writeFileSync(
-          require("path").resolve("config/hubspotInfo.json"),
-          JSON.stringify(hubpostInfo)
+      if(process.env.NODE_ENV !== 'localhost') {
+        let hubpostInfo = JSON.parse(
+          require("fs").readFileSync(
+            require("path").resolve("config/hubspotInfo.json")
+          )
         );
-      } else {
-        require("fs").appendFileSync(
-          require("path").resolve("config/hubspotInfo.json"),
-          JSON.stringify(hubpostInfo)
-        );
+        hubpostInfo.Solicitudes = new Intl.NumberFormat()
+          .format(user.idDistrito)
+          .toString()
+          .replace(".", ",");
+  
+        if (
+          require("fs").existsSync(
+            require("path").resolve("config/hubspotInfo.json")
+          )
+        ) {
+          require("fs").writeFileSync(
+            require("path").resolve("config/hubspotInfo.json"),
+            JSON.stringify(hubpostInfo)
+          );
+        } else {
+          require("fs").appendFileSync(
+            require("path").resolve("config/hubspotInfo.json"),
+            JSON.stringify(hubpostInfo)
+          );
+        }
+  
+        global.io.emitToAll("hubspotInfo", {
+          hubpostInfo,
+          difference: ["Solicitudes"],
+        });
       }
-
-      global.io.emitToAll("hubspotInfo", {
-        hubpostInfo,
-        difference: ["Solicitudes"],
-      });
 
       const { password: _, ...userWithoutPassword } = user.toObject();
 
@@ -114,12 +123,13 @@ const authController = {
         user: userWithoutPassword,
       });
     } catch (error) {
-      let messages = validationsManager.user(error.errors);
+      console.log(error);
+      // let messages = validationsManager.user(error.errors);
 
       return response.json({
         code: 500,
         msg: "Ha ocurrido un error al registrarse",
-        errors: messages,
+        errors: error,
       });
     }
   },
