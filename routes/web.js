@@ -19,9 +19,12 @@ const brokerController = require("../app/http/controllers/brokerController");
 const landingController = require("../app/http/controllers/landingController");
 const ciecController = require("../app/http/controllers/ciecController");
 const HubspotController = require("../app/http/controllers/hubspotController");
+const dataController = require("../app/http/controllers/dataController");
 
 route.post('/signin', authController.sigin);
 route.post('/login', authController.login);
+route.post('/register', authController.createUserAdmin);
+route.post('/admin/login', authController.loginUserAdmin);
 route.post('/delete', authController.eliminate_user);
 route.post("/forgot_password", authController.forgotten_password);
 route.get("/validate_resetHash/:hash", authController.validate_resetHash);
@@ -30,6 +33,10 @@ route.post("/reset_password/:hash", authController.reset_password);
 //ciec
 route.post("/ciec", ciecController.create);
 //prueba
+route.get("/control/buro", dataController.getControl);
+route.post("/control/buro", dataController.updateControl);
+route.get("/control/consultas", dataController.getConsultas);
+// route.post("/buro", BuroController.Prospector);
 
 //Contador
 route.post("/counter/:type", counterController.add);
