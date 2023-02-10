@@ -475,7 +475,6 @@ const dataBuro = {
         },
       },
     });
-    console.log(data);
     const token = await getToken("PPF");
     return {
       url: url,

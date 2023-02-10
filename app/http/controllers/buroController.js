@@ -760,7 +760,6 @@ const buroController = {
     let res = await axios(config)
       .then(async (response) => {
         let Resburo = response.data;
-        console.log(Resburo);
 
         if (Resburo.respuesta === undefined && type !== "moral") {
           console.log("error buro");
@@ -993,7 +992,7 @@ const buroController = {
         id,
         type: "prospector",
       });
-      console.log(prospector);
+
       if (!prospector.success) {
         return res.status(412).json({
           ...prospector,
@@ -1014,7 +1013,7 @@ const buroController = {
           type: "buro",
           scoreProspector,
         });
-        console.log(buro);
+
         return res.status(200).json({
           ...buro,
         });
@@ -1037,6 +1036,15 @@ const buroController = {
     let user = await User.findById(id);
     let comercialKey = user.idClient.idComercialInfo;
     let appliance = Appliance.findById(user.idClient.appliance[0]._id);
+
+    if(user.idClient.score < 524) {
+      return res.status(200).json({
+        success: true,
+        message: "El cliente no tiene el score suficiente para consultar el buro moral",
+        user : user
+      });
+    }
+
 
     if (user.idClient.appliance[0].idBuro) {
       let buro = await Buro.findById(user.idClient.appliance[0].idBuro._id);
