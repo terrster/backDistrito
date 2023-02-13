@@ -1158,6 +1158,43 @@ const buroController = {
       console.log("No se encontro el usuario");
     }
   },
+  async getConsultas (req, res) {
+    let email = req.body.email;
+    let token = req.body.token;
+
+    if (token != 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs=') {
+      return res.status(403).send("A token is required for authentication");
+    }
+
+    let user = await User.findOne({ email });
+
+    if(user) {
+      let appliance = await Appliance.findById(user.idClient.appliance[0]._id);
+      let buro = await Buro.findById(appliance.idBuro._id);
+
+      let comercialKey = user.idClient.idComercialInfo;
+      let generalKey = user.idClient.idGeneralInfo;
+      let comercialInfo = await ComercialInfo.findById(comercialKey);
+      let generalInfo = await GeneralInfo.findById(generalKey);
+
+      let rfc = comercialInfo.rfc;
+      let rfcPerson = generalInfo.rfcPerson ? generalInfo.rfcPerson : comercialInfo.rfc;
+
+      return res.status(200).json({
+        success: true,
+        message: "Consultas",
+        consultas: buro.consultas,
+        rfc: rfc,
+        rfcPerson: rfcPerson,
+      });
+    } else {
+      return res.status(200).json({
+        success: false,
+        message: "No se encontro el usuario",
+      });
+      console.log("No se encontro el usuario");
+    }
+  }
 };
 
 module.exports = buroController;
