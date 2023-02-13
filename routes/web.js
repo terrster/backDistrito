@@ -21,6 +21,8 @@ const ciecController = require("../app/http/controllers/ciecController");
 const HubspotController = require("../app/http/controllers/hubspotController");
 const dataController = require("../app/http/controllers/dataController");
 
+
+
 route.post('/signin', authController.sigin);
 route.post('/login', authController.login);
 route.post('/register', authController.createUserAdmin);

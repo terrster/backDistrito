@@ -1,7 +1,7 @@
 const axios = require("axios");
 const Control = require("../models/Control");
 const Consultas = require("../models/Consultas");
-const Buro = require("../models/Buro");
+const Buro = require("../models/BuroM");
 const Client = require("../models/Client");
 const hubspotController = require("../controllers/hubspotController");
 require("dotenv").config({
