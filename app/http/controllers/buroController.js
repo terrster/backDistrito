@@ -1037,6 +1037,14 @@ const buroController = {
     let comercialKey = user.idClient.idComercialInfo;
     let appliance = Appliance.findById(user.idClient.appliance[0]._id);
 
+    if(user.idClient.score === undefined || user.idClient.score === null || user.idClient.score === "") {
+      return res.status(200).json({
+        success: true,
+        message: "El cliente no tiene score",
+        user : user
+      });
+    }
+
     if(user.idClient.score < 524) {
       return res.status(200).json({
         success: true,
@@ -1160,7 +1168,7 @@ const buroController = {
   },
   async getConsultas (req, res) {
     let email = req.body.email;
-    let token = req.body.token;
+    let token = req.headers["token"];
 
     if (token != 'D7Mqvg5aPcypn97dxdB/Kfe330wwu0IXx0pFQXIFmjs=') {
       return res.status(403).send("A token is required for authentication");
