@@ -484,7 +484,7 @@ const dataBuro = {
   },
   async dataBuroMoral({ general, firma }) {
     const url =
-      "https://api.burodecredito.com.mx:4431/devpm/informe-buro/pm-report/api/v1/reporte-informe-buro";
+      "https://api.burodecredito.com.mx:4431/pm/reporte-de-credito/pm-report/api/v1/reporte-de-credito";
     const data = JSON.stringify({
       ambiguedad: "N",
       claveDeConsolidacion: "",

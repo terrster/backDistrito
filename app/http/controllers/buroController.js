@@ -976,6 +976,19 @@ const buroController = {
   async buroLogic(req, res) {
     let { id } = req.body;
     if (req.body.update) {
+      let {
+        name,
+        lastname,
+        secondLastname,
+        address,
+        carCredit,
+        creditCard,
+        mortgageCredit,
+        last4,
+        rfcPerson,
+        rfc,
+        update,
+      } = req.body;
       let user = await User.findById(id);
       let appliance = Appliance.findById(user.idClient.appliance[0]._id);
       let generalKey = user.idClient.idGeneralInfo;
@@ -983,6 +996,46 @@ const buroController = {
 
       await getUpdate(GeneralInfo, generalKey, req.body);
       await getUpdate(ComercialInfo, comercialKey, req.body);
+
+      if (rfc) {
+        await ComercialInfo.findByIdAndUpdate(
+          user.idClient.idComercialInfo,
+          {
+            rfc: rfc,
+          }
+        );
+        await hubspotController.deal.update(
+          user.hubspotDealId,
+          "single_field",
+          {
+            value: rfc,
+            name: "n3_rfc",
+          }
+        );
+      }
+
+      let dealUpdated = await hubspotController.deal.update(
+        user.hubspotDealId,
+        "generalBuro",
+        {
+          name, //info general
+          lastname,
+          secondLastname,
+          rfcPerson,
+          mortgageCredit,
+          carCredit,
+          creditCard,
+          last4,
+        }
+      );
+
+      if (dealUpdated.error) {
+        return res.status(400).json({
+          success: false,
+          message: "ERROR AL ACTUALIZAR EL DEAL EN HUBSPOT",
+          user: user,
+        });
+      }
     }
     // return res.status(500).json({
     //   success: true,
@@ -1092,10 +1145,26 @@ const buroController = {
       let moral = await buroController.consulta({ id, type: "moral" });
 
         if (moral.success) {
+          await hubspotController.deal.update(
+            user.hubspotDealId,
+            "single_field",
+            {
+              value: "SUCCESS SUCCES SUCCES SUCCES",
+              name: "respuesta_unykoo_2_buro_moral_",
+            }
+          );
           return res.status(200).json({
             ...moral,
           });
         } else {
+          await hubspotController.deal.update(
+            user.hubspotDealId,
+            "single_field",
+            {
+              value: "4",
+              name: "respuesta_unykoo_2_buro_moral_",
+            }
+          );
           return res.status(412).json({
             ...moral,
           });
@@ -1110,10 +1179,26 @@ const buroController = {
         let moral = await buroController.consulta({ id, type: "moral" });
 
         if (moral.success) {
+          await hubspotController.deal.update(
+            user.hubspotDealId,
+            "single_field",
+            {
+              value: "SUCCESS SUCCES SUCCES SUCCES",
+              name: "respuesta_unykoo_2_buro_moral_",
+            }
+          );
           return res.status(200).json({
             ...moral,
           });
         } else {
+          await hubspotController.deal.update(
+            user.hubspotDealId,
+            "single_field",
+            {
+              value: "4",
+              name: "respuesta_unykoo_2_buro_moral_",
+            }
+          );
           return res.status(412).json({
             ...moral,
           });

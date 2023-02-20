@@ -818,13 +818,9 @@ const deal = {
                                     "value": request.secondLastname,
                                     "name": "n4_3_apellido_materno"
                                 },
-                                {
-                                    "value": request.rfcPerson,
+                                rfcPerson && {
+                                    "value": rfcPerson,
                                     "name": "n3_15_rfc_pm"
-                                },
-                                {
-                                    "value": request.curp,
-                                    "name": "curp"
                                 },
                                 {
                                     "value": format.YES_NO_QUESTION[request.mortgageCredit],
