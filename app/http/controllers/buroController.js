@@ -619,8 +619,6 @@ const buroController = {
       let data = await Buro.findById(user.idClient.appliance[0].idBuro._id);
       if (data) {
         buro = data;
-        let consultas = data.consultas;
-        console.log(consultas);
       }
       if(data.status){
         return {
@@ -702,8 +700,9 @@ const buroController = {
         error: "token",
         message: "Error al generar token",
         token: token,
+        user: user,
       };
-    }
+    } 
 
     // if(process.env.NODE_ENV !== "production"){
     //   return {
@@ -751,11 +750,13 @@ const buroController = {
     console.log("consulta buro :", user.name);
 
     // if(process.env.NODE_ENV !== "production"){
-    //   return res.status(200).json({
+    //   return {
     //   success: true,
     //   message: "Consulta buro",
-    // });
+    //   user: user,
+    //   };
     // }
+    
 
     let res = await axios(config)
       .then(async (response) => {
@@ -770,12 +771,10 @@ const buroController = {
             status: "error",
             error: Resburo,
           };
-
+          let dataBuro = await Buro.findById(user.idClient.appliance[0].idBuro._id);
           let nuevaConsulta = await Consultas.create(data);
           await Buro.findByIdAndUpdate(buro._id, {
-            consultas: {
-              _id: nuevaConsulta._id,
-            },
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
           });
 
           let score = client.score;
@@ -804,7 +803,7 @@ const buroController = {
           let paramsHub = {
             score: "",
             status: "ERROR",
-            idConsulta: nuevaConsulta._id,
+            idConsulta: "INTERNO",
           };
 
           let buroHub = await hubspotController.deal.update(
@@ -843,12 +842,10 @@ const buroController = {
             error: Resburo.respuesta.persona.error,
           };
 
+          let dataBuro = await Buro.findById(user.idClient.appliance[0].idBuro._id);
           let nuevaConsulta = await Consultas.create(data);
-
           await Buro.findByIdAndUpdate(buro._id, {
-            consultas: {
-              _id: nuevaConsulta._id,
-            },
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
           });
 
           let score = client.score;
@@ -917,12 +914,10 @@ const buroController = {
             buroMoral: true,
           });
 
+          let dataBuro = await Buro.findById(user.idClient.appliance[0].idBuro._id);
           let nuevaConsulta = await Consultas.create(data);
           await Buro.findByIdAndUpdate(buro._id, {
-            moralStatus: true,
-            consultas: {
-              _id: nuevaConsulta._id,
-            },
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
           });
 
           let userUpdate = await User.findById(id);
@@ -940,6 +935,9 @@ const buroController = {
           ? scoreProspector
           : "ERROR";
 
+          let  buroId = user.idClient.appliance[0].idBuro._id
+          let moral  = user.idClient.type === "PM" ? true : false
+
         await dataBuro.resBuro(
           Resburo,
           referenciaOperador,
@@ -947,7 +945,9 @@ const buroController = {
           hubspotDealId,
           client,
           type,
-          scoreProspector
+          buroId,
+          scoreProspector,
+          moral
         );
 
         let userUpdate = await User.findById(id);
@@ -1030,6 +1030,7 @@ const buroController = {
       );
 
       if (dealUpdated.error) {
+        console.log("ERROR AL ACTUALIZAR EL DEAL EN HUBSPOT" + dealUpdated.error);
         return res.status(400).json({
           success: false,
           message: "ERROR AL ACTUALIZAR EL DEAL EN HUBSPOT",
@@ -1085,8 +1086,8 @@ const buroController = {
     }
   },
   async buroLogicMoral(req, res) {
-    let { id, idAmount } = req.body;
-    let user = await User.findById(id);
+    let { id, idAmount, email } = req.body;
+    let user = await User.findOne({ email });
     let comercialKey = user.idClient.idComercialInfo;
     let appliance = Appliance.findById(user.idClient.appliance[0]._id);
 
@@ -1287,7 +1288,7 @@ const buroController = {
       });
       console.log("No se encontro el usuario");
     }
-  }
+      }
 };
 
 module.exports = buroController;

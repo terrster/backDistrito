@@ -131,6 +131,7 @@ async function getToken(type) {
       token = response.data.access_token;
     })
     .catch(function (error) {
+      console.log("error al obtener token");
       if (error.response.data) {
         console.log(error.response.data);
       } else {
@@ -504,9 +505,7 @@ const dataBuro = {
           coloniaOPoblacion: removeAccents(general.address.town),
           direccion: removeAccents(
             `${general.address.street} ${
-              general.address.extNumber
-                ? `N${general.address.extNumber}`
-                : ""
+              general.address.extNumber ? `N${general.address.extNumber}` : ""
             }`
           ),
           estado: codigoEstado(general.address.state),
@@ -537,7 +536,9 @@ const dataBuro = {
     hubspotDealId,
     client,
     type,
-    scoreProspector
+    buroId,
+    scoreProspector,
+    moral
   ) {
     let scoreValue = Resburo.respuesta.persona.scoreBuroCredito
       ? Resburo.respuesta.persona.scoreBuroCredito[0].valorScore
@@ -555,24 +556,38 @@ const dataBuro = {
       scoreValue: scoreValue,
     };
 
+    let dataBuro = await Buro.findById(buroId);
     let nuevaConsulta = await Consultas.create(data);
     await Buro.findByIdAndUpdate(buro._id, {
-      consultas: {
-        _id: nuevaConsulta._id,
-      },
+      consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
     });
 
     let paramsHub = {
       score: scoreValue,
-      status: "SUCCESS",
-      idConsulta: nuevaConsulta._id,
+      status: "COMPLETED",
+      idConsulta: "INTERNO",
     };
+
+    if( scoreValue >= 525 && type === "buro"){
+      paramsHub.status = "SUCCESS";
+    }
 
     let buroHub = await hubspotController.deal.update(
       hubspotDealId,
       "buro",
       paramsHub
     );
+
+    if(moral){
+    await hubspotController.deal.update(
+      user.hubspotDealId,
+      "single_field",
+      {
+        value: "SUCCESS",
+        name: "respuesta_unykoo_2_buro_moral_",
+      }
+    );
+    }
 
     // console.log("buroHub", buroHub);
 
