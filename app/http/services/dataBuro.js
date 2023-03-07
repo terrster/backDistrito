@@ -125,6 +125,8 @@ async function getToken(type) {
   let success = null;
   let token = null;
 
+  // console.log("Configuración de token:" + JSON.stringify(config));
+
   await axios(config)
     .then(function (response) {
       success = true;
@@ -306,7 +308,7 @@ const dataBuro = {
 
             numeroReferenciaOperador: referenciaOperador,
 
-            productoRequerido: "001",
+            productoRequerido: "007",
 
             tipoConsulta: "I",
 
@@ -564,13 +566,9 @@ const dataBuro = {
 
     let paramsHub = {
       score: scoreValue,
-      status: "COMPLETED",
+      status: "SUCCESS",
       idConsulta: "INTERNO",
     };
-
-    if( scoreValue >= 525 && type === "buro"){
-      paramsHub.status = "SUCCESS";
-    }
 
     let buroHub = await hubspotController.deal.update(
       hubspotDealId,

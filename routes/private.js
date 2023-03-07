@@ -18,6 +18,7 @@ const smsController = require("../app/http/controllers/smsController");
 const realTimeManager = require("../app/http/services/realTimeManager");
 const metamapController = require("../app/http/controllers/metamapController");
 const buroController = require("../app/http/controllers/buroController");
+const buroHelper = require("../app/http/controllers/BuroHelper");
 
 // route.use((request, response, next) => {
 //     if(!request.query.tokensecret){
@@ -70,8 +71,8 @@ route.group("/metamap", (meta) => {
 });
 //update de moral
 route.group("/buro", (buro) => {
-    buro.post('/moral', buroController.updateMoral);
-    buro.post('/consultas', buroController.getConsultas);
+    buro.post('/moral', buroHelper.updateMoral);
+    buro.post('/consultas', buroHelper.getConsultas);
 });
 
 module.exports = route;

@@ -31,6 +31,7 @@ const openBankingController = require("../app//http/controllers/openBankingContr
 const kykoyaController = require("../app/http/controllers/kykoyaController");
 const updateDataController = require("../app/http/controllers/updateDataController");
 const metamapController = require("../app/http/controllers/metamapController");
+const buroHelper = require("../app/http/controllers/BuroHelper");
 const rateLimit = require("express-rate-limit");
 
 route.use(verifyToken);
@@ -115,12 +116,12 @@ route.group("/documents", (documents) => {
 //Consulta de buro
 route.group("/buro", (buro) => {
     buro.post('/:id', [limit], buroController.inicio);
-    buro.put('/consulta', [limit],  buroController.buroLogic);
+    buro.put('/consulta', [limit],  buroHelper.buroLogic);
     buro.post('/update/:id', buroController.update);
   });
   //Consulta de buroMoral
 route.group("/buroMoral", (buro) => {
-    buro.post('/:id', buroController.buroLogicMoral);
+    buro.post('/:id', buroHelper.buroLogicMoral);
     // buro.get('/:id', [limit], buroController.buroLogicMoral);
   });
 
