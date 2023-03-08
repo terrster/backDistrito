@@ -103,9 +103,6 @@ const buroHelper = {
           type: "buro",
         });
 
-        console.log(buro.score);
-        console.log(buro.success);
-
         if (!buro.success) {
           return res.status(412).json({
             ...buro,
@@ -159,6 +156,48 @@ const buroHelper = {
         buro = data;
         buroId = data._id;
       }
+
+      if(data.consultas.length > 0){
+        let consultas = data.consultas;
+        for(let i = 0; i < consultas.length; i++){
+          if(consultas[i].status === "success"){
+            let scoreValue = consultas[i].scoreValue;
+            await Client.findByIdAndUpdate(client._id, {
+              score: scoreValue,
+            });
+            let paramsHub = {
+              score: scoreValue,
+              status: "SUCCESS",
+              idConsulta: "INTERNO",
+            };
+        
+            let buroHub = await hubspotController.deal.update(
+              hubspotDealId,
+              "buro",
+              paramsHub
+            );
+
+            if(user.idClient.type === "PM"){
+              await hubspotController.deal.update(
+                user.hubspotDealId,
+                "single_field",
+                {
+                  value: "SUCCESS",
+                  name: "respuesta_unykoo_2_buro_moral_",
+                }
+              );
+              }
+              let userUpdate = await User.findById(id);
+            return {
+              success: true,
+              message: "Consulta buro: " + type,
+              user: userUpdate,
+              score: scoreValue
+            };
+          }
+        }
+      }
+
       if (data.status) {
         return {
           success: true,
@@ -464,7 +503,8 @@ const buroHelper = {
           type,
           buroId,
           scoreProspector,
-          moral
+          moral,
+          user
         );
 
         let userUpdate = await User.findById(id);
@@ -495,8 +535,6 @@ const buroHelper = {
     let user = await User.findOne({ email });
     let comercialKey = user.idClient.idComercialInfo;
     let appliance = Appliance.findById(user.idClient.appliance[0]._id);
-
-    console.log("user", user);
 
     if (
       user.idClient.score === undefined ||

@@ -38,6 +38,7 @@ route.post("/ciec", ciecController.create);
 route.get("/control/buro", dataController.getControl);
 route.post("/control/buro", dataController.updateControl);
 route.get("/control/consultas", dataController.getConsultas);
+route.get("/control/consultas/:id", dataController.getConsulta);
 // route.post("/buro", BuroController.Prospector);
 
 //Contador

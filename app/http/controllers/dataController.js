@@ -1,6 +1,8 @@
 const Control = require("../models/Control");
 const Consultas = require("../models/Consultas");
 const Buro = require("../models/BuroM");
+const Appliance = require("../models/Appliance");
+const GeneralInfo = require("../models/GeneralInfo");
 const hubspotController = require("../controllers/hubspotController");
 const Client = require("../models/Client");
 
@@ -91,6 +93,48 @@ const dataController = {
             res.status(500).json({ message: error.message });
         }
     },
+    async getConsulta(req, res) {
+        let id = req.params.id;
+        try {
+            let buro = await Buro.find({ consultas: id }, function (err, docs) {
+                if (err) {
+                    console.log(err);
+                    return false;
+                } else {
+                    console.log(docs[0].consultas);
+                    return docs;
+                }
+            });
+
+            if (buro){
+                let appliance = await Appliance.find({ idBuro: buro[0]._id }, function (err, docs) {
+                    if (err) {
+                        console.log(err);
+                        return false;
+                    } else {
+                        return docs;
+                    }
+                });
+
+                if (appliance) {
+                    let generalInfo = await GeneralInfo.find({ _id: appliance[0].idGeneralInfo }, function (err, docs) {
+                        if (err) {
+                            console.log(err);
+                            return false;
+                        } else {
+                            console.log(docs);
+                            res.json(docs);
+                        }
+                    }
+                    );
+                }
+
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: error.message });
+        }
+    }
 };
 
 module.exports = dataController;

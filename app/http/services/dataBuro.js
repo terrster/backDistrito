@@ -540,7 +540,8 @@ const dataBuro = {
     type,
     buroId,
     scoreProspector,
-    moral
+    moral,
+    user
   ) {
     let scoreValue = Resburo.respuesta.persona.scoreBuroCredito
       ? Resburo.respuesta.persona.scoreBuroCredito[0].valorScore
@@ -589,7 +590,7 @@ const dataBuro = {
 
     // console.log("buroHub", buroHub);
 
-    let clientUpdate = await Client.findByIdAndUpdate(client._id, {
+    await Client.findByIdAndUpdate(client._id, {
       score: scoreValue,
     });
   },
