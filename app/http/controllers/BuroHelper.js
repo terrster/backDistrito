@@ -150,6 +150,8 @@ const buroHelper = {
       rfc = comercial.rfc;
     }
 
+
+
     if (user.idClient.appliance[0].idBuro) {
       let data = await Buro.findById(user.idClient.appliance[0].idBuro._id);
       if (data) {
@@ -160,7 +162,7 @@ const buroHelper = {
       if(data.consultas.length > 0){
         let consultas = data.consultas;
         for(let i = 0; i < consultas.length; i++){
-          if(consultas[i].status === "success"){
+          if(consultas[i].status === "success" && type === "buro"){
             let scoreValue = consultas[i].scoreValue;
             await Client.findByIdAndUpdate(client._id, {
               score: scoreValue,
@@ -199,6 +201,7 @@ const buroHelper = {
       }
 
       if (data.status) {
+        console.log("Ya se realizo una consulta buro");
         return {
           success: true,
           message: "Consulta buro: " + type,
@@ -478,7 +481,7 @@ const buroHelper = {
             buroId
           );
           let nuevaConsulta = await Consultas.create(data);
-          await Buro.findByIdAndUpdate(buro._id, {
+          await Buro.findByIdAndUpdate(BuroId, {
             consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
           });
 
@@ -487,7 +490,8 @@ const buroHelper = {
           return {
             success: true,
             message: "Consulta buro: " + type,
-            user: userUpdate,
+            resultado: Resburo,
+            // user: userUpdate,
           };
         }
 
@@ -609,7 +613,6 @@ const buroHelper = {
 
     if (comercialInfo.firma === true) {
       let moral = await buroHelper.consulta({ id, type: "moral" });
-
       if (moral.success) {
         await hubspotController.deal.update(
           user.hubspotDealId,
@@ -666,7 +669,7 @@ const buroHelper = {
         });
 
         let moral = await buroHelper.buroLogicMoral({ email });
-        console.log("moral", moral);
+        
         return res.status(200).json({
           success: true,
           message: "Se actualizo la firma a " + firma,
