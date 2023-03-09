@@ -354,7 +354,7 @@ const buroHelper = {
 
           let paramsHub = {
             score: "",
-            status: "ERROR",
+            status: "ERROR AUTENTICACION",
             idConsulta: "INTERNO",
           };
 
@@ -404,6 +404,12 @@ const buroHelper = {
 
           let score = client.score;
 
+          let error = Resburo.respuesta.persona.error ? Resburo.respuesta.persona.error.ur : "ERROR";
+
+          if(error !== "ERROR"){
+            error = JSON.stringify(error);
+          }
+
           switch (score) {
             case null:
             case undefined:
@@ -427,7 +433,7 @@ const buroHelper = {
 
           let paramsHub = {
             score: "",
-            status: "ERROR",
+            status: "ERROR" + error,
             idConsulta: nuevaConsulta._id,
           };
 
