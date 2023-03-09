@@ -354,7 +354,7 @@ const buroHelper = {
 
           let paramsHub = {
             score: "",
-            status: "ERROR AUTENTICACION",
+            status: "ERROR_AUTENTICACION",
             idConsulta: "INTERNO",
           };
 
