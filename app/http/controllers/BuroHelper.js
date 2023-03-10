@@ -185,7 +185,7 @@ const buroHelper = {
                 "single_field",
                 {
                   value: "SUCCESS",
-                  name: "respuesta_unykoo_2_buro_moral_",
+                  name: "estatus_workflow_unykoo_2_buro_moral_",
                 }
               );
               }
@@ -619,7 +619,7 @@ const buroHelper = {
           "single_field",
           {
             value: "SUCCESS SUCCES SUCCES SUCCES",
-            name: "respuesta_unykoo_2_buro_moral_",
+            name: "estatus_workflow_unykoo_2_buro_moral_",
           }
         );
         return {
@@ -632,7 +632,7 @@ const buroHelper = {
           "single_field",
           {
             value: "4",
-            name: "respuesta_unykoo_2_buro_moral_",
+            name: "estatus_workflow_unykoo_2_buro_moral_",
           }
         );
         return {
