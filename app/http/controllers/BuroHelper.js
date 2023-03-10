@@ -481,7 +481,7 @@ const buroHelper = {
             buroId
           );
           let nuevaConsulta = await Consultas.create(data);
-          await Buro.findByIdAndUpdate(BuroId, {
+          await Buro.findByIdAndUpdate(buroId, {
             consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
           });
 
