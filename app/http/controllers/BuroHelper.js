@@ -322,6 +322,7 @@ const buroHelper = {
             tipo: type,
             fecha: new Date(),
             status: "error",
+            name: `${general.name} ${general.lastName}`,
             error: Resburo,
           };
           let dataBuro = await Buro.findById(
@@ -394,6 +395,7 @@ const buroHelper = {
             tipo: type,
             fecha: new Date(),
             status: "error",
+            name: `${general.name} ${general.lastName}`,
             error: Resburo.respuesta.persona.error,
           };
 
@@ -470,6 +472,7 @@ const buroHelper = {
               : "ERROR",
             fecha: new Date(),
             status: "success",
+            name: `${comercial.businessName}`,
             resultado: Resburo,
           };
 
@@ -514,7 +517,8 @@ const buroHelper = {
           buroId,
           scoreProspector,
           moral,
-          user
+          user,
+          general,
         );
 
         let userUpdate = await User.findById(id);

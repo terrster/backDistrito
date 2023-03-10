@@ -541,7 +541,8 @@ const dataBuro = {
     buroId,
     scoreProspector,
     moral,
-    user
+    user,
+    general
   ) {
     let scoreValue = Resburo.respuesta.persona.scoreBuroCredito
       ? Resburo.respuesta.persona.scoreBuroCredito[0].valorScore
@@ -555,6 +556,7 @@ const dataBuro = {
       tipo: type,
       fecha: new Date(),
       status: "success",
+      name: `${general.name} ${general.lastName}`,
       resultado: Resburo,
       scoreValue: scoreValue,
     };

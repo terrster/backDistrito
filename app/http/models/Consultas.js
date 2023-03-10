@@ -6,6 +6,7 @@ let utc = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString(
 const consultasSchema = new Schema({
     folio: Number,
     fecha: { type: Date, default: utc},
+    name: String,
     tipo: String,
     status: String,
     error: Object,
