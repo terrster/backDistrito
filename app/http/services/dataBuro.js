@@ -223,15 +223,15 @@ const dataBuro = {
 
               codPais: "MX",
 
-              coloniaPoblacion: general.address.town,
+              coloniaPoblacion: removeAccents(general.address.town),
 
               cp: general.address.zipCode,
 
-              delegacionMunicipio: general.address.municipality,
+              delegacionMunicipio: removeAccents(general.address.municipality),
 
-              direccion1: `${general.address.street} ${
+              direccion1: removeAccents(`${general.address.street} ${
                 general.address.extNumber ? `${general.address.extNumber}` : ""
-              }`,
+              }`),
 
               direccion2: general.address.intNumber
                 ? `INT ${general.address.intNumber}`
@@ -316,15 +316,15 @@ const dataBuro = {
           },
 
           nombre: {
-            apellidoPaterno: general.lastname,
+            apellidoPaterno: removeAccents(general.lastname),
 
-            apellidoMaterno: general.secondLastname,
+            apellidoMaterno: removeAccents(general.secondLastname),
 
             apellidoAdicional: "",
 
-            primerNombre: general.name,
+            primerNombre: removeAccents(general.name),
 
-            segundoNombre: general.segundoNombre ? general.segundoNombre : "",
+            segundoNombre: general.segundoNombre ? removeAccents(general.segundoNombre) : "",
 
             fechaNacimiento: "",
 
@@ -517,7 +517,7 @@ const dataBuro = {
         fechaDeNacimiento: "",
         nacionalidad: "",
         nombre: "",
-        razonSocial: general.businessName,
+        razonSocial:removeAccents(general.businessName),
         rfc: general.rfc,
         segundoNombre: "",
         tipoCliente: "1",
