@@ -732,6 +732,33 @@ const buroHelper = {
       console.log("No se encontro el usuario");
     }
   },
+  async putConsultas(req, res) {
+
+    const { email, consulta } = req.body;
+    let token = req.headers["token"];
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      let appliance = await Appliance.findById(user.idClient.appliance[0]._id);
+      let client = await Client.findById(user.idClient._id);
+      let buro = await Buro.findById(appliance.idBuro._id);
+      // let nuevaConsulta = await Consultas.create(consulta);
+
+      console.log(consulta);
+      return res.status(200).json({
+        success: true,
+        message: "Consultas",
+        consultas: buro.consultas,
+      });
+
+    } else {
+      return res.status(200).json({
+        success: false,
+        message: "No se encontro el usuario",
+      });
+    }
+  }
 };
 
 module.exports = buroHelper;

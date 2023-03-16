@@ -53,6 +53,55 @@ const dataController = {
             res.status(500).json({ message: error.message });
         }
     },
+    async setBuro(req, res) {
+        let { update } = req.body;
+        try {
+            let unykoo = await Control.findOne({ name: "unykoo" });
+
+            if (!unykoo) {
+                const newControl = new Control({
+                    name: "unykoo",
+                    unykoo: false,
+                    userBuro: "123",
+                    passwordBuro: "456",
+                });
+                await newControl.save();
+                unykoo = await Control.findOne({ name: "unykoo" });
+            }
+            
+            if (update) {
+                unykoo.unykoo = true;
+                await unykoo.save();
+            } else {
+                unykoo.unykoo = false;
+                await unykoo.save();
+            }
+            res.json(unykoo);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: error.message });
+        }
+    },
+    async getUnykoo(req, res) {
+        try {
+            let unykoo = await Control.findOne({ name: "unykoo" });
+
+            if (!unykoo) {
+                const newControl = new Control({
+                    name: "unykoo",
+                    unykoo: false,
+                    userBuro: "123",
+                    passwordBuro: "456",
+                });
+                await newControl.save();
+                unykoo = await Control.findOne({ name: "unykoo" });
+            }
+            res.json(unykoo);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: error.message });
+        }
+    },
     async updateControl(req, res) {
         let { password, user, name } = req.body;
         try {

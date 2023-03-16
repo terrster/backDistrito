@@ -73,6 +73,7 @@ route.group("/metamap", (meta) => {
 route.group("/buro", (buro) => {
     buro.post('/moral', buroHelper.updateMoral);
     buro.post('/consultas', buroHelper.getConsultas);
+    buro.put('/consulta', buroHelper.putConsultas);
 });
 
 module.exports = route;
