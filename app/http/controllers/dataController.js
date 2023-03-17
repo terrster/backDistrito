@@ -102,6 +102,33 @@ const dataController = {
             res.status(500).json({ message: error.message });
         }
     },
+    async getCiec(req, res) {
+        let {update, password} = req.body;
+        try {
+            let ciec = await Control.findOne({ name: "ciec" });
+
+            if (!ciec) {
+                const newControl = new Control({
+                    name: "ciec",
+                    unykoo: false,
+                    userBuro: "dpyme",
+                    passwordBuro: "456",
+                });
+                await newControl.save();
+                ciec = await Control.findOne({ name: "unykoo" });
+            }
+
+            if(update){
+                ciec.passwordBuro = password;
+                await ciec.save();
+            }
+
+            res.json(ciec);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: error.message });
+        }
+    },
     async updateControl(req, res) {
         let { password, user, name } = req.body;
         try {

@@ -9,6 +9,7 @@ const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
 const { google } = require("googleapis");
 const Sheets = require("../controllers/sheetsController");
+const  Control = require("../models/Control");
 
 const _axios = require("axios").default;
 const axios = _axios.create({
@@ -86,6 +87,9 @@ const getPro = async (Accion, id) => {
 const ciecController = {
   create: async (req, res) => {
     let { rfc, ciec, newCiec, id } = req.body;
+
+    let controlCiec = await Control.findOne({ name: "ciec" });
+    let ciecActual = controlCiec.passwordBuro;
 
     let comercialId = "";
     let hubspotDealId = "";
@@ -182,6 +186,42 @@ const ciecController = {
         comercialId = comercial._id;
       }
       hubspotDealId = user.hubspotDealId;
+    }
+
+    if (ciecActual === ciec) {
+      let n4_93_ciec = Buffer.from(ciec).toString("base64");
+      await hubspotController.deal.update(hubspotDealId, "single_field", {
+        name: "n4_93_ciec",
+        value: "INTERNO",
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).json({
+          msg: "Algo salió mal tratando de actualizar el CIEC",
+          error: error,
+        });
+      });
+      await hubspotController.deal.update(hubspotDealId, "single_field", {
+        name: "datacode",
+        value: n4_93_ciec,
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).json({
+          msg: "Algo salió mal tratando de actualizar el CIEC",
+          error: error,
+        });
+      });
+      await ComercialInfo.findByIdAndUpdate(comercialId, {
+        ciecstatus: true,
+      });
+      let user = await getPro(User, id);
+      console.log(user);
+      return res.status(200).json({
+        code: 200,
+        msg: "la CIEC se actualizó correctamente",
+        user,
+      });
     }
 
     let data = {

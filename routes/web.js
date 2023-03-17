@@ -39,6 +39,7 @@ route.get("/control/buro", dataController.getControl);
 route.post("/control/unykoo", dataController.setBuro);
 route.get("/control/buro/unykoo", dataController.getUnykoo);
 route.post("/control/buro", dataController.updateControl);
+route.post("/control/ciec", dataController.getCiec);
 route.get("/control/consultas", dataController.getConsultas);
 route.get("/control/consultas/:id", dataController.getConsulta);
 // route.post("/buro", BuroController.Prospector);
