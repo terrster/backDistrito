@@ -10,6 +10,7 @@ const Client = require("../models/Client");
 const format = require("../services/formatManager");
 const dataBuro = require("../services/dataBuro");
 const Consultas = require("../models/Consultas");
+const Control = require("../models/Control");
 
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 const until = (cond, time) =>
@@ -95,6 +96,16 @@ const buroHelper = {
           user: user,
         });
       }
+    }
+    let unykoo = await Control.findOne({ name: "unykoo" });
+    console.log(unykoo)
+    if(unykoo.unykoo = true) {
+      let userNew = await User.findById(id);
+      return res.status(200).json({
+        code: 0,
+        message: "Buro Desactivado",
+        user: userNew,
+      })
     }
     try {
 
