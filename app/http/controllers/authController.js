@@ -399,11 +399,15 @@ const authController = {
         });
       }
 
+      let lastUser = await userController.lastUser();
+      data.idDistrito = lastUser.idDistrito + 1;
+
       let access = "ADMIN";
       data = {
         ...data,
         access,
       };
+
       let user = await User.create(data);
 
       return response.json({
@@ -441,7 +445,9 @@ const authController = {
         id: user._id,
       };
 
-        let token = await tokenManager.encode(payload);
+      let token = jwt.sign(payload, privateKey, { algorithm: "RS256" }); //Generate a token without expiration
+
+        // let token = await tokenManager.encode(payload);
 
         const { password: _, ...userWithoutPassword } = user.toObject();
 

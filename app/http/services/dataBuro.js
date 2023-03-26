@@ -531,6 +531,201 @@ const dataBuro = {
       token: token,
     };
   },
+  async dataBuroCasa({consulta, referenciaOperador}){
+    let {
+      ejercidoCreditoAutomotriz,
+      ejercidoCreditoHipotecario,
+      tarjetaCredito,
+      ultimosCuatroDigitos,
+      direccion1,
+      estado,
+      delegacionMunicipio,
+      coloniaPoblacion,
+      cp,
+      apellidoPaterno,
+      apellidoMaterno,
+      primerNombre,
+      segundoNombre,
+      rfc,
+    } = consulta
+    const token = await getToken("RPF");
+    const url =
+      "https://api.burodecredito.com.mx:4431/pf/autenticador/credit-report-api/v1/autenticador";
+      const data = JSON.stringify({
+        consulta: {
+          persona: {
+            autentica: {
+              ejercidoCreditoAutomotriz: ejercidoCreditoAutomotriz,
+  
+              ejercidoCreditoHipotecario: ejercidoCreditoHipotecario,
+  
+              referenciaOperador: referenciaOperador,
+  
+              tarjetaCredito: tarjetaCredito,
+  
+              tipoReporte: "RCN",
+  
+              tipoSalidaAU: "1",
+  
+              ultimosCuatroDigitos: ultimosCuatroDigitos,
+            },
+  
+            cuentaC: [
+              {
+                claveOtorgante: "",
+  
+                nombreOtorgante: "",
+  
+                numeroCuenta: "",
+              },
+            ],
+  
+            domicilios: [
+              {
+                ciudad: "",
+  
+                codPais: "MX",
+  
+                coloniaPoblacion: removeAccents(coloniaPoblacion),
+  
+                cp: cp,
+  
+                delegacionMunicipio: removeAccents(delegacionMunicipio),
+  
+                direccion1: removeAccents(direccion1),
+  
+                direccion2: "",
+  
+                estado: codigoEstado(estado),
+  
+                extension: "",
+  
+                fax: "",
+  
+                fechaResidencia: "",
+  
+                indicadorEspecialDomicilio: "",
+  
+                numeroTelefono: "",
+  
+                tipoDomicilio: "",
+              },
+            ],
+  
+            empleos: [
+              {
+                baseSalarial: "",
+  
+                cargo: "",
+  
+                ciudad: "",
+  
+                claveMonedaSalario: "",
+  
+                codPais: "",
+  
+                coloniaPoblacion: "",
+  
+                cp: "",
+  
+                delegacionMunicipio: "",
+  
+                direccion1: "",
+  
+                direccion2: "",
+  
+                estado: "",
+  
+                extension: "",
+  
+                fax: "",
+  
+                fechaContratacion: "",
+  
+                fechaUltimoDiaEmpleo: "",
+  
+                nombreEmpresa: "",
+  
+                numeroEmpleado: "",
+  
+                numeroTelefono: "",
+  
+                salario: "",
+              },
+            ],
+  
+            encabezado: {
+              clavePais: "MX",
+  
+              claveUnidadMonetaria: " ",
+  
+              identificadorBuro: "",
+  
+              idioma: "SP",
+  
+              importeContrato: "",
+  
+              numeroReferenciaOperador: referenciaOperador,
+  
+              productoRequerido: "007",
+  
+              tipoConsulta: "I",
+  
+              tipoContrato: "CL",
+            },
+  
+            nombre: {
+              apellidoPaterno: removeAccents(apellidoPaterno),
+  
+              apellidoMaterno: removeAccents(apellidoMaterno),
+  
+              apellidoAdicional: "",
+  
+              primerNombre: removeAccents(primerNombre),
+  
+              segundoNombre: segundoNombre ? removeAccents(segundoNombre) : "",
+  
+              fechaNacimiento: "",
+  
+              rfc: rfc,
+  
+              prefijo: "",
+  
+              sufijo: "",
+  
+              nacionalidad: "MX",
+  
+              residencia: "",
+  
+              numeroLicenciaConducir: "",
+  
+              estadoCivil: "",
+  
+              sexo: "",
+  
+              numeroCedulaProfesional: "",
+  
+              numeroRegistroElectoral: "",
+  
+              claveImpuestosOtroPais: "",
+  
+              claveOtroPais: "",
+  
+              numeroDependientes: "",
+  
+              edadesDependientes: "",
+  
+              fechaRecepcionInformacionDependientes: "",
+            },
+          },
+        },
+      });
+      return {
+        url: url,
+        data: data,
+        token: token,
+      };
+  },
   async resBuro(
     Resburo,
     referenciaOperador,
