@@ -98,7 +98,10 @@ const buroHelper = {
     }
     let unykoo = await Control.findOne({ name: "unykoo" });
 
-    if ((unykoo.unykoo = true)) {
+    console.log("UNYKOO", unykoo);
+
+    if (unykoo.unykoo === true) {
+      console.log("UNYKOO ACTIVADO");
       let userNew = await User.findById(id);
       return res.status(200).json({
         code: 0,
@@ -106,6 +109,7 @@ const buroHelper = {
         user: userNew,
       });
     }
+
     try {
       let buro = await buroHelper.consulta({
         id,
