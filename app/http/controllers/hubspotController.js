@@ -804,8 +804,8 @@ const deal = {
                             ]
                         }
                         case 'generalBuro'://información general
-                        return {
-                            "properties": [
+                        
+                            let properties = [
                                 {
                                     "value": request.name,
                                     "name": "n4_1_nombre"
@@ -817,14 +817,6 @@ const deal = {
                                 {
                                     "value": request.secondLastname,
                                     "name": "n4_3_apellido_materno"
-                                },
-                                {
-                                    "value": request.rfcPerson,
-                                    "name": "n3_15_rfc_pm"
-                                },
-                                {
-                                    "value": request.curp,
-                                    "name": "curp"
                                 },
                                 {
                                     "value": format.YES_NO_QUESTION[request.mortgageCredit],
@@ -843,13 +835,25 @@ const deal = {
                                     "name": "n6_4_tdc_4_d_gitos"
                                 },
                             ]
-                        }
+
+                            if(request.rfcPerson){
+                                properties.push({
+                                    "value": request.rfcPerson,
+                                    "name": "n3_15_rfc_pm"
+                                });
+                            }
+
+                            return {
+                                "properties": properties
+                            }
+                        
                 }
             }
             const {data} = await axios.put('deals/v1/deal/' + hubspotDealId, dealParams);
             return data;
         }
         catch(error){
+            console.log(error);
             let response = {
                 msg: "Hubspot: Algo salió mal tratando de actualizar la información del deal",
                 error: error

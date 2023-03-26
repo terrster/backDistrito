@@ -17,6 +17,8 @@ const circuloCreditoController = require("../app/http/controllers/circuloCredito
 const smsController = require("../app/http/controllers/smsController");
 const realTimeManager = require("../app/http/services/realTimeManager");
 const metamapController = require("../app/http/controllers/metamapController");
+const buroController = require("../app/http/controllers/buroController");
+const buroHelper = require("../app/http/controllers/BuroHelper");
 
 // route.use((request, response, next) => {
 //     if(!request.query.tokensecret){
@@ -66,6 +68,13 @@ route.post("/real-time-hubspot-info", realTimeManager.hubspotInfo);
 //Consulta de metamap 
 route.group("/metamap", (meta) => {
     meta.post('/v1', metamapController.listener);
+});
+//update de moral
+route.group("/buro", (buro) => {
+    buro.post('/moral', buroHelper.updateMoral);
+    buro.post('/consultas', buroHelper.getConsultas);
+    buro.put('/consulta', buroHelper.putConsultas);
+    buro.post('/casa', buroHelper.buroCasa);
 });
 
 module.exports = route;

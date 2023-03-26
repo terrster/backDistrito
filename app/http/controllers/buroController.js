@@ -1,19 +1,22 @@
-const path = require("path");
 const User = require("../models/User");
 const ComercialInfo = require("../models/ComercialInfo");
 const GeneralInfo = require("../models/GeneralInfo");
+const Appliance = require("../models/Appliance");
+const Buro = require("../models/BuroM");
 const hubspotController = require("../controllers/hubspotController");
 const axios = require("axios");
+const userController = require("../controllers/userController");
 const Client = require("../models/Client");
 const format = require("../services/formatManager");
+const dataBuro = require("../services/dataBuro");
+const Consultas = require("../models/Consultas");
+const Amount = require("../models/Amount");
 const { response } = require("express");
-const rateLimit = require("express-rate-limit");
 require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 });
 const HAPIKEY_UNYKOO = process.env.HAPIKEY_UNYKOO;
 const UNYKOO_URL = process.env.UNYKOO_URL;
-
 
 const headers = {
   "Content-Type": "application/json",
@@ -21,11 +24,27 @@ const headers = {
   company_code: "P2VXMnh",
 };
 
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+const until = (cond, time) =>
+  cond().then((result) => result || delay(time).then(() => until(cond, time)));
 
+const getUpdate = async (Accion, id, params) => {
+  return await until(
+    () => {
+      return Accion.findByIdAndUpdate(id, params).then((res) => {
+        if (res) {
+          return res;
+        }
+        return false;
+      });
+    },
+    1000,
+    10
+  );
+};
 
 const buroController = {
   async inicio(req, res) {
-
     const data = JSON.stringify({
       login: "PROSPECTOR",
       workflowName: "DP",
@@ -41,7 +60,7 @@ const buroController = {
     let hubspotDealId = user.hubspotDealId;
     // si se consulta el buro de un usuario en hubspot se actuliza en la base de datos el buro y regreso la calificacion de la persona
     let pruebaScore = await hubspotController.deal.getScore(hubspotDealId);
-    if(!isNaN(pruebaScore)){
+    if (!isNaN(pruebaScore)) {
       await Client.findByIdAndUpdate(user.idClient._id, {
         score: pruebaScore,
       });
@@ -50,7 +69,7 @@ const buroController = {
       return res.status(200).json({
         success: true,
         buro: {
-          valorScore : pruebaScore,
+          valorScore: pruebaScore,
           status: "success",
         },
         user: userUpdateHub,
@@ -71,7 +90,7 @@ const buroController = {
         rfc,
         update,
       } = req.body;
-      
+
       let rfcConsulta = "";
       let comercialRFC = "";
       let razonSocial = "";
@@ -94,16 +113,23 @@ const buroController = {
             rfcPerson: rfcPerson,
           });
           if (rfc) {
-            await ComercialInfo.findByIdAndUpdate(user.idClient.idComercialInfo, {
-              rfc: rfc,
-            });
-            await hubspotController.deal.update(user.hubspotDealId, "single_field",{
-              value: rfc,
-              name: "n3_rfc"
-            });
+            await ComercialInfo.findByIdAndUpdate(
+              user.idClient.idComercialInfo,
+              {
+                rfc: rfc,
+              }
+            );
+            await hubspotController.deal.update(
+              user.hubspotDealId,
+              "single_field",
+              {
+                value: rfc,
+                name: "n3_rfc",
+              }
+            );
           }
           let generalInfo = await GeneralInfo.findById(generalKey);
-          
+
           let dealUpdated = await hubspotController.deal.update(
             user.hubspotDealId,
             "generalBuro",
@@ -119,7 +145,7 @@ const buroController = {
               last4,
             }
           );
-          
+
           if (dealUpdated.error) {
             return res.status(400).json({
               success: false,
@@ -155,7 +181,12 @@ const buroController = {
         user.idClient.idComercialInfo
       );
 
-      person = user.idClient.type === "PM" ? "P.Moral" : user.idClient.type === "PF" ? "PF" : "PFAE";
+      person =
+        user.idClient.type === "PM"
+          ? "P.Moral"
+          : user.idClient.type === "PF"
+          ? "PF"
+          : "PFAE";
 
       if (person === "P.Moral") {
         rfcConsulta = rfcPerson;
@@ -170,7 +201,7 @@ const buroController = {
 
       const { street, zipCode } = address;
 
-            //para pruebas en local
+      //para pruebas en local
       // if (process.env.NODE_ENV === "localhost") {
       //   return res.status(400).json({
       //     success: true,
@@ -261,15 +292,22 @@ const buroController = {
         const resForm = await axios(configForm);
         if (resForm.data.success === true) {
           //Si el formulario se envio correctamente
-          
+
           let datos = null;
 
           let tarjeta = "";
           let hipotecario = "";
-          creditCard === true ? (tarjeta = "V") : creditCard === "1" ? (tarjeta = "V") : (tarjeta = "F");
-          mortgageCredit === true ? (hipotecario = "V") : mortgageCredit === "1" ? (hipotecario = "V") : (hipotecario = "F");
+          creditCard === true
+            ? (tarjeta = "V")
+            : creditCard === "1"
+            ? (tarjeta = "V")
+            : (tarjeta = "F");
+          mortgageCredit === true
+            ? (hipotecario = "V")
+            : mortgageCredit === "1"
+            ? (hipotecario = "V")
+            : (hipotecario = "F");
 
-          
           let carro = carCredit === "YES" ? "V" : "F";
           let last4N = last4 !== null ? last4 : "";
 
@@ -400,7 +438,6 @@ const buroController = {
         });
       }
     } catch (error) {
-
       let response = "response" in error ? error.response : 500;
       if (response === 500) {
         console.log(error);
@@ -423,60 +460,54 @@ const buroController = {
       }
       let errorCode = "errorCode" in code ? code.errorCode : 500;
 
-      if (errorCode === 8){
+      if (errorCode === 8) {
         let paramsHub = {
           score: "",
           status: "ERROR_AUTENTICACION",
           idConsulta: error.response.data.data.idUnykoo,
         };
-        let buroHub = await hubspotController.deal.update(
-          hubspotDealId,
-          "buro",
-          paramsHub
-        );
         const clienteError = await Client.findById(user.idClient._id);
-            const { score } = clienteError;
-            let scoreError = "";
-            let statusCode = 400;
-            switch (score) {
-              case null || undefined:
-                scoreError = "ERROR";
-                break;
-              case "":
-                scoreError = "ERROR";
-                break;
-              case "ERROR":
-                scoreError = "ERROR 1";
-                break;
-              case "ERROR 1":
-                scoreError = "ERROR 2";
-                break;
-              case "ERROR 2":
-                scoreError = "ERROR 3";
-                break;
-              case "ERROR 3":
-                scoreError = "ERROR 3";
-                statusCode = 401;
-                break;
-              default:
-                scoreError = score;
-                break;
-            }
-            await Client.findByIdAndUpdate(user.idClient._id, {
-              score: scoreError,
-            });
+        const { score } = clienteError;
+        let scoreError = "";
+        let statusCode = 400;
+        switch (score) {
+          case null || undefined:
+            scoreError = "ERROR";
+            break;
+          case "":
+            scoreError = "ERROR";
+            break;
+          case "ERROR":
+            scoreError = "ERROR 1";
+            break;
+          case "ERROR 1":
+            scoreError = "ERROR 2";
+            break;
+          case "ERROR 2":
+            scoreError = "ERROR 3";
+            break;
+          case "ERROR 3":
+            scoreError = "ERROR 3";
+            statusCode = 401;
+            break;
+          default:
+            scoreError = score;
+            break;
+        }
+        await Client.findByIdAndUpdate(user.idClient._id, {
+          score: scoreError,
+        });
 
-            let userUpdate = await User.findById(req.params.id);
+        let userUpdate = await User.findById(req.params.id);
 
-            return res.status(statusCode).json({
-              success: false,
-              message: "Error Autenticación",
-              user: userUpdate,
-              error: error,
-            });
-
+        return res.status(statusCode).json({
+          success: false,
+          message: "Error Autenticación",
+          user: userUpdate,
+          error: error,
+        });
       } else if (errorCode !== 500) {
-        console.log(errorCode, "error de worfloo")
+        console.log(errorCode, "error de worfloo");
         console.log(code);
         return res.status(400).json({
           success: false,
@@ -516,21 +547,25 @@ const buroController = {
       case 4:
         warranty = 1;
         break;
-        default:
-          warranty = 1;
-          break;
+      default:
+        warranty = 1;
+        break;
     }
 
     try {
       let params = {
         value: format.WARRANTY[warranty],
-        name: "n3_14_garant_a"
-      }
-      let update = await hubspotController.deal.update(hubspotDealId, "single_field", params);
+        name: "n3_14_garant_a",
+      };
+      let update = await hubspotController.deal.update(
+        hubspotDealId,
+        "single_field",
+        params
+      );
       if (update) {
         await ComercialInfo.findByIdAndUpdate(user.idClient.idComercialInfo, {
-          warranty : warranty 
-        })
+          warranty: warranty,
+        });
         let userUpdate = await User.findById(req.params.id);
         return res.status(200).json({
           success: true,
@@ -553,7 +588,7 @@ const buroController = {
         error: error,
       });
     }
-
   },
 };
+
 module.exports = buroController;

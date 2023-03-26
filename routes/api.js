@@ -31,6 +31,7 @@ const openBankingController = require("../app//http/controllers/openBankingContr
 const kykoyaController = require("../app/http/controllers/kykoyaController");
 const updateDataController = require("../app/http/controllers/updateDataController");
 const metamapController = require("../app/http/controllers/metamapController");
+const buroHelper = require("../app/http/controllers/BuroHelper");
 const rateLimit = require("express-rate-limit");
 
 route.use(verifyToken);
@@ -44,6 +45,12 @@ const limit = rateLimit({
     max: 3, // limit each IP to 100 requests per windowMs
     message: "Too many accounts created from this IP, please try again after an hour",
     keyGenerator: (req) => req.params.id
+});
+const limitBody = rateLimit({
+    windowMs: 14 * 60 * 60 * 1000, // 12 hours
+    max: 3, // limit each IP to 100 requests per windowMs
+    message: "Too many accounts created from this IP, please try again after an hour",
+    keyGenerator: (req) => req.body.id
 });
 
 
@@ -115,7 +122,13 @@ route.group("/documents", (documents) => {
 //Consulta de buro
 route.group("/buro", (buro) => {
     buro.post('/:id', [limit], buroController.inicio);
+    buro.put('/consulta', [limitBody],  buroHelper.buroLogic);
     buro.post('/update/:id', buroController.update);
+  });
+  //Consulta de buroMoral
+route.group("/buroMoral", (buro) => {
+    buro.post('/:id', buroHelper.buroLogicMoral);
+    // buro.get('/:id', [limit], buroController.buroLogicMoral);
   });
 
 route.group("/v1", (v1) => {
