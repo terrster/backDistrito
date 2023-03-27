@@ -807,23 +807,26 @@ const buroHelper = {
       data: data,
     };
 
-    return res.status(200).json({
-      success: true,
-      message: "Consulta realizada",
-      data: JSON.parse(AuthConfig.data),
-    });
+    // return res.status(200).json({
+    //   success: true,
+    //   message: "Consulta realizada",
+    //   data: JSON.parse(AuthConfig.data),
+    // });
 
-    await axios(AuthConfig).then(async (res) => {
-      let Resburo = res.data;
+    console.log("Consulta casa:", consulta.primerNombre );
+
+    await axios(AuthConfig).then(async (response) => {
+      let Resburo = response.data;
 
       if (Resburo.respuesta === undefined) {
         console.log("error buro");
+        console.log(Resburo);
         let data = {
           folio: referenciaOperador,
-          tipo: type,
+          tipo: "buro casa",
           fecha: new Date(),
           status: "error Buro Casa",
-          name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.nombre}`,
+          name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
           error: Resburo,
         };
 
@@ -844,7 +847,6 @@ const buroHelper = {
         return res.status(200).json({
           success: false,
           error: "datos",
-          consulta: nuevaConsulta,
           message: "Error al consultar datos",
         });
       }
@@ -853,10 +855,10 @@ const buroHelper = {
         Resburo.respuesta.persona.error !== undefined &&
         Resburo.respuesta.persona.error !== null
       ) {
-        console.log("error buro");
+        console.log("error buro casa");
         let data = {
           folio: referenciaOperador,
-          tipo: type,
+          tipo: "buro casa",
           fecha: new Date(),
           status: "error Buro Casa",
           name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.nombre}`,
@@ -880,10 +882,76 @@ const buroHelper = {
         return res.status(200).json({
           success: false,
           error: "datos",
-          consulta: nuevaConsulta,
           message: "Error al consultar datos",
         });
       }
+
+      let scoreValue = Resburo.respuesta.persona.scoreBuroCredito;
+
+      let paramsHub = {
+        score: scoreValue,
+        status: "COMPLETADO",
+        idConsulta: "INTERNO",
+      };
+
+      let buroHub = await hubspotController.deal.update(
+        hubspotDealId,
+        "buro",
+        paramsHub
+      );
+
+      let data = {
+        folio: referenciaOperador,
+        referencia: Resburo.respuesta.persona.encabezado.numeroControlConsulta,
+        tipo: "Buro Casa",
+        fecha: new Date(),
+        status: "success",
+        name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
+        resultado: Resburo,
+        scoreValue: scoreValue,
+      };
+
+      let nuevaConsulta = await Consultas.create(data);
+
+      return res.status(200).json({
+        success: true,
+        message: "Consulta realizada",
+        score: scoreValue,
+      });
+
+
+    }).catch (async (err) => {
+      console.log("error buro casa");
+      console.log(err);
+      let data = {
+        folio: referenciaOperador,
+        tipo: "Buro Casa",
+        fecha: new Date(),
+        status: "error Buro Casa",
+        name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
+        error: err,
+      };
+
+      let nuevaConsulta = await Consultas.create(data);
+
+      let paramsHub = {
+        score: "",
+        status: "ERROR_AUTENTICACION",
+        idConsulta: "INTERNO",
+      };
+
+      let buroHub = await hubspotController.deal.update(
+        hubspotDealId,
+        "buro",
+        paramsHub
+      );
+
+      return res.status(200).json({
+        success: false,
+        error: "datos",
+        consulta: nuevaConsulta,
+        message: "Error al consultar datos",
+      });
     });
   },
 };
