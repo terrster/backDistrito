@@ -98,8 +98,6 @@ const buroHelper = {
     }
     let unykoo = await Control.findOne({ name: "unykoo" });
 
-    console.log("UNYKOO", unykoo);
-
     if (unykoo.unykoo === true) {
       console.log("UNYKOO ACTIVADO");
       let userNew = await User.findById(id);
@@ -117,6 +115,11 @@ const buroHelper = {
       });
 
       if (!buro.success) {
+        if(buro.code !== undefined){
+          return res.status(200).json({
+            ...buro,
+          });
+        }
         return res.status(412).json({
           ...buro,
         });
@@ -169,6 +172,19 @@ const buroHelper = {
         buro = data;
         buroId = data._id;
       }
+
+      // data.intentos = data.intentos + 1;
+      // console.log("INTENTOS: " + data.intentos);
+
+      // if (data.intentos > 8) {
+      //   return {
+      //     success: false,
+      //     message: "Se ha superado el limite de intentos",
+      //     user: user,
+      //     code: 1,
+      //   };
+      // }
+      // await data.save();
 
       if (data.consultas.length > 0) {
         let consultas = data.consultas;
@@ -223,6 +239,7 @@ const buroHelper = {
     } else {
       let buroCreate = await Buro.create({
         status: false,
+        intentos: 1,
       });
 
       await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {

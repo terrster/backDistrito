@@ -9,6 +9,7 @@ const buroSchema = new Schema({
     status: { type: Boolean, default: false },
     moralStatus: { type: Boolean, default: false },
     consultas: [{ type: Schema.Types.ObjectId, ref: 'Consultas', autopopulate: true }],
+    intentos:{ type: Number, default: 0 },
 }, { collection: 'Buro' });
 
 buroSchema.plugin(require('mongoose-autopopulate'));
