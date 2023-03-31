@@ -711,7 +711,23 @@ const buroHelper = {
     let user = await User.findOne({ email });
 
     if (user) {
+      
+      if(user.idClient.appliance[0]._id === undefined){
+        return res.status(200).json({
+          success: false,
+          message: "No se encontro el id del appliance",
+        });
+      }
+
       let appliance = await Appliance.findById(user.idClient.appliance[0]._id);
+
+      if(!appliance.idBuro){
+        return res.status(200).json({
+          success: false,
+          message: "No se encontro el buro",
+        });
+      }
+
       let buro = await Buro.findById(appliance.idBuro._id);
 
       let comercialKey = user.idClient.idComercialInfo;
