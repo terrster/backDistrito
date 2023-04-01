@@ -147,6 +147,13 @@ const ciecController = {
         }
 
       let user = await User.findOne({ idClient: { $eq: idClient } });
+
+      if (!user) {
+        return res.status(500).json({
+          msg: "no se encontró el cliente, favor de verificar el RFC",
+        });
+      }
+
       let type = user.idClient.type;
 
       if (type === "PM" && pMoral) {
@@ -252,9 +259,9 @@ const ciecController = {
     }
     let satStatus = "";
     const checkSatatus = setInterval(async () => {
+      try{
       const sat = await axios.get(`/b39d75/${response.data.id}`);
       const status = sat.data.status;
-
       switch (status) {
         case "pending":
           break;
@@ -263,6 +270,23 @@ const ciecController = {
           await ciecController.updateStatus(req, res);
           clearInterval(checkSatatus);
           break;
+      }
+      } catch (error) {
+        if(error.response !== undefined){
+        console.log(error.response);
+        return res.status(500).json({
+          msg: "Error al consultar el CIEC",
+          error: error.response,
+        });
+        clearInterval(checkSatatus);
+      } else {
+        console.log(error);
+        return res.status(500).json({
+          msg: "Error al consultar el CIEC",
+          error: error,
+        });
+        clearInterval(checkSatatus);
+      }
       }
     }, refreshInterval);
   },

@@ -186,6 +186,7 @@ const removeAccents = (str) => {
 
 const dataBuro = {
   async dataBuroReporte({ general, referenciaOperador, rfc }) {
+    let estado = removeAccents(general.address.state);
     const url =
       "https://api.burodecredito.com.mx:4431/pf/autenticador/credit-report-api/v1/autenticador";
     const data = JSON.stringify({
@@ -237,7 +238,7 @@ const dataBuro = {
                 ? `INT ${general.address.intNumber}`
                 : "",
 
-              estado: codigoEstado(general.address.state),
+              estado: codigoEstado(estado),
 
               extension: "",
 
@@ -369,6 +370,7 @@ const dataBuro = {
     };
   },
   async dataBuroProspector({ general, referenciaOperador, rfc }) {
+    let estado = removeAccents(general.address.state);
     const url =
       "https://api.burodecredito.com.mx:4431/pf/prospector/credit-report-api/v1/prospector";
     const data = JSON.stringify({
@@ -407,7 +409,7 @@ const dataBuro = {
               direccion2: general.address.intNumber
                 ? `INT ${general.address.intNumber}`
                 : "",
-              estado: codigoEstado(general.address.state),
+              estado: codigoEstado(estado),
               extension: "",
               fax: "",
               fechaResidencia: "",
@@ -486,6 +488,7 @@ const dataBuro = {
     };
   },
   async dataBuroMoral({ general, firma }) {
+    let estado = removeAccents(general.address.state);
     const url =
       "https://api.burodecredito.com.mx:4431/pm/reporte-de-credito/pm-report/api/v1/reporte-de-credito";
     const data = JSON.stringify({
@@ -510,7 +513,7 @@ const dataBuro = {
               general.address.extNumber ? `N${general.address.extNumber}` : ""
             }`
           ),
-          estado: codigoEstado(general.address.state),
+          estado: codigoEstado(estado),
           paisDeOrigenDelDomicilio: "MX",
           segundaDireccion: "",
         },
@@ -548,6 +551,7 @@ const dataBuro = {
       segundoNombre,
       rfc,
     } = consulta
+    estado = removeAccents(estado);
     const token = await getToken("RPF");
     const url =
       "https://api.burodecredito.com.mx:4431/pf/autenticador/credit-report-api/v1/autenticador";
