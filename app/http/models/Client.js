@@ -11,6 +11,7 @@ const clientSchema = new Schema({
     appliance: [{ type: Schema.Types.ObjectId, ref: 'Appliance', autopopulate: true }],
     sign: String,
     registerDate: { type: Date, default: utc },
+    idFiscalInfo: { type: Schema.Types.ObjectId, ref: 'FiscalInfo' },
     idDocuments: { type: Schema.Types.ObjectId, ref: 'Documents' },
     idGeneralInfo: { type: Schema.Types.ObjectId, ref: 'GeneralInfo' },
     idComercialInfo: { type: Schema.Types.ObjectId, ref: 'ComercialInfo' },

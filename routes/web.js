@@ -33,7 +33,7 @@ route.get("/validate_resetHash/:hash", authController.validate_resetHash);
 route.post("/reset_password/:hash", authController.reset_password);
 
 //ciec
-route.post("/ciec", ciecController.create);
+// route.post("/ciec", ciecController.create);
 //prueba
 route.get("/control/buro", dataController.getControl);
 route.post("/control/unykoo", dataController.setBuro);

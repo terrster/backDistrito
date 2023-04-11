@@ -800,13 +800,6 @@ const buroHelper = {
   async buroCasa(req, res) {
     let { consulta, hubspotDealId } = req.body;
 
-    if (consulta === undefined) {
-      return res.status(500).json({
-        success: false,
-        message: "No se encontro informacion para la consulta",
-      });
-    }
-
     let ultimaConsulta = await userController.ultimaConsulta();
 
     if (ultimaConsulta) {
