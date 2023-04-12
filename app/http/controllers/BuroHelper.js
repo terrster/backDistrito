@@ -798,14 +798,71 @@ const buroHelper = {
     }
   },
   async buroCasa(req, res) {
-    let { consulta, hubspotDealId } = req.body;
 
-    if (consulta === undefined) {
+    let { hubspotDealId } = req.body;
+
+    if (hubspotDealId === undefined) {
       return res.status(500).json({
         success: false,
         message: "No se encontro informacion para la consulta",
       });
     }
+
+    let consulta = {}
+
+    let info = null;
+
+    let tokenSepomex = process.env.SEPOMEX_TOKEN;
+
+    let {properties} = await hubspotController.deal.show(hubspotDealId);
+
+    if(properties.n4_9_c_p_.value !== undefined){
+      await axios.get(`https://api.copomex.com/query/info_cp/${properties.n4_9_c_p_.value}?type=simplified&token=${tokenSepomex}`).then(async (res) => {
+        if(res.data.error){
+          console.log(res.data.error);
+          await axios.get(`https://api.copomex.com/query/info_cp/${properties.n4_9_c_p_.value}?type=simplified&token=${tokenSepomex}`).then((res) => {
+            if(res.data.error){
+              console.log(res.data.error);
+            }else{
+              info = res.data.response;
+            }
+          }).catch((err) => {
+            console.log(err);
+            return res.status(500).json({
+              success: false,
+              message: "Error al consultar el codigo postal",
+            })
+          })
+
+        }else{
+          info = res.data.response;
+        }
+      }).catch((err) => {
+        console.log(err);
+        return res.status(500).json({
+          success: false,
+          message: "Error al consultar el codigo postal",
+        })
+      })
+    }
+
+    properties.n3_rfc.value ? consulta.rfc = properties.n3_rfc.value : null;
+
+    properties.automotriz_v_f.value ? consulta.ejercidoCreditoAutomotriz = properties.automotriz_v_f.value : null;
+    properties.hipotecario_v_f.value ? consulta.ejercidoCreditoHipotecario = properties.hipotecario_v_f.value : null;
+    properties.tdc_v_f.value ? consulta.tarjetaCredito = properties.tdc_v_f.value : null;
+    consulta.tarjetaCredito === "V" ? consulta.ultimosCuatroDigitos = properties.n6_4_tdc_4_d_gitos.value : "";
+
+    properties.n4_6_calle.value ? consulta.direccion1 = properties.n4_6_calle.value : null;
+    consulta.estado = info.estado;
+    consulta.delegacionMunicipio = info.municipio;
+    properties.n4_91_colonia.value ? consulta.coloniaPoblacion = properties.n4_91_colonia.value : null;
+    
+    properties.n4_9_c_p_.value ? consulta.cp = properties.n4_9_c_p_.value : null;
+
+    properties.n4_2_apellido_paterno.value ? consulta.apellidoPaterno = properties.n4_2_apellido_paterno.value : null;
+    properties.n4_3_apellido_materno.value ? consulta.apellidoMaterno = properties.n4_3_apellido_materno.value : null;
+    properties.n4_1_nombre.value ? consulta.primerNombre = properties.n4_1_nombre.value : null;
 
     let ultimaConsulta = await userController.ultimaConsulta();
 
@@ -839,12 +896,6 @@ const buroHelper = {
       },
       data: data,
     };
-
-    // return res.status(200).json({
-    //   success: true,
-    //   message: "Consulta realizada",
-    //   data: JSON.parse(AuthConfig.data),
-    // });
 
     console.log("Consulta casa:", consulta.primerNombre );
 
@@ -889,6 +940,7 @@ const buroHelper = {
         Resburo.respuesta.persona.error !== null
       ) {
         console.log("error buro casa");
+        console.log(Resburo);
         let data = {
           folio: referenciaOperador,
           tipo: "buro casa",
@@ -919,7 +971,7 @@ const buroHelper = {
         });
       }
 
-      let scoreValue = Resburo.respuesta.persona.scoreBuroCredito;
+      let scoreValue = Resburo.respuesta.persona.scoreBuroCredito[0].valorScore;
 
       let paramsHub = {
         score: scoreValue,
@@ -945,6 +997,8 @@ const buroHelper = {
       };
 
       let nuevaConsulta = await Consultas.create(data);
+
+      console.log("buro casa consultado correctamente")
 
       return res.status(200).json({
         success: true,
