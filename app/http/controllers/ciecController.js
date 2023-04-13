@@ -7,9 +7,10 @@ const GeneralInfo = require("../models/GeneralInfo");
 const Address = require("../models/Address");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
+const FiscalInfo = require("../models/Fiscal");
 const { google } = require("googleapis");
 const Sheets = require("../controllers/sheetsController");
-const  Control = require("../models/Control");
+const Control = require("../models/Control");
 
 const _axios = require("axios").default;
 const axios = _axios.create({
@@ -20,17 +21,17 @@ require("dotenv").config({
 });
 
 /*
-    * @desc    validacion y guardado de la CIEC
-    * @Author  Jonathan
-    * @route   POST /ciec
-    * @access  Public
-    * @params  RFC, CIEC, ID
-    * @return  json
-    * @return  status
-    * @return  message
-    * @return  user
-    * @return  error
-*/
+ * @desc    validacion y guardado de la CIEC
+ * @Author  Jonathan
+ * @route   POST /ciec
+ * @access  Public
+ * @params  RFC, CIEC, ID
+ * @return  json
+ * @return  status
+ * @return  message
+ * @return  user
+ * @return  error
+ */
 
 const rfcValido = (rfc, aceptarGenerico = true) => {
   let _rfc_pattern_pm =
@@ -245,7 +246,7 @@ const getPro = async (Accion, id) => {
 //   getStatus: async (req, res) => {
 //     let { data } = req;
 //     const refreshInterval = 4000;
-    
+
 //     let response = await axios.post("/b39d75", data).then((res) => {
 //       return res;
 //     }).catch((err) => {
@@ -339,46 +340,102 @@ const getPro = async (Accion, id) => {
 const ciecController = {
   get: async (req, res) => {
     let { rfc, ciec, CiecStatus } = req.body;
+    let id = req.params.id;
+    console.log(id);
+
+    let user = await getPro(User, id);
+
+    if (!user) {
+      return res.status(404).json({
+        msg: "El usuario no existe",
+        code: 404,
+      });
+    }
 
     if (CiecStatus === true) {
+      let controlCiec = await Control.findOne({ name: "ciec" });
+      let ciecActual = controlCiec.passwordBuro;
 
-    let controlCiec = await Control.findOne({ name: "ciec" });
-    let ciecActual = controlCiec.passwordBuro;
+      if (ciecActual === ciec) {
+        return res.status(200).json({
+          msg: "la CIEC es correcta",
+          code: 200,
+        });
+      }
 
-    if (ciecActual === ciec) {
+      let rfcValid = rfcValido(rfc);
+
+      if (!rfcValid) {
+        return res.status(400).json({
+          msg: "El RFC no es válido",
+          code: 400,
+        });
+      }
+
+      let data = {
+        type: "ciec",
+        rfcPerson: rfc,
+        ciec: ciec,
+        ciecStatus: true,
+        slug: "b39d75",
+      };
+
+      if(user.idClient.appliance[0] === undefined){
+        return res.status(404).json({
+          msg: "La solicitud no existe",
+          code: 404,
+        });
+      }
+
+      let solicitud = Appliance.findOne({
+        _id: user.idClient.appliance[0]._id,
+      });
+
+      if (!solicitud) {
+        return res.status(404).json({
+          msg: "La solicitud no existe",
+          code: 404,
+        });
+      }
+
+      if (!solicitud.idFiscal) {
+        console.log("no tiene ciec");
+
+        let fiscal = await FiscalInfo.create(data);
+
+        await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+          idFiscal: {
+            _id: fiscal._id,
+          },
+        });
+
+        await Client.findByIdAndUpdate(user.idClient._id, {
+          idFiscal: {
+            _id: fiscal._id,
+          },
+        });
+
+        solicitud = await getPro(Appliance, user.idClient.appliance[0]._id);
+      }
+
+      let fiscalNew = await FiscalInfo.findOne({ _id: solicitud.idFiscal._id });
+      fiscalNew.ciec = ciec;
+      fiscalNew.ciecStatus = true;
+      await fiscalNew.save();
+
+      let userUpdated = await getPro(User, id);
+
       return res.status(200).json({
         msg: "la CIEC es correcta",
         code: 200,
+        user: userUpdated,
       });
-    }
-
-    let rfcValid = rfcValido(rfc);
-
-    if (!rfcValid) {
-      return res.status(400).json({
-        msg: "El RFC no es válido",
-        code: 400,
-      });
-    }
-
-    let data = {
-      type: "ciec",
-      rfc: rfc,
-      password: ciec,
-      slug: "b39d75",
-    };
-
-    return res.status(200).json({
-      msg: "la CIEC es correcta",
-      code: 200,
-    });
- 
     } else {
       return res.status(200).json({
         msg: "la CIEC es incorrecta",
         code: 400,
       });
-    } 
+    }
   },
 };
 
