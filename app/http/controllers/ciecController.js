@@ -24,13 +24,6 @@ require("dotenv").config({
  * @desc    validacion y guardado de la CIEC
  * @Author  Jonathan
  * @route   POST /ciec
- * @access  Public
- * @params  RFC, CIEC, ID
- * @return  json
- * @return  status
- * @return  message
- * @return  user
- * @return  error
  */
 
 const rfcValido = (rfc, aceptarGenerico = true) => {
@@ -198,28 +191,28 @@ const getPro = async (Accion, id) => {
 
 //     if (ciecActual === ciec) {
 //       let n4_93_ciec = Buffer.from(ciec).toString("base64");
-//       await hubspotController.deal.update(hubspotDealId, "single_field", {
-//         name: "n4_93_ciec",
-//         value: "INTERNO",
-//       })
-//       .catch((error) => {
-//         console.log(error);
-//         return res.status(500).json({
-//           msg: "Algo salió mal tratando de actualizar el CIEC",
-//           error: error,
-//         });
-//       });
-//       await hubspotController.deal.update(hubspotDealId, "single_field", {
-//         name: "datacode",
-//         value: n4_93_ciec,
-//       })
-//       .catch((error) => {
-//         console.log(error);
-//         return res.status(500).json({
-//           msg: "Algo salió mal tratando de actualizar el CIEC",
-//           error: error,
-//         });
-//       });
+      // await hubspotController.deal.update(hubspotDealId, "single_field", {
+      //   name: "n4_93_ciec",
+      //   value: "INTERNO",
+      // })
+      // .catch((error) => {
+      //   console.log(error);
+      //   return res.status(500).json({
+      //     msg: "Algo salió mal tratando de actualizar el CIEC",
+      //     error: error,
+      //   });
+      // });
+      // await hubspotController.deal.update(hubspotDealId, "single_field", {
+      //   name: "datacode",
+      //   value: n4_93_ciec,
+      // })
+      // .catch((error) => {
+      //   console.log(error);
+      //   return res.status(500).json({
+      //     msg: "Algo salió mal tratando de actualizar el CIEC",
+      //     error: error,
+      //   });
+      // });
 //       await ComercialInfo.findByIdAndUpdate(comercialId, {
 //         ciecstatus: true,
 //       });
@@ -341,7 +334,6 @@ const ciecController = {
   get: async (req, res) => {
     let { rfc, ciec, CiecStatus } = req.body;
     let id = req.params.id;
-    console.log(id);
 
     let user = await getPro(User, id);
 
@@ -352,90 +344,262 @@ const ciecController = {
       });
     }
 
-    if (CiecStatus === true) {
-      let controlCiec = await Control.findOne({ name: "ciec" });
-      let ciecActual = controlCiec.passwordBuro;
+    let rfcLength = rfc.length;
 
-      if (ciecActual === ciec) {
-        return res.status(200).json({
-          msg: "la CIEC es correcta",
-          code: 200,
-        });
-      }
-
-      let rfcValid = rfcValido(rfc);
-
-      if (!rfcValid) {
+    if (!CiecStatus) {
+      if (rfcLength !== 10) {
         return res.status(400).json({
           msg: "El RFC no es válido",
           code: 400,
         });
       }
-
-      let data = {
-        type: "ciec",
+      let params = {
+        ciecStatus: !CiecStatus,
         rfcPerson: rfc,
-        ciec: ciec,
-        ciecStatus: true,
-        slug: "b39d75",
+        ciec: "sin ciec",
       };
 
-      if(user.idClient.appliance[0] === undefined){
-        return res.status(404).json({
-          msg: "La solicitud no existe",
-          code: 404,
-        });
-      }
+      let type = "PF";
 
-      let solicitud = Appliance.findOne({
-        _id: user.idClient.appliance[0]._id,
-      });
-
-      if (!solicitud) {
-        return res.status(404).json({
-          msg: "La solicitud no existe",
-          code: 404,
-        });
-      }
-
-      if (!solicitud.idFiscal) {
-        console.log("no tiene ciec");
-
-        let fiscal = await FiscalInfo.create(data);
-
-        await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
-          idFiscal: {
-            _id: fiscal._id,
-          },
-        });
-
-        await Client.findByIdAndUpdate(user.idClient._id, {
-          idFiscal: {
-            _id: fiscal._id,
-          },
-        });
-
-        solicitud = await getPro(Appliance, user.idClient.appliance[0]._id);
-      }
-
-      let fiscalNew = await FiscalInfo.findOne({ _id: solicitud.idFiscal._id });
-      fiscalNew.ciec = ciec;
-      fiscalNew.ciecStatus = true;
-      await fiscalNew.save();
-
-      let userUpdated = await getPro(User, id);
+      let userUpdated = await ciecController.save(params, user, id, type);
 
       return res.status(200).json({
         msg: "la CIEC es correcta",
         code: 200,
         user: userUpdated,
       });
-    } else {
-      return res.status(200).json({
-        msg: "la CIEC es incorrecta",
+    }
+
+    if (rfcLength === 10) {
+      return res.status(400).json({
+        msg: "El RFC no es válido",
         code: 400,
       });
     }
+
+    let type = rfcLength === 12 ? "PM" : "PFAE";
+    let controlCiec = await Control.findOne({ name: "ciec" });
+    let ciecActual = controlCiec.passwordBuro;
+
+    if (ciecActual === ciec) {
+      let params = {
+        ciecStatus: true,
+        rfcPerson: rfcLength === 12 ? "" : rfc,
+        rfcMoral: rfcLength === 12 ? rfc : "",
+        ciec: ciec,
+      };
+
+      let userUpdated = await ciecController.save(params, user, id, type);
+
+      return res.status(200).json({
+        msg: "la CIEC es correcta",
+        code: 200,
+        user: userUpdated,
+      });
+    }
+
+    let rfcValid = rfcValido(rfc);
+
+    if (!rfcValid) {
+      return res.status(400).json({
+        msg: "El RFC no es válido",
+        code: 400,
+      });
+    }
+
+    let data = {
+      type: "ciec",
+      rfc: rfc,
+      password: ciec,
+      slug: "b39d75",
+    };
+
+    let ciecStatus = await ciecController.getStatus(data);
+    
+    let status = ciecStatus.status;
+
+    if (status === "invalid" || status === 500) {
+      let code = status === "invalid" ? 404 : 500;
+      return res.status(code).json({
+        msg: "la contraseña CIEC es incorrecta",
+        code: 404,
+      });
+    }
+
+    let params = {
+      ciecStatus: true,
+      rfcPerson: rfcLength === 12 ? "" : rfc,
+      rfcMoral: rfcLength === 12 ? rfc : "",
+      ciec: ciec,
+    };
+
+    let userUpdated = await ciecController.save(params, user, id, type);
+
+    return res.status(200).json({
+      msg: "la CIEC es correcta",
+      code: 200,
+      user: userUpdated,
+    });
+  },
+  save: async (params, user, id, type) => {
+    let applianceID = user.idClient.appliance[0];
+    let hubspotDealId = user.hubspotDealId;
+    let n4_93_ciec = Buffer.from(params.ciec).toString("base64");
+
+    await hubspotController.deal.update(hubspotDealId, "single_field", {
+      name: "n4_93_ciec",
+      value: "valid",
+    })
+    await hubspotController.deal.update(hubspotDealId, "single_field", {
+      name: "datacode",
+      value: n4_93_ciec,
+    })
+
+    if(type !== "PM"){
+    await hubspotController.deal.update(hubspotDealId, "single_field", {
+        "value": params.rfcPerson,
+        "name": "n3_rfc"
+    })
+    } else {
+    await hubspotController.deal.update(hubspotDealId, "single_field", {
+        "value": params.rfcMoral,
+        "name": "n3_rfc_moral"
+    })
+    }
+
+    if (applianceID === undefined || applianceID === null) {
+      let fiscalStore = await FiscalInfo.create(params);
+
+      let applianceStored = await Appliance.create({
+        idClient: {
+          _id: user.idClient._id,
+        },
+        idFiscal: {
+          _id: fiscalStore._id,
+        },
+      });
+
+      await Client.findByIdAndUpdate(user.idClient._id, {
+        appliance: {
+          _id: applianceStored._id,
+        },
+        idFiscal: {
+          _id: fiscalStore._id,
+        },
+        type: type,
+      });
+
+      let userUpdated = await getPro(User, id);
+
+      return userUpdated;
+    } else {
+      let appliance = await Appliance.findOne({
+        _id: user.idClient.appliance[0]._id,
+      });
+      let fiscal = await FiscalInfo.findOne({
+        _id: appliance.idFiscal._id,
+      });
+
+      if (!fiscal) {
+        let fiscalStore = await FiscalInfo.create(params);
+
+        await Appliance.findByIdAndUpdate(appliance._id, {
+          idFiscal: {
+            _id: fiscalStore._id,
+          },
+        });
+
+        await Client.findByIdAndUpdate(user.idClient._id, {
+          idFiscal: {
+            _id: fiscalStore._id,
+          },
+          type: type,
+        });
+
+        let userUpdated = await getPro(User, id);
+
+        return userUpdated;
+      } else {
+        fiscal.ciec = params.ciec;
+        fiscal.ciecStatus = params.ciecStatus;
+        fiscal.rfcPerson = params.rfcPerson
+          ? params.rfcPerson
+          : fiscal.rfcPerson;
+        fiscal.rfcMoral = params.rfcMoral ? params.rfcMoral : fiscal.rfcMoral;
+        fiscal.razonSocial = params.razonSocial
+          ? params.razonSocial
+          : fiscal.razonSocial;
+        await fiscal.save();
+
+        await Client.findByIdAndUpdate(user.idClient._id, {
+          type: type,
+        });
+
+        let userUpdated = await getPro(User, id);
+
+        return userUpdated;
+      }
+    }
+  },
+  getStatus: async (data) => {
+    const refreshInterval = 4000;
+    let response = await axios
+      .post("/b39d75", data)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return false;
+      });
+
+    if (!response) {
+      return res.status(500).json({
+        msg: "Error al consultar el CIEC",
+      });
+    }
+    let respuesta = null;
+    const checkSatatus = setInterval(async () => {
+        await axios.get(`/b39d75/${response.data.id}`).then((sat) => {
+        const status = sat.data.status;
+        switch (status) {
+          case "pending":
+            break;
+          default:
+            respuesta = {
+              status: status,
+              data: sat.data,
+            }
+            clearInterval(checkSatatus);
+            break;
+        }
+      }).catch((err) => {
+          if (err.response !== undefined) {
+            console.log(err.response);
+            respuesta = {
+              status: 500,
+              data: err.response.data,
+            };
+            clearInterval(checkSatatus);
+          } else {
+            console.log(err);
+            respuesta = {
+              status: 500,
+              data: err,
+            };
+            clearInterval(checkSatatus);
+          }
+        } 
+      );
+    }, refreshInterval);
+    
+    await new Promise((resolve) => {
+      setInterval(() => {
+        if (respuesta !== null) {
+          resolve();
+        }
+      }, 1000);
+    } );
+    return respuesta;
   },
 };
 

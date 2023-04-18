@@ -38,7 +38,7 @@ const buroHelper = {
       let {
         name,
         lastname,
-        secondLastname,
+        secondlastname,
         address,
         carCredit,
         creditCard,
@@ -76,7 +76,7 @@ const buroHelper = {
         {
           name, //info general
           lastname,
-          secondLastname,
+          secondlastname,
           rfcPerson,
           mortgageCredit,
           carCredit,
@@ -115,7 +115,7 @@ const buroHelper = {
       });
 
       if (!buro.success) {
-        if(buro.code !== undefined){
+        if (buro.code !== undefined) {
           return res.status(200).json({
             ...buro,
           });
@@ -328,8 +328,11 @@ const buroHelper = {
     }
 
     // console.log("config buro :", config);
-
-    console.log("consulta buro :", user.name);
+    if (type === "moral") {
+      console.log("consulta buro moral :", comercial.businessName);
+    } else {
+      console.log("consulta buro :", user.name);
+    }
 
     // if(process.env.NODE_ENV !== "production"){
     //   return {
@@ -350,7 +353,7 @@ const buroHelper = {
             tipo: type,
             fecha: new Date(),
             status: "error",
-            name: `${general.name} ${general.lastName}`,
+            name: `${general.name} ${general.lastname}`,
             error: Resburo,
           };
           let dataBuro = await Buro.findById(buroId);
@@ -421,7 +424,7 @@ const buroHelper = {
             tipo: type,
             fecha: new Date(),
             status: "error",
-            name: `${general.name} ${general.lastName}`,
+            name: `${general.name} ${general.lastname}`,
             error: Resburo.respuesta.persona.error,
           };
 
@@ -728,8 +731,7 @@ const buroHelper = {
     let user = await User.findOne({ email });
 
     if (user) {
-      
-      if(user.idClient.appliance[0]._id === undefined){
+      if (user.idClient.appliance[0]._id === undefined) {
         return res.status(200).json({
           success: false,
           message: "No se encontro el id del appliance",
@@ -738,7 +740,7 @@ const buroHelper = {
 
       let appliance = await Appliance.findById(user.idClient.appliance[0]._id);
 
-      if(!appliance.idBuro){
+      if (!appliance.idBuro) {
         return res.status(200).json({
           success: false,
           message: "No se encontro el buro",
@@ -839,21 +841,124 @@ const buroHelper = {
     //   data: JSON.parse(AuthConfig.data),
     // });
 
-    console.log("Consulta casa:", consulta.primerNombre );
+    console.log("Consulta casa:", consulta.primerNombre);
 
-    await axios(AuthConfig).then(async (response) => {
-      let Resburo = response.data;
+    await axios(AuthConfig)
+      .then(async (response) => {
+        let Resburo = response.data;
 
-      if (Resburo.respuesta === undefined) {
-        console.log("error buro");
-        console.log(Resburo);
+        if (Resburo.respuesta === undefined) {
+          console.log("error buro");
+          console.log(Resburo);
+          let data = {
+            folio: referenciaOperador,
+            tipo: "buro casa",
+            fecha: new Date(),
+            status: "error Buro Casa",
+            name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
+            error: Resburo,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+
+          let paramsHub = {
+            score: "",
+            status: "ERROR_AUTENTICACION",
+            idConsulta: "INTERNO",
+          };
+
+          let buroHub = await hubspotController.deal.update(
+            hubspotDealId,
+            "buro",
+            paramsHub
+          );
+
+          return res.status(200).json({
+            success: false,
+            error: "datos",
+            message: "Error al consultar datos",
+          });
+        }
+        if (
+          Resburo.respuesta !== undefined &&
+          Resburo.respuesta.persona.error !== undefined &&
+          Resburo.respuesta.persona.error !== null
+        ) {
+          console.log("error buro casa");
+          let data = {
+            folio: referenciaOperador,
+            tipo: "buro casa",
+            fecha: new Date(),
+            status: "error Buro Casa",
+            name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.nombre}`,
+            error: Resburo,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+
+          let paramsHub = {
+            score: "",
+            status: "ERROR_AUTENTICACION",
+            idConsulta: "INTERNO",
+          };
+
+          let buroHub = await hubspotController.deal.update(
+            hubspotDealId,
+            "buro",
+            paramsHub
+          );
+
+          return res.status(200).json({
+            success: false,
+            error: "datos",
+            message: "Error al consultar datos",
+          });
+        }
+
+        let scoreValue = Resburo.respuesta.persona.scoreBuroCredito;
+
+        let paramsHub = {
+          score: scoreValue,
+          status: "COMPLETADO",
+          idConsulta: "INTERNO",
+        };
+
+        let buroHub = await hubspotController.deal.update(
+          hubspotDealId,
+          "buro",
+          paramsHub
+        );
+
         let data = {
           folio: referenciaOperador,
-          tipo: "buro casa",
+          referencia:
+            Resburo.respuesta.persona.encabezado.numeroControlConsulta,
+          tipo: "Buro Casa",
+          fecha: new Date(),
+          status: "success",
+          name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
+          resultado: Resburo,
+          scoreValue: scoreValue,
+        };
+
+        let nuevaConsulta = await Consultas.create(data);
+
+        return res.status(200).json({
+          success: true,
+          message: "Consulta realizada",
+          score: scoreValue,
+        });
+      })
+      .catch(async (err) => {
+        console.log("error buro casa");
+        console.log(err);
+        let data = {
+          folio: referenciaOperador,
+          tipo: "Buro Casa",
           fecha: new Date(),
           status: "error Buro Casa",
           name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
-          error: Resburo,
+          error: err,
         };
 
         let nuevaConsulta = await Consultas.create(data);
@@ -873,112 +978,10 @@ const buroHelper = {
         return res.status(200).json({
           success: false,
           error: "datos",
+          consulta: nuevaConsulta,
           message: "Error al consultar datos",
         });
-      }
-      if (
-        Resburo.respuesta !== undefined &&
-        Resburo.respuesta.persona.error !== undefined &&
-        Resburo.respuesta.persona.error !== null
-      ) {
-        console.log("error buro casa");
-        let data = {
-          folio: referenciaOperador,
-          tipo: "buro casa",
-          fecha: new Date(),
-          status: "error Buro Casa",
-          name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.nombre}`,
-          error: Resburo,
-        };
-
-        let nuevaConsulta = await Consultas.create(data);
-
-        let paramsHub = {
-          score: "",
-          status: "ERROR_AUTENTICACION",
-          idConsulta: "INTERNO",
-        };
-
-        let buroHub = await hubspotController.deal.update(
-          hubspotDealId,
-          "buro",
-          paramsHub
-        );
-
-        return res.status(200).json({
-          success: false,
-          error: "datos",
-          message: "Error al consultar datos",
-        });
-      }
-
-      let scoreValue = Resburo.respuesta.persona.scoreBuroCredito;
-
-      let paramsHub = {
-        score: scoreValue,
-        status: "COMPLETADO",
-        idConsulta: "INTERNO",
-      };
-
-      let buroHub = await hubspotController.deal.update(
-        hubspotDealId,
-        "buro",
-        paramsHub
-      );
-
-      let data = {
-        folio: referenciaOperador,
-        referencia: Resburo.respuesta.persona.encabezado.numeroControlConsulta,
-        tipo: "Buro Casa",
-        fecha: new Date(),
-        status: "success",
-        name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
-        resultado: Resburo,
-        scoreValue: scoreValue,
-      };
-
-      let nuevaConsulta = await Consultas.create(data);
-
-      return res.status(200).json({
-        success: true,
-        message: "Consulta realizada",
-        score: scoreValue,
       });
-
-
-    }).catch (async (err) => {
-      console.log("error buro casa");
-      console.log(err);
-      let data = {
-        folio: referenciaOperador,
-        tipo: "Buro Casa",
-        fecha: new Date(),
-        status: "error Buro Casa",
-        name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
-        error: err,
-      };
-
-      let nuevaConsulta = await Consultas.create(data);
-
-      let paramsHub = {
-        score: "",
-        status: "ERROR_AUTENTICACION",
-        idConsulta: "INTERNO",
-      };
-
-      let buroHub = await hubspotController.deal.update(
-        hubspotDealId,
-        "buro",
-        paramsHub
-      );
-
-      return res.status(200).json({
-        success: false,
-        error: "datos",
-        consulta: nuevaConsulta,
-        message: "Error al consultar datos",
-      });
-    });
   },
 };
 

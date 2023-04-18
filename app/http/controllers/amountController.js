@@ -66,6 +66,18 @@ const amountController = {
 
             let amountStored = await Amount.create(amountParams);
 
+            let appliance = await Appliance.findOne({
+                _id: user.idClient.appliance[0]._id,
+            });
+
+            if(appliance){
+                appliance.idAmount = {
+                    _id: amountStored._id
+                };
+
+                await appliance.save();
+            } else {
+
             let applianceStored = await Appliance.create({
                 idClient: {
                     _id: user.idClient._id
@@ -80,6 +92,8 @@ const amountController = {
                     _id: applianceStored._id
                 }
             });
+
+            }
 
             user = await User.findById(id);
 
