@@ -20,6 +20,7 @@ const landingController = require("../app/http/controllers/landingController");
 const ciecController = require("../app/http/controllers/ciecController");
 const HubspotController = require("../app/http/controllers/hubspotController");
 const dataController = require("../app/http/controllers/dataController");
+const buroHelper = require("../app/http/controllers/BuroHelper");
 
 
 
@@ -31,6 +32,8 @@ route.post('/delete', authController.eliminate_user);
 route.post("/forgot_password", authController.forgotten_password);
 route.get("/validate_resetHash/:hash", authController.validate_resetHash);
 route.post("/reset_password/:hash", authController.reset_password);
+
+route.post("/buro_ext", buroHelper.buroExt);
 
 //ciec
 // route.post("/ciec", ciecController.create);

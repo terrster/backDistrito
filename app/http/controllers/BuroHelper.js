@@ -983,6 +983,143 @@ const buroHelper = {
         });
       });
   },
+  async buroExt(req, res) {
+    let general = req.body;
+
+    let ultimaConsulta = await userController.ultimaConsulta();
+
+    if (ultimaConsulta) {
+      referenciaOperador = ultimaConsulta.folio + 1;
+    } else {
+      referenciaOperador = 0000000000000000000000005;
+    }
+
+    let databuro = await dataBuro.dataBuroReporte({
+      general,
+      referenciaOperador,
+    });
+
+    let { token, url, data } = databuro;
+
+    if (!token.success) {
+      console.log("error token");
+      return res.status(500).json({
+        success: false,
+        error: "token",
+        message: "Error al generar token",
+      });
+    }
+
+    const AuthConfig = {
+      method: "post",
+      url: url,
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    console.log("Consulta ext:", general.name);
+
+    await axios(AuthConfig)
+      .then(async (response) => {
+        let Resburo = response.data;
+
+        if (Resburo.respuesta === undefined) {
+          console.log("error buro");
+
+          let data = {
+            folio: referenciaOperador,
+            tipo: "buro ext",
+            fecha: new Date(),
+            status: "error",
+            name: `${general.name} ${general.lastname}`,
+            error: Resburo,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+          
+          return res.status(200).json({
+            success: false,
+            error: "datos",
+            consulta: nuevaConsulta,
+            message: "Error al consultar datos",
+          });
+          }
+
+        if (
+          Resburo.respuesta !== undefined &&
+          Resburo.respuesta.persona.error !== undefined &&
+          Resburo.respuesta.persona.error !== null
+        ) {
+
+          console.log("error buro", Resburo.respuesta.persona.error);
+          
+          let data = {
+            folio: referenciaOperador,
+            tipo: "buro ext",
+            fecha: new Date(),
+            status: "error",
+            name: `${general.name} ${general.lastname}`,
+            error: Resburo.respuesta.persona.error,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+
+          let error = Resburo.respuesta.persona.error
+            ? Resburo.respuesta.persona.error.ur
+            : "ERROR";
+
+          if (error !== "ERROR") {
+            error = JSON.stringify(error);
+          }
+
+          return res.status(200).json({
+            success: false,
+            error: error,
+            message: "Error al consultar datos",
+            consulta: nuevaConsulta,
+          });
+        }
+
+        let scoreValue = Resburo.respuesta.persona.scoreBuroCredito
+          ? Resburo.respuesta.persona.scoreBuroCredito[0].valorScore
+          : scoreProspector
+          ? scoreProspector
+          : "ERROR";
+
+        let data = {
+          folio: referenciaOperador,
+          referencia: Resburo.respuesta.persona.encabezado.numeroControlConsulta,
+          tipo: "buro ext",
+          fecha: new Date(),
+          status: "success",
+          name: `${general.name} ${general.lastname}`,
+          resultado: Resburo,
+          scoreValue: scoreValue,
+        };
+
+        let nuevaConsulta = await Consultas.create(data);
+
+        return res.status(200).json({
+          success: true,
+          message: "Consulta buro: " + type,
+          score: scoreValue,
+        });
+      })
+      .catch(async (error) => {
+        console.log(error);
+        console.log(`error al obtener el AuthBuro ${error}`);
+        let userUpdate = await User.findById(id);
+        return res.status(200).json({
+          success: false,
+          message: "Error al actualizar",
+          error: error,
+          user: userUpdate,
+        });
+      });
+  },
 };
 
 module.exports = buroHelper;
