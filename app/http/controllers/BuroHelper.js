@@ -10,6 +10,8 @@ const Client = require("../models/Client");
 const format = require("../services/formatManager");
 const dataBuro = require("../services/dataBuro");
 const Consultas = require("../models/Consultas");
+const BuroExtModel = require("../models/BuroExt");
+const Address = require("../models/Address");
 const Control = require("../models/Control");
 
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
@@ -38,7 +40,7 @@ const buroHelper = {
       let {
         name,
         lastname,
-        secondLastname,
+        secondlastname,
         address,
         carCredit,
         creditCard,
@@ -76,7 +78,7 @@ const buroHelper = {
         {
           name, //info general
           lastname,
-          secondLastname,
+          secondlastname,
           rfcPerson,
           mortgageCredit,
           carCredit,
@@ -115,7 +117,7 @@ const buroHelper = {
       });
 
       if (!buro.success) {
-        if(buro.code !== undefined){
+        if (buro.code !== undefined) {
           return res.status(200).json({
             ...buro,
           });
@@ -328,8 +330,11 @@ const buroHelper = {
     }
 
     // console.log("config buro :", config);
-
-    console.log("consulta buro :", user.name);
+    if (type === "moral") {
+      console.log("consulta buro moral :", comercial.businessName);
+    } else {
+      console.log("consulta buro :", user.name);
+    }
 
     // if(process.env.NODE_ENV !== "production"){
     //   return {
@@ -350,7 +355,7 @@ const buroHelper = {
             tipo: type,
             fecha: new Date(),
             status: "error",
-            name: `${general.name} ${general.lastName}`,
+            name: `${general.name} ${general.lastname}`,
             error: Resburo,
           };
           let dataBuro = await Buro.findById(buroId);
@@ -421,7 +426,7 @@ const buroHelper = {
             tipo: type,
             fecha: new Date(),
             status: "error",
-            name: `${general.name} ${general.lastName}`,
+            name: `${general.name} ${general.lastname}`,
             error: Resburo.respuesta.persona.error,
           };
 
@@ -728,8 +733,7 @@ const buroHelper = {
     let user = await User.findOne({ email });
 
     if (user) {
-      
-      if(user.idClient.appliance[0]._id === undefined){
+      if (user.idClient.appliance[0]._id === undefined) {
         return res.status(200).json({
           success: false,
           message: "No se encontro el id del appliance",
@@ -738,7 +742,7 @@ const buroHelper = {
 
       let appliance = await Appliance.findById(user.idClient.appliance[0]._id);
 
-      if(!appliance.idBuro){
+      if (!appliance.idBuro) {
         return res.status(200).json({
           success: false,
           message: "No se encontro el buro",
@@ -899,19 +903,122 @@ const buroHelper = {
 
     console.log("Consulta casa:", consulta.primerNombre );
 
-    await axios(AuthConfig).then(async (response) => {
-      let Resburo = response.data;
+    await axios(AuthConfig)
+      .then(async (response) => {
+        let Resburo = response.data;
 
-      if (Resburo.respuesta === undefined) {
-        console.log("error buro");
-        console.log(Resburo);
+        if (Resburo.respuesta === undefined) {
+          console.log("error buro");
+          console.log(Resburo);
+          let data = {
+            folio: referenciaOperador,
+            tipo: "buro casa",
+            fecha: new Date(),
+            status: "error Buro Casa",
+            name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
+            error: Resburo,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+
+          let paramsHub = {
+            score: "",
+            status: "ERROR_AUTENTICACION",
+            idConsulta: "INTERNO",
+          };
+
+          let buroHub = await hubspotController.deal.update(
+            hubspotDealId,
+            "buro",
+            paramsHub
+          );
+
+          return res.status(200).json({
+            success: false,
+            error: "datos",
+            message: "Error al consultar datos",
+          });
+        }
+        if (
+          Resburo.respuesta !== undefined &&
+          Resburo.respuesta.persona.error !== undefined &&
+          Resburo.respuesta.persona.error !== null
+        ) {
+          console.log("error buro casa");
+          let data = {
+            folio: referenciaOperador,
+            tipo: "buro casa",
+            fecha: new Date(),
+            status: "error Buro Casa",
+            name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.nombre}`,
+            error: Resburo,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+
+          let paramsHub = {
+            score: "",
+            status: "ERROR_AUTENTICACION",
+            idConsulta: "INTERNO",
+          };
+
+          let buroHub = await hubspotController.deal.update(
+            hubspotDealId,
+            "buro",
+            paramsHub
+          );
+
+          return res.status(200).json({
+            success: false,
+            error: "datos",
+            message: "Error al consultar datos",
+          });
+        }
+
+        let scoreValue = Resburo.respuesta.persona.scoreBuroCredito;
+
+        let paramsHub = {
+          score: scoreValue,
+          status: "COMPLETADO",
+          idConsulta: "INTERNO",
+        };
+
+        let buroHub = await hubspotController.deal.update(
+          hubspotDealId,
+          "buro",
+          paramsHub
+        );
+
         let data = {
           folio: referenciaOperador,
-          tipo: "buro casa",
+          referencia:
+            Resburo.respuesta.persona.encabezado.numeroControlConsulta,
+          tipo: "Buro Casa",
+          fecha: new Date(),
+          status: "success",
+          name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
+          resultado: Resburo,
+          scoreValue: scoreValue,
+        };
+
+        let nuevaConsulta = await Consultas.create(data);
+
+        return res.status(200).json({
+          success: true,
+          message: "Consulta realizada",
+          score: scoreValue,
+        });
+      })
+      .catch(async (err) => {
+        console.log("error buro casa");
+        console.log(err);
+        let data = {
+          folio: referenciaOperador,
+          tipo: "Buro Casa",
           fecha: new Date(),
           status: "error Buro Casa",
           name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
-          error: Resburo,
+          error: err,
         };
 
         let nuevaConsulta = await Consultas.create(data);
@@ -931,6 +1038,7 @@ const buroHelper = {
         return res.status(200).json({
           success: false,
           error: "datos",
+          consulta: nuevaConsulta,
           message: "Error al consultar datos",
         });
       }
@@ -1005,41 +1113,215 @@ const buroHelper = {
         message: "Consulta realizada",
         score: scoreValue,
       });
+  },
+  async buroExt(req, res) {
+    const general = req.body;
 
-
-    }).catch (async (err) => {
-      console.log("error buro casa");
-      console.log(err);
-      let data = {
-        folio: referenciaOperador,
-        tipo: "Buro Casa",
-        fecha: new Date(),
-        status: "error Buro Casa",
-        name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
-        error: err,
-      };
-
-      let nuevaConsulta = await Consultas.create(data);
-
-      let paramsHub = {
-        score: "",
-        status: "ERROR_AUTENTICACION",
-        idConsulta: "INTERNO",
-      };
-
-      let buroHub = await hubspotController.deal.update(
-        hubspotDealId,
-        "buro",
-        paramsHub
-      );
-
+    if(!general){
       return res.status(200).json({
         success: false,
         error: "datos",
-        consulta: nuevaConsulta,
-        message: "Error al consultar datos",
+        message: "No se obtuvieron los datos",
       });
+    }
+
+    let prevConsulta = await BuroExtModel.findOne({ email: general.email });
+    
+    let idBuro = prevConsulta ? prevConsulta.idBuro._id : null;
+
+    if (!prevConsulta) {
+
+        let addressStored = await Address.create(general.address);
+        let buroStored = await Buro.create({
+          status: false,
+          intentos: 1,
+        });
+
+        let params = {};
+
+        for(let key in general){
+          if(key !== 'address'){
+            params[key] = general[key];
+          } 
+        }
+
+        params.address = {
+          _id: addressStored._id,
+        };
+        params.idBuro = {
+          _id: buroStored._id,
+        }
+
+        let buroExtStored = await BuroExtModel.create(params);
+        idBuro = buroExtStored.idBuro._id;
+      } else {
+
+        let intentos = prevConsulta.idBuro.intentos + 1;
+
+        let buroStored = await Buro.updateOne(
+          { _id: idBuro },
+          {
+            $set: {
+              intentos: intentos,
+              mortgageCredit : general.mortgageCredit,
+              carCredit : general.carCredit,
+              creditCard : general.creditCard,
+              last4: general.last4,
+            },
+          }
+        );
+
+
+      }
+
+    let ultimaConsulta = await userController.ultimaConsulta();
+
+    if (ultimaConsulta) {
+      referenciaOperador = ultimaConsulta.folio + 1;
+    } else {
+      referenciaOperador = 0000000000000000000000005;
+    }
+
+    let databuro = await dataBuro.dataBuroReporte({
+      general,
+      referenciaOperador,
     });
+
+    let { token, url, data } = databuro;
+
+    if (!token.success) {
+      console.log("error token");
+      return res.status(500).json({
+        success: false,
+        error: "token",
+        message: "Error al generar token",
+      });
+    }
+
+    const AuthConfig = {
+      method: "post",
+      url: url,
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    console.log("Consulta ext:", general.name);
+
+    await axios(AuthConfig)
+      .then(async (response) => {
+        let Resburo = response.data;
+
+        if (Resburo.respuesta === undefined) {
+          console.log("error buro");
+
+          let data = {
+            folio: referenciaOperador,
+            tipo: "buro ext",
+            fecha: new Date(),
+            status: "error",
+            name: `${general.name} ${general.lastname}`,
+            error: Resburo,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+
+          let dataBuro = await Buro.findById(idBuro);
+          await Buro.findByIdAndUpdate(idBuro, {
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
+          });
+          
+          return res.status(200).json({
+            success: false,
+            error: "datos",
+            consulta: nuevaConsulta,
+            message: "Error al consultar datos",
+          });
+          }
+
+        if (
+          Resburo.respuesta !== undefined &&
+          Resburo.respuesta.persona.error !== undefined &&
+          Resburo.respuesta.persona.error !== null
+        ) {
+
+          console.log("error buro", Resburo.respuesta.persona.error);
+          
+          let data = {
+            folio: referenciaOperador,
+            tipo: "buro ext",
+            fecha: new Date(),
+            status: "error",
+            name: `${general.name} ${general.lastname}`,
+            error: Resburo.respuesta.persona.error,
+          };
+
+          let nuevaConsulta = await Consultas.create(data);
+
+          let dataBuro = await Buro.findById(idBuro);
+          await Buro.findByIdAndUpdate(idBuro, {
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
+          });
+
+          let error = Resburo.respuesta.persona.error
+            ? Resburo.respuesta.persona.error.ur
+            : "ERROR";
+
+          if (error !== "ERROR") {
+            error = JSON.stringify(error);
+          }
+
+          return res.status(200).json({
+            success: false,
+            error: error,
+            message: "Error al consultar datos",
+            consulta: nuevaConsulta,
+          });
+        }
+
+        let scoreValue = Resburo.respuesta.persona.scoreBuroCredito
+          ? Resburo.respuesta.persona.scoreBuroCredito[0].valorScore
+          : scoreProspector
+          ? scoreProspector
+          : "ERROR";
+
+        let data = {
+          folio: referenciaOperador,
+          referencia: Resburo.respuesta.persona.encabezado.numeroControlConsulta,
+          tipo: "buro ext",
+          fecha: new Date(),
+          status: "success",
+          name: `${general.name} ${general.lastname}`,
+          resultado: Resburo,
+          scoreValue: scoreValue,
+        };
+
+        let nuevaConsulta = await Consultas.create(data);
+
+        let dataBuro = await Buro.findById(idBuro);
+          await Buro.findByIdAndUpdate(idBuro, {
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
+          });
+
+        return res.status(200).json({
+          success: true,
+          message: "Consulta buro: " + type,
+          score: scoreValue,
+        });
+      })
+      .catch(async (error) => {
+        console.log(error);
+        console.log(`error al obtener el AuthBuro ${error}`);
+        let userUpdate = await User.findById(id);
+        return res.status(200).json({
+          success: false,
+          message: "Error al actualizar",
+          error: error,
+          user: userUpdate,
+        });
+      });
   },
 };
 

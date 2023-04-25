@@ -32,6 +32,7 @@ const kykoyaController = require("../app/http/controllers/kykoyaController");
 const updateDataController = require("../app/http/controllers/updateDataController");
 const metamapController = require("../app/http/controllers/metamapController");
 const buroHelper = require("../app/http/controllers/BuroHelper");
+const ciecController = require("../app/http/controllers/ciecController");
 const rateLimit = require("express-rate-limit");
 
 route.use(verifyToken);
@@ -125,6 +126,11 @@ route.group("/buro", (buro) => {
     buro.put('/consulta', [limitBody],  buroHelper.buroLogic);
     buro.post('/update/:id', buroController.update);
   });
+
+// consulta de ciec
+route.group("/ciec", (ciec) => {
+    ciec.post('/:id', [limit], ciecController.get);
+});
   //Consulta de buroMoral
 route.group("/buroMoral", (buro) => {
     buro.post('/:id', buroHelper.buroLogicMoral);

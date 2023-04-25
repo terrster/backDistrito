@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 const hubspotController = require("../controllers/hubspotController");
 const GeneralInfo = require("../models/GeneralInfo");
@@ -7,351 +7,381 @@ const Address = require("../models/Address");
 const Reference = require("../models/Reference");
 const Appliance = require("../models/Appliance");
 const Client = require("../models/Client");
+const FiscalInfo = require("../models/Fiscal");
 
 const generalInfoController = {
+  store: async (request, response) => {
+    let id = request.params.id; //id de user
 
-    store: async(request, response) => {
-        let id = request.params.id;//id de user
+    request.body.birthDate = `${request.body.day}/${request.body.month}/${request.body.year}`;
 
-        request.body.birthDate = `${request.body.day}/${request.body.month}/${request.body.year}`;
+    try {
+      let user = await User.findById(id);
 
-        try{
-            let user = await User.findById(id);
+      let {
+        state, //info address
+        municipality,
+        street,
+        extNumber,
+        intNumber,
+        town,
+        zipCode,
+        name1, //info reference 1
+        phone1,
+        relative1,
+        name2, //info reference 2
+        phone2,
+        relative2,
+        name, //info general
+        lastname,
+        secondLastname,
+        civilStatus,
+        curp,
+        rfcPerson,
+        bankAccount, //Except PM
+        phone,
+        mortgageCredit,
+        carCredit,
+        creditCard,
+        last4,
+        tyc,
+        birthDate,
+      } = request.body;
 
-            let {
-                state,//info address  
-                municipality,
-                street,
-                extNumber, 
-                intNumber, 
-                town, 
-                zipCode,
-                name1,//info reference 1
-                phone1,
-                relative1,
-                name2,//info reference 2
-                phone2,
-                relative2,
-                name,//info general
-                lastname,
-                secondLastname,
-                civilStatus,
-                curp,
-                rfcPerson,
-                bankAccount, //Except PM
-                phone,
-                mortgageCredit,
-                carCredit,
-                creditCard,
-                last4,
-                tyc,
-                birthDate
-            } = request.body;
+      if (user) {
+        if (rfcPerson !== null || rfcPerson !== undefined || rfcPerson !== "") {
+          let appliance = await Appliance.findOne({
+            _id: user.idClient.appliance[0]._id,
+          });
 
-            if(user){
-                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'general', { 
-                    state,//info address  
-                    municipality,
-                    street, 
-                    extNumber, 
-                    intNumber, 
-                    town, 
-                    zipCode,
-                    name1,//info reference 1
-                    phone1,
-                    relative1,
-                    name2,//info reference 2
-                    phone2,
-                    relative2,
-                    name,//info general
-                    lastname,
-                    secondLastname,
-                    civilStatus,
-                    curp,
-                    rfcPerson,
-                    bankAccount, //Except PM
-                    phone,
-                    mortgageCredit,
-                    carCredit,
-                    creditCard,
-                    last4,
-                    birthDate
-                });
+          let fiscal = await FiscalInfo.findOne({
+            _id: appliance.idFiscal._id,
+          });
 
-                if(dealUpdated.error){
-                    return response.json({
-                        code: 500,
-                        msg : "Algo salió mal tratando de guardar información | Hubspot: general",
-                        error: dealUpdated.error
-                    });
-                }
-            }
-            else{
-                return response.json({
-                    code: 500,
-                    msg: "Algo salió mal tratando de guardar información | Hubspot: general"
-                });
-            }
-
-            let addressParams = {
-                state,//info address  
-                municipality,
-                street, 
-                extNumber, 
-                intNumber, 
-                town, 
-                zipCode
-            };
-
-            let addressStored = await Address.create(addressParams);
-
-            let reference1 = {
-                name: name1,
-                phone: phone1,
-                relative: relative1
-            }
-
-            let reference1Stored = await Reference.create(reference1);
-
-            let reference2 = {
-                name: name2,
-                phone: phone2,
-                relative: relative2
-            }
-
-            let reference2Stored = await Reference.create(reference2);
-
-            let generalInfoParams = {
-                name,
-                lastname,
-                secondLastname,
-                civilStatus,
-                curp,
-                rfcPerson,
-                bankAccount, //Except PM
-                phone,
-                mortgageCredit,
-                carCredit,
-                creditCard,
-                last4,
-                tyc,
-                birthDate,
-                address: {
-                    _id: addressStored._id
-                },
-                contactWith: [
-                    {
-                        _id : reference1Stored._id
-                    },
-                    {
-                        _id : reference2Stored._id
-                    }
-                ],
-                idClient: {
-                    _id: user.idClient._id
-                },
-                status: true
-            };
-
-            let generalInfoStored = await GeneralInfo.create(generalInfoParams);
-
-            await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
-                idGeneralInfo : {
-                    _id : generalInfoStored._id
-                }
-            });
-
-            await Client.findByIdAndUpdate(user.idClient._id, {
-                idGeneralInfo: {
-                    _id: generalInfoStored._id
-                }
-            });
-
-            user = await User.findById(id);
-
-            return response.json({ 
-                code: 200,
-                msg: "Información general guardada exitosamente",
-                user: user 
-            });
-
-        } 
-        catch(error){
-            return response.json({
-                code: 500,
-                msg: "Algo salió mal tratando de guardar la información general",
-                error: error
-            });
+          fiscal.rfcPerson = rfcPerson;
+          await fiscal.save();
         }
-    },
-    show: async(request, response) => {        
-        let id = request.params.id;//id de info general
 
-        try{
-            let general = await GeneralInfo.findById(id);
+        let dealUpdated = await hubspotController.deal.update(
+          user.hubspotDealId,
+          "general",
+          {
+            state, //info address
+            municipality,
+            street,
+            extNumber,
+            intNumber,
+            town,
+            zipCode,
+            name1, //info reference 1
+            phone1,
+            relative1,
+            name2, //info reference 2
+            phone2,
+            relative2,
+            name, //info general
+            lastname,
+            secondLastname,
+            civilStatus,
+            curp,
+            rfcPerson,
+            bankAccount, //Except PM
+            phone,
+            mortgageCredit,
+            carCredit,
+            creditCard,
+            last4,
+            birthDate,
+          }
+        );
 
-            return response.json({ 
-                code: 200,
-                general: general 
-            });
-        } 
-        catch(error){
-            return response.json({
-                code: 500,
-                msg: "Algo salió mal tratando de obtener la información general",
-                error: error
-            });
+        if (dealUpdated.error) {
+          return response.json({
+            code: 500,
+            msg: "Algo salió mal tratando de guardar información | Hubspot: general",
+            error: dealUpdated.error,
+          });
         }
-    },
-    update: async(request, response) => {
-        let id = request.params.id;//id de info general
-        let idUser = request.headers.tokenDecoded.data.id;
+      } else {
+        return response.json({
+          code: 500,
+          msg: "Algo salió mal tratando de guardar información | Hubspot: general",
+        });
+      }
 
-        request.body.birthDate = `${request.body.day}/${request.body.month}/${request.body.year}`;
+      let addressParams = {
+        state, //info address
+        municipality,
+        street,
+        extNumber,
+        intNumber,
+        town,
+        zipCode,
+      };
 
-        try{
-            let general = await GeneralInfo.findById(id);
-            let user = await User.findById(idUser);
+      let addressStored = await Address.create(addressParams);
 
-            let {
-                state,//info address  
-                municipality,
-                street,
-                extNumber, 
-                intNumber, 
-                town, 
-                zipCode,
-                name1,//info reference 1
-                phone1,
-                relative1,
-                name2,//info reference 2
-                phone2,
-                relative2,
-                name,//info general
-                lastname,
-                secondLastname,
-                civilStatus,
-                curp,
-                rfcPerson,
-                bankAccount, //Except PM
-                phone,
-                mortgageCredit,
-                carCredit,
-                creditCard,
-                last4,
-                tyc,
-                birthDate
-            } = request.body;
-            
-            if(user){
-                let dealUpdated = await hubspotController.deal.update(user.hubspotDealId, 'general', { 
-                    state,//info address  
-                    municipality,
-                    street,
-                    extNumber, 
-                    intNumber, 
-                    town, 
-                    zipCode,
-                    name1,//info reference 1
-                    phone1,
-                    relative1,
-                    name2,//info reference 2
-                    phone2,
-                    relative2,
-                    name,//info general
-                    lastname,
-                    secondLastname,
-                    civilStatus,
-                    curp,
-                    rfcPerson,
-                    bankAccount, //Except PM
-                    phone,
-                    mortgageCredit,
-                    carCredit,
-                    creditCard,
-                    last4,
-                    birthDate
-                });
+      let reference1 = {
+        name: name1,
+        phone: phone1,
+        relative: relative1,
+      };
 
-                if(dealUpdated.error){
-                    return response.json({
-                        code: 500,
-                        msg : "Algo salió mal tratando de actualizar información | Hubspot: general",
-                        error: dealUpdated.error
-                    });
-                }
-            }
-            else{
-                return response.json({
-                    code: 500,
-                    msg: "Algo salió mal tratando de actualizar información | Hubspot: general"
-                });
-            }
+      let reference1Stored = await Reference.create(reference1);
 
-            let addressParams = {
-                state,
-                municipality,
-                street, 
-                extNumber, 
-                intNumber, 
-                town, 
-                zipCode
-            };
+      let reference2 = {
+        name: name2,
+        phone: phone2,
+        relative: relative2,
+      };
 
-            await Address.findByIdAndUpdate(general.address._id, addressParams);
+      let reference2Stored = await Reference.create(reference2);
 
-            let reference1 = {
-                name: name1,
-                phone: phone1,
-                relative: relative1
-            }
+      let generalInfoParams = {
+        name,
+        lastname,
+        secondLastname,
+        civilStatus,
+        curp,
+        rfcPerson,
+        bankAccount, //Except PM
+        phone,
+        mortgageCredit,
+        carCredit,
+        creditCard,
+        last4,
+        tyc,
+        birthDate,
+        address: {
+          _id: addressStored._id,
+        },
+        contactWith: [
+          {
+            _id: reference1Stored._id,
+          },
+          {
+            _id: reference2Stored._id,
+          },
+        ],
+        idClient: {
+          _id: user.idClient._id,
+        },
+        status: true,
+      };
 
-            await Reference.findByIdAndUpdate(general.contactWith[0]._id, reference1);
+      let generalInfoStored = await GeneralInfo.create(generalInfoParams);
 
-            let reference2 = {
-                name: name2,
-                phone: phone2,
-                relative: relative2
-            }
+      await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
+        idGeneralInfo: {
+          _id: generalInfoStored._id,
+        },
+      });
 
-            await Reference.findByIdAndUpdate(general.contactWith[1]._id, reference2);
+      await Client.findByIdAndUpdate(user.idClient._id, {
+        idGeneralInfo: {
+          _id: generalInfoStored._id,
+        },
+      });
 
-            let generalInfoParams = {
-                name,
-                lastname,
-                secondLastname,
-                civilStatus,
-                curp,
-                rfcPerson,
-                bankAccount, //Except PM
-                phone,
-                mortgageCredit,
-                carCredit,
-                creditCard,
-                last4,
-                tyc,
-                birthDate
-            };
+      user = await User.findById(id);
 
-            await GeneralInfo.findByIdAndUpdate(general._id, generalInfoParams);
-
-            user = await User.findById(idUser);
-
-            return response.json({ 
-                code: 200,
-                msg: "Información general actualizada exitosamente",
-                user: user 
-            });
-        } 
-        catch(error){
-            return response.json({
-                code: 500,
-                msg: "Algo salió mal tratando de actualizar la información general",
-                error: error
-            });
-        }
+      return response.json({
+        code: 200,
+        msg: "Información general guardada exitosamente",
+        user: user,
+      });
+    } catch (error) {
+        console.log("Algo salió mal tratando de guardar la información general");
+        console.log(error);
+      return response.json({
+        code: 500,
+        msg: "Algo salió mal tratando de guardar la información general",
+        error: error,
+      });
     }
+  },
+  show: async (request, response) => {
+    let id = request.params.id; //id de info general
 
-}
+    try {
+      let general = await GeneralInfo.findById(id);
+
+      return response.json({
+        code: 200,
+        general: general,
+      });
+    } catch (error) {
+      return response.json({
+        code: 500,
+        msg: "Algo salió mal tratando de obtener la información general",
+        error: error,
+      });
+    }
+  },
+  update: async (request, response) => {
+    let id = request.params.id; //id de info general
+    let idUser = request.headers.tokenDecoded.data.id;
+
+    request.body.birthDate = `${request.body.day}/${request.body.month}/${request.body.year}`;
+
+    try {
+      let general = await GeneralInfo.findById(id);
+      let user = await User.findById(idUser);
+
+      let {
+        state, //info address
+        municipality,
+        street,
+        extNumber,
+        intNumber,
+        town,
+        zipCode,
+        name1, //info reference 1
+        phone1,
+        relative1,
+        name2, //info reference 2
+        phone2,
+        relative2,
+        name, //info general
+        lastname,
+        secondLastname,
+        civilStatus,
+        curp,
+        rfcPerson,
+        bankAccount, //Except PM
+        phone,
+        mortgageCredit,
+        carCredit,
+        creditCard,
+        last4,
+        tyc,
+        birthDate,
+      } = request.body;
+
+      if (user) {
+        if (rfcPerson !== null || rfcPerson !== undefined || rfcPerson !== "") {
+          let appliance = await Appliance.findOne({
+            _id: user.idClient.appliance[0]._id,
+          });
+
+          let fiscal = await FiscalInfo.findOne({
+            _id: appliance.idFiscal._id,
+          });
+
+          fiscal.rfcPerson = rfcPerson;
+          await fiscal.save();
+        }
+        let dealUpdated = await hubspotController.deal.update(
+          user.hubspotDealId,
+          "general",
+          {
+            state, //info address
+            municipality,
+            street,
+            extNumber,
+            intNumber,
+            town,
+            zipCode,
+            name1, //info reference 1
+            phone1,
+            relative1,
+            name2, //info reference 2
+            phone2,
+            relative2,
+            name, //info general
+            lastname,
+            secondLastname,
+            civilStatus,
+            curp,
+            rfcPerson,
+            bankAccount, //Except PM
+            phone,
+            mortgageCredit,
+            carCredit,
+            creditCard,
+            last4,
+            birthDate,
+          }
+        );
+
+        if (dealUpdated.error) {
+          console.log("dealUpdated.error: ", dealUpdated.error);
+          return response.json({
+            code: 500,
+            msg: "Algo salió mal tratando de actualizar información | Hubspot: general",
+            error: dealUpdated.error,
+          });
+        }
+      } else {
+        return response.json({
+          code: 500,
+          msg: "Algo salió mal tratando de actualizar información | Hubspot: general",
+        });
+      }
+
+      let addressParams = {
+        state,
+        municipality,
+        street,
+        extNumber,
+        intNumber,
+        town,
+        zipCode,
+      };
+
+      await Address.findByIdAndUpdate(general.address._id, addressParams);
+
+      let reference1 = {
+        name: name1,
+        phone: phone1,
+        relative: relative1,
+      };
+
+      await Reference.findByIdAndUpdate(general.contactWith[0]._id, reference1);
+
+      let reference2 = {
+        name: name2,
+        phone: phone2,
+        relative: relative2,
+      };
+
+      await Reference.findByIdAndUpdate(general.contactWith[1]._id, reference2);
+
+      let generalInfoParams = {
+        name,
+        lastname,
+        secondLastname,
+        civilStatus,
+        curp,
+        rfcPerson,
+        bankAccount, //Except PM
+        phone,
+        mortgageCredit,
+        carCredit,
+        creditCard,
+        last4,
+        tyc,
+        birthDate,
+      };
+
+      await GeneralInfo.findByIdAndUpdate(general._id, generalInfoParams);
+
+      user = await User.findById(idUser);
+
+      return response.json({
+        code: 200,
+        msg: "Información general actualizada exitosamente",
+        user: user,
+      });
+    } catch (error) {
+        console.log(error)
+      return response.json({
+        code: 500,
+        msg: "Algo salió mal tratando de actualizar la información general",
+        error: error,
+      });
+    }
+  },
+};
 
 module.exports = generalInfoController;

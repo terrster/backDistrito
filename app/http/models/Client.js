@@ -14,6 +14,7 @@ const clientSchema = new Schema({
     idDocuments: { type: Schema.Types.ObjectId, ref: 'Documents' },
     idGeneralInfo: { type: Schema.Types.ObjectId, ref: 'GeneralInfo' },
     idComercialInfo: { type: Schema.Types.ObjectId, ref: 'ComercialInfo' },
+    idFiscal: { type: Schema.Types.ObjectId, ref: 'FiscalInfo' },
     credits: Array
 }, { collection: 'Client' });
 
