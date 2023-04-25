@@ -16,6 +16,8 @@ const buroExtSchema = new Schema({
     creditCard : String,
     last4: String,
     tyc: Boolean,
+    ocuppation: String,
+    ingresosMensuales: String,
     address: { type: Schema.Types.ObjectId, ref: 'Address', autopopulate: true },
     idBuro: { type: Schema.Types.ObjectId, ref: 'Buro', autopopulate: true  },
 }, { collection: 'buroExt' });

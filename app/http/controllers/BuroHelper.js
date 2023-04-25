@@ -10,6 +10,8 @@ const Client = require("../models/Client");
 const format = require("../services/formatManager");
 const dataBuro = require("../services/dataBuro");
 const Consultas = require("../models/Consultas");
+const BuroExtModel = require("../models/BuroExt");
+const Address = require("../models/Address");
 const Control = require("../models/Control");
 
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
@@ -984,7 +986,64 @@ const buroHelper = {
       });
   },
   async buroExt(req, res) {
-    let general = req.body;
+    const general = req.body;
+
+    if(!general){
+      return res.status(200).json({
+        success: false,
+        error: "datos",
+        message: "No se obtuvieron los datos",
+      });
+    }
+
+    let prevConsulta = await BuroExtModel.findOne({ email: general.email });
+    
+    let idBuro = prevConsulta ? prevConsulta.idBuro._id : null;
+
+    if (!prevConsulta) {
+
+        let addressStored = await Address.create(general.address);
+        let buroStored = await Buro.create({
+          status: false,
+          intentos: 1,
+        });
+
+        let params = {};
+
+        for(let key in general){
+          if(key !== 'address'){
+            params[key] = general[key];
+          } 
+        }
+
+        params.address = {
+          _id: addressStored._id,
+        };
+        params.idBuro = {
+          _id: buroStored._id,
+        }
+
+        let buroExtStored = await BuroExtModel.create(params);
+        idBuro = buroExtStored.idBuro._id;
+      } else {
+
+        let intentos = prevConsulta.idBuro.intentos + 1;
+
+        let buroStored = await Buro.updateOne(
+          { _id: idBuro },
+          {
+            $set: {
+              intentos: intentos,
+              mortgageCredit : general.mortgageCredit,
+              carCredit : general.carCredit,
+              creditCard : general.creditCard,
+              last4: general.last4,
+            },
+          }
+        );
+
+
+      }
 
     let ultimaConsulta = await userController.ultimaConsulta();
 
@@ -1039,6 +1098,11 @@ const buroHelper = {
           };
 
           let nuevaConsulta = await Consultas.create(data);
+
+          let dataBuro = await Buro.findById(idBuro);
+          await Buro.findByIdAndUpdate(idBuro, {
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
+          });
           
           return res.status(200).json({
             success: false,
@@ -1066,6 +1130,11 @@ const buroHelper = {
           };
 
           let nuevaConsulta = await Consultas.create(data);
+
+          let dataBuro = await Buro.findById(idBuro);
+          await Buro.findByIdAndUpdate(idBuro, {
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
+          });
 
           let error = Resburo.respuesta.persona.error
             ? Resburo.respuesta.persona.error.ur
@@ -1101,6 +1170,11 @@ const buroHelper = {
         };
 
         let nuevaConsulta = await Consultas.create(data);
+
+        let dataBuro = await Buro.findById(idBuro);
+          await Buro.findByIdAndUpdate(idBuro, {
+            consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
+          });
 
         return res.status(200).json({
           success: true,
