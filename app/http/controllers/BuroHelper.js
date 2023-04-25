@@ -1042,77 +1042,78 @@ const buroHelper = {
           message: "Error al consultar datos",
         });
       }
-      if (
-        Resburo.respuesta !== undefined &&
-        Resburo.respuesta.persona.error !== undefined &&
-        Resburo.respuesta.persona.error !== null
-      ) {
-        console.log("error buro casa");
-        console.log(Resburo);
-        let data = {
-          folio: referenciaOperador,
-          tipo: "buro casa",
-          fecha: new Date(),
-          status: "error Buro Casa",
-          name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.nombre}`,
-          error: Resburo,
-        };
-
-        let nuevaConsulta = await Consultas.create(data);
-
-        let paramsHub = {
-          score: "",
-          status: "ERROR_AUTENTICACION",
-          idConsulta: "INTERNO",
-        };
-
-        let buroHub = await hubspotController.deal.update(
-          hubspotDealId,
-          "buro",
-          paramsHub
-        );
-
-        return res.status(200).json({
-          success: false,
-          error: "datos",
-          message: "Error al consultar datos",
-        });
-      }
-
-      let scoreValue = Resburo.respuesta.persona.scoreBuroCredito[0].valorScore;
-
-      let paramsHub = {
-        score: scoreValue,
-        status: "COMPLETADO",
-        idConsulta: "INTERNO",
-      };
-
-      let buroHub = await hubspotController.deal.update(
-        hubspotDealId,
-        "buro",
-        paramsHub
       );
+      // if (
+      //   Resburo.respuesta !== undefined &&
+      //   Resburo.respuesta.persona.error !== undefined &&
+      //   Resburo.respuesta.persona.error !== null
+      // ) {
+      //   console.log("error buro casa");
+      //   console.log(Resburo);
+      //   let data = {
+      //     folio: referenciaOperador,
+      //     tipo: "buro casa",
+      //     fecha: new Date(),
+      //     status: "error Buro Casa",
+      //     name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.nombre}`,
+      //     error: Resburo,
+      //   };
 
-      let data = {
-        folio: referenciaOperador,
-        referencia: Resburo.respuesta.persona.encabezado.numeroControlConsulta,
-        tipo: "Buro Casa",
-        fecha: new Date(),
-        status: "success",
-        name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
-        resultado: Resburo,
-        scoreValue: scoreValue,
-      };
+      //   let nuevaConsulta = await Consultas.create(data);
 
-      let nuevaConsulta = await Consultas.create(data);
+      //   let paramsHub = {
+      //     score: "",
+      //     status: "ERROR_AUTENTICACION",
+      //     idConsulta: "INTERNO",
+      //   };
 
-      console.log("buro casa consultado correctamente")
+      //   let buroHub = await hubspotController.deal.update(
+      //     hubspotDealId,
+      //     "buro",
+      //     paramsHub
+      //   );
 
-      return res.status(200).json({
-        success: true,
-        message: "Consulta realizada",
-        score: scoreValue,
-      });
+      //   return res.status(200).json({
+      //     success: false,
+      //     error: "datos",
+      //     message: "Error al consultar datos",
+      //   });
+      // }
+
+      // let scoreValue = Resburo.respuesta.persona.scoreBuroCredito[0].valorScore;
+
+      // let paramsHub = {
+      //   score: scoreValue,
+      //   status: "COMPLETADO",
+      //   idConsulta: "INTERNO",
+      // };
+
+      // let buroHub = await hubspotController.deal.update(
+      //   hubspotDealId,
+      //   "buro",
+      //   paramsHub
+      // );
+
+      // let data = {
+      //   folio: referenciaOperador,
+      //   referencia: Resburo.respuesta.persona.encabezado.numeroControlConsulta,
+      //   tipo: "Buro Casa",
+      //   fecha: new Date(),
+      //   status: "success",
+      //   name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
+      //   resultado: Resburo,
+      //   scoreValue: scoreValue,
+      // };
+
+      // let nuevaConsulta = await Consultas.create(data);
+
+      // console.log("buro casa consultado correctamente")
+
+      // return res.status(200).json({
+      //   success: true,
+      //   message: "Consulta realizada",
+      //   score: scoreValue,
+      // });
   },
   async buroExt(req, res) {
     const general = req.body;
