@@ -802,7 +802,7 @@ const buroHelper = {
     }
   },
   async buroCasa(req, res) {
-
+    console.log("buroCasa", req.body);
     let { hubspotDealId } = req.body;
 
     if (hubspotDealId === undefined) {

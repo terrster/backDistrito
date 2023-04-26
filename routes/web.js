@@ -21,7 +21,7 @@ const ciecController = require("../app/http/controllers/ciecController");
 const HubspotController = require("../app/http/controllers/hubspotController");
 const dataController = require("../app/http/controllers/dataController");
 const buroHelper = require("../app/http/controllers/BuroHelper");
-
+const miFielController = require("../app/http/controllers/mifielController");
 
 
 route.post('/signin', authController.sigin);
@@ -34,6 +34,7 @@ route.get("/validate_resetHash/:hash", authController.validate_resetHash);
 route.post("/reset_password/:hash", authController.reset_password);
 
 route.post("/buro_ext", buroHelper.buroExt);
+route.get("/mifiel", miFielController.index);
 
 //ciec
 // route.post("/ciec", ciecController.create);
