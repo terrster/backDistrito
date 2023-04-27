@@ -33,6 +33,21 @@ const getUpdate = async (Accion, id, params) => {
   );
 };
 
+const getPro = async (Accion, id) => {
+  return await until(
+    () => {
+      return Accion.findById(id).then((acc) => {
+        if (acc) {
+          return acc;
+        }
+        return false;
+      });
+    },
+    1000,
+    10
+  );
+};
+
 const buroHelper = {
   async buroLogic(req, res) {
     let { id } = req.body;
@@ -1119,7 +1134,7 @@ const buroHelper = {
     const general = req.body;
 
     if(!general){
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         error: "datos",
         message: "No se obtuvieron los datos",
@@ -1129,6 +1144,7 @@ const buroHelper = {
     let prevConsulta = await BuroExtModel.findOne({ email: general.email });
     
     let idBuro = prevConsulta ? prevConsulta.idBuro._id : null;
+    let idPrev = prevConsulta ? prevConsulta._id : null;
 
     if (!prevConsulta) {
 
@@ -1155,6 +1171,8 @@ const buroHelper = {
 
         let buroExtStored = await BuroExtModel.create(params);
         idBuro = buroExtStored.idBuro._id;
+        idPrev = buroExtStored._id;
+
       } else {
 
         let intentos = prevConsulta.idBuro.intentos + 1;
@@ -1191,11 +1209,13 @@ const buroHelper = {
     let { token, url, data } = databuro;
 
     if (!token.success) {
+      const user = await getPro(BuroExtModel, idPrev);
       console.log("error token");
       return res.status(500).json({
         success: false,
         error: "token",
         message: "Error al generar token",
+        user: user,
       });
     }
 
@@ -1233,12 +1253,15 @@ const buroHelper = {
           await Buro.findByIdAndUpdate(idBuro, {
             consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
           });
+
+          const user = await getPro(BuroExtModel, idPrev);
           
           return res.status(200).json({
             success: false,
             error: "datos",
             consulta: nuevaConsulta,
-            message: "Error al consultar datos",
+            message: "Parece que alguno de tus datos es incorrecto, ayúdanos a revisar e intentarlo nuevamente",
+            user: user,
           });
           }
 
@@ -1274,11 +1297,14 @@ const buroHelper = {
             error = JSON.stringify(error);
           }
 
+          const user = await getPro(BuroExtModel, idPrev);
+
           return res.status(200).json({
             success: false,
             error: error,
             message: "Error al consultar datos",
             consulta: nuevaConsulta,
+            user: user,
           });
         }
 
@@ -1306,10 +1332,13 @@ const buroHelper = {
             consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
           });
 
+          const user = await getPro(BuroExtModel, idPrev);
+
         return res.status(200).json({
           success: true,
           message: "Consulta buro: " + type,
           score: scoreValue,
+          user: user,
         });
       })
       .catch(async (error) => {

@@ -8,6 +8,7 @@
 
 const express = require("express");
 const route = express.Router();
+const rateLimit = require("express-rate-limit");
 
 //Controllers
 const authController = require("../app/http/controllers/authController");
@@ -22,6 +23,13 @@ const HubspotController = require("../app/http/controllers/hubspotController");
 const dataController = require("../app/http/controllers/dataController");
 const buroHelper = require("../app/http/controllers/BuroHelper");
 
+const limit = rateLimit({
+    windowMs: 14 * 60 * 60 * 1000, // 12 hours
+    max: 3, // limit each IP to 100 requests per windowMs
+    message: "Too many accounts created from this IP, please try again after an hour",
+    keyGenerator: (req) => req.body.rfcPerson
+});
+
 
 
 route.post('/signin', authController.sigin);
@@ -33,7 +41,7 @@ route.post("/forgot_password", authController.forgotten_password);
 route.get("/validate_resetHash/:hash", authController.validate_resetHash);
 route.post("/reset_password/:hash", authController.reset_password);
 
-route.post("/buro_ext", buroHelper.buroExt);
+route.post("/buro_ext", [limit] ,buroHelper.buroExt);
 
 //ciec
 // route.post("/ciec", ciecController.create);
