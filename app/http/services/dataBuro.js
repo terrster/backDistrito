@@ -21,6 +21,7 @@ const codigoEstado = (estado) => {
     case "CAMPECHE":
       return "CAM";
     case "COAHUILA":
+    case "COAHUILA DE ZARAGOZA":
       return "COA";
     case "COLIMA":
       return "COL";
@@ -29,6 +30,7 @@ const codigoEstado = (estado) => {
     case "CHIHUAHUA":
       return "CHI";
     case "CIUDAD DE MEXICO":
+    case "DISTRITO FEDERAL":
       return "CDMX";
     case "DURANGO":
       return "DGO";
@@ -46,6 +48,7 @@ const codigoEstado = (estado) => {
     case "MÉXICO":
       return "EM";
     case "MICHOACAN":
+    case "MICHOACAN DE OCAMPO":
       return "MICH";
     case "MORELOS":
       return "MOR";
@@ -74,6 +77,7 @@ const codigoEstado = (estado) => {
     case "TLAXCALA":
       return "TLAX";
     case "VERACRUZ":
+    case "VERACRUZ DE IGNACIO DE LA LLAVE":
       return "VER";
     case "YUCATAN":
       return "YUC";
