@@ -10,7 +10,7 @@ const smsController = {
 
             await axios.post('https://api.smsmasivos.com.mx/sms/send', {
                 message: msg,
-                numbers: '5522483811, 5568781567',
+                numbers: '5568781567, 5615139382',
                 country_code: '52'
             }, {
                 headers: {
