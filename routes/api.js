@@ -33,6 +33,7 @@ const updateDataController = require("../app/http/controllers/updateDataControll
 const metamapController = require("../app/http/controllers/metamapController");
 const buroHelper = require("../app/http/controllers/BuroHelper");
 const ciecController = require("../app/http/controllers/ciecController");
+const miFielController = require("../app/http/controllers/miFielController");
 const rateLimit = require("express-rate-limit");
 
 route.use(verifyToken);
@@ -144,6 +145,12 @@ route.group("/meta", (meta) => {
     meta.post("/consulta", metamapController.listener);
     meta.post("/update", metamapController.updateSate);
     meta.get("/data", metamapController.updateData);
+});
+
+//mifiel 
+route.group("/mifiel", (mifiel) => {
+    mifiel.post("/:id", miFielController.create);
+    mifiel.get("/data", miFielController.index);
 });
 
 //Finerio routes

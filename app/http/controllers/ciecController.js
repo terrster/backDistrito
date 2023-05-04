@@ -441,10 +441,14 @@ const ciecController = {
       user: userUpdated,
     });
   },
-  save: async (params, user, id, type) => {
+   save: async (params, user, id, type) => {
     let applianceID = user.idClient.appliance[0];
     let hubspotDealId = user.hubspotDealId;
     let n4_93_ciec = Buffer.from(params.ciec).toString("base64");
+
+    await hubspotController.deal.update(hubspotDealId, 'type', {
+      type: type
+    });
 
     await hubspotController.deal.update(hubspotDealId, "single_field", {
       name: "n4_93_ciec",
@@ -463,7 +467,7 @@ const ciecController = {
     } else {
     await hubspotController.deal.update(hubspotDealId, "single_field", {
         "value": params.rfcMoral,
-        "name": "n3_rfc_moral"
+        "name": "n3_15_rfc_pm"
     })
     }
 
@@ -496,9 +500,9 @@ const ciecController = {
       let appliance = await Appliance.findOne({
         _id: user.idClient.appliance[0]._id,
       });
-      let fiscal = await FiscalInfo.findOne({
+      let fiscal = appliance.idFiscal ? await FiscalInfo.findOne({
         _id: appliance.idFiscal._id,
-      });
+      }) : null;
 
       if (!fiscal) {
         let fiscalStore = await FiscalInfo.create(params);

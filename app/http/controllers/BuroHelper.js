@@ -128,6 +128,7 @@ const buroHelper = {
       }
 
       if (buro.score === "ERROR") {
+        console.log("ERROR AL CONSULTAR BURO");
         return res.status(412).json({
           ...buro,
         });
@@ -137,7 +138,7 @@ const buroHelper = {
         ...buro,
       });
     } catch (error) {
-      console.log(error);
+      console.log("error al consultar buro: " + error);
       return res.status(500).json({
         success: false,
         message: "Error al actualizar",
@@ -193,6 +194,11 @@ const buroHelper = {
         for (let i = 0; i < consultas.length; i++) {
           if (consultas[i].status === "success" && type === "buro") {
             let scoreValue = consultas[i].scoreValue;
+
+            if(scoreValue === "ERROR"){
+              scoreValue = 700;
+            }
+            
             await Client.findByIdAndUpdate(client._id, {
               score: scoreValue,
             });
@@ -218,6 +224,10 @@ const buroHelper = {
                 }
               );
             }
+
+            await getUpdate(Client, user.idClient._id, {
+              score: scoreValue,
+              });
             let userUpdate = await User.findById(id);
             return {
               success: true,
@@ -343,6 +353,21 @@ const buroHelper = {
     //   user: user,
     //   };
     // }
+
+    if(process.env.NODE_ENV !== "production"){
+      let pruebas = await dataBuro.dataPruebas();
+      console.log("pruebas :", pruebas);
+      let dataPruebas =  {
+        method: "post",
+        url: pruebas.url,
+        headers: {
+          Authorization: `Bearer ${pruebas.token.token}`,
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+      config = dataPruebas;
+    };
 
     let res = await axios(config)
       .then(async (response) => {
@@ -518,7 +543,7 @@ const buroHelper = {
           });
 
           let userUpdate = await User.findById(id);
-
+          console.log("cuatro");
           return {
             success: true,
             message: "Consulta buro: " + type,
@@ -551,7 +576,7 @@ const buroHelper = {
         );
 
         let userUpdate = await User.findById(id);
-
+        console.log("uno")
         return {
           success: true,
           message: "Consulta buro: " + type,
@@ -560,8 +585,8 @@ const buroHelper = {
         };
       })
       .catch(async (error) => {
-        console.log(error);
-        console.log(`error al obtener el AuthBuro ${error}`);
+        // console.log(`error al obtener el AuthBuro ${error}`);
+        console.log(error.response.data);
         let userUpdate = await User.findById(id);
         return {
           success: false,
@@ -1305,7 +1330,7 @@ const buroHelper = {
           await Buro.findByIdAndUpdate(idBuro, {
             consultas: [...dataBuro.consultas, { _id: nuevaConsulta._id }],
           });
-
+        console.log("dos");
         return res.status(200).json({
           success: true,
           message: "Consulta buro: " + type,

@@ -19,7 +19,7 @@ const realTimeManager = require("../app/http/services/realTimeManager");
 const metamapController = require("../app/http/controllers/metamapController");
 const buroController = require("../app/http/controllers/buroController");
 const buroHelper = require("../app/http/controllers/BuroHelper");
-const miFielController = require("../app/http/controllers/mifielController");
+const miFielController = require("../app/http/controllers/miFielController");
 
 // route.use((request, response, next) => {
 //     if(!request.query.tokensecret){
@@ -80,7 +80,8 @@ route.group("/buro", (buro) => {
 
 //Consulta de mifiel
 route.group("/mifiel", (mifiel) => {
-    mifiel.get('/documents', miFielController.listener);
+    mifiel.post('/documents', miFielController.listener);
+    mifiel.get('/prueba', miFielController.index);
 });
 
 module.exports = route;

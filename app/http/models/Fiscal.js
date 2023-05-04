@@ -1,3 +1,4 @@
+const { books } = require('googleapis/build/src/apis/books');
 const { Schema, model }= require('mongoose');
 
 const fiscalSchema = new Schema({
@@ -6,6 +7,11 @@ const fiscalSchema = new Schema({
     rfcMoral: String,
     rfcPerson: String,
     ciec: String,
+    buroMoral: {
+        documentId: String,
+        firma: { type: Boolean, default: false },
+        widgetId: String,
+    },
     ciecStatus: { type: Boolean, default: false },
 }, { collection: 'FiscalInfo' });
 

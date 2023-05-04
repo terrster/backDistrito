@@ -149,19 +149,19 @@ async function getToken(type) {
   };
 }
 
-async function getTokenPÑruebas() {
+async function getTokenPruebas() {
   let data = qs.stringify({
-    grant_type: "client_credentials",
+    'grant_type': 'client_credentials' 
   });
   let config = {
-    method: "post",
-    url: "https://apigateway1.burodecredito.com.mx:8443/auth/oauth/v2/token",
-    headers: {
-      Authorization:
-        "Basic bDdmNGFiOTYxOTkyMzM0MzA2OWUzYTQ4YzMyMDliNjFlNDplZTliYTY5OWU5ZjU0Y2Q3YmJlNzk0OGUwODg0Y2NjOQ==",
-      "Content-Type": "application/x-www-form-urlencoded",
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://apigateway1.burodecredito.com.mx:8443/auth/oauth/v2/token',
+    headers: { 
+      'Authorization': 'Basic bDdmNGFiOTYxOTkyMzM0MzA2OWUzYTQ4YzMyMDliNjFlNDplZTliYTY5OWU5ZjU0Y2Q3YmJlNzk0OGUwODg0Y2NjOQ==', 
+      'Content-Type': 'application/x-www-form-urlencoded'
     },
-    data: data,
+    data : data
   };
 
   let success = null;
@@ -177,6 +177,11 @@ async function getTokenPÑruebas() {
       success = false;
       token = error;
     });
+
+    return {
+      success: success,
+      token: token,
+    };
 }
 
 const removeAccents = (str) => {
@@ -729,6 +734,14 @@ const dataBuro = {
         data: data,
         token: token,
       };
+  },
+  async dataPruebas(){
+    const token = await getTokenPruebas();
+    const url = 'https://api.burodecredito.com.mx:4431/devpf/autenticador/credit-report-api/v1/autenticador'
+    return {
+      url: url,
+      token: token,
+    }
   },
   async resBuro(
     Resburo,

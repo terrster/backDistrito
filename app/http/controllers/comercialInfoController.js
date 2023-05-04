@@ -258,6 +258,18 @@ const comercialInfoController = {
       } else {
         console.log("No hay info comercial");
 
+        let addressParams = {
+          state,
+          municipality,
+          street,
+          extNumber,
+          intNumber,
+          town,
+          zipCode,
+        };
+  
+        let addressStored = await Address.create(addressParams);
+  
         let comercialInfoParams = {
           comercialName,
           businessName,
@@ -275,23 +287,26 @@ const comercialInfoController = {
           exportation,
           ciec,
           warranty,
+          address: {
+            _id: addressStored._id,
+          },
           status: true,
         };
-
-        let comercialInfoStored = await ComercialInfo.create(
-          comercialInfoParams
-        );
+  
+        let comercialInfoStored = await ComercialInfo.create(comercialInfoParams);
+  
         await Appliance.findByIdAndUpdate(user.idClient.appliance[0]._id, {
           idComercialInfo: {
             _id: comercialInfoStored._id,
           },
         });
-
+  
         await Client.findByIdAndUpdate(user.idClient._id, {
           idComercialInfo: {
             _id: comercialInfoStored._id,
           },
         });
+
         comercial = comercialInfoStored;
       }
 
