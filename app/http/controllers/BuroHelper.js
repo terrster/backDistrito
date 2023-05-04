@@ -354,7 +354,7 @@ const buroHelper = {
     //   };
     // }
 
-    if(process.env.NODE_ENV !== "production"){
+    if(process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "development"){
       let pruebas = await dataBuro.dataPruebas();
       console.log("pruebas :", pruebas);
       let dataPruebas =  {
@@ -828,7 +828,9 @@ const buroHelper = {
   },
   async buroCasa(req, res) {
     console.log("buroCasa", req.body);
-    let { hubspotDealId } = req.body;
+    let { dealId } = req.body;
+
+    const hubspotDealId = dealId;
 
     if (hubspotDealId === undefined) {
       return res.status(500).json({
@@ -907,6 +909,12 @@ const buroHelper = {
     });
 
     let { token, url, data } = dataConsulta;
+
+    // return res.status(200).json({
+    //   success: true,
+    //   message: "Consulta Buro Casa",
+    //   data: JSON.parse(data),
+    // });
 
     if (!token.success) {
       return res.status(500).json({
@@ -1000,7 +1008,8 @@ const buroHelper = {
           });
         }
 
-        let scoreValue = Resburo.respuesta.persona.scoreBuroCredito;
+        let scoreValue = Resburo.respuesta.persona.scoreBuroCredito
+        ? Resburo.respuesta.persona.scoreBuroCredito[0].valorScore : 0;
 
         let paramsHub = {
           score: scoreValue,
@@ -1043,7 +1052,7 @@ const buroHelper = {
           fecha: new Date(),
           status: "error Buro Casa",
           name: `${consulta.apellidoPaterno} ${consulta.apellidoMaterno} ${consulta.primerNombre}`,
-          error: err,
+          error: err.response.data,
         };
 
         let nuevaConsulta = await Consultas.create(data);
