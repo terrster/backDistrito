@@ -493,6 +493,13 @@ const dataBuro = {
   },
   async dataBuroMoral({ general, firma }) {
     let estado = removeAccents(general.address.state);
+    const longitudMaxima = 75;
+
+    if(general.businessName && general.businessName.length > longitudMaxima){
+      console.log("Se recorto el nombre de la empresa")
+      general.businessName = general.businessName.substring(0, longitudMaxima);
+    }
+
     const url =
       "https://api.burodecredito.com.mx:4431/pm/reporte-de-credito/pm-report/api/v1/reporte-de-credito";
     const data = JSON.stringify({
