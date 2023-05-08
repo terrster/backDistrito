@@ -117,23 +117,37 @@ const miFielController = {
     });
 
     try {
-    const fields = await Template.getFields({ templateId: '98f9ae82-1762-4372-a12c-fa1714c2c42c' });
 
     const document = await Template.generateDocument({
-      templateId: '98f9ae82-1762-4372-a12c-fa1714c2c42c',
+      templateId: '2b4170c4-b52f-47c4-aac7-3ae9aad36054',
       document: {
         name: 'prueba documento',
+        send_mail: true,
         signatories: [{
           name: 'Juan Perez',
           email: 'terrorkmr@gmail.com',
           tax_id: 'FSE920910CC6'
         }],
-        callback_url: "https://aaa0-2806-2f0-90c0-b9fa-b124-ecfe-4508-2967.ngrok-free.app/private/api/mifiel/documents",
+        fields: {
+          'razon_social': 'prueba razon social',
+          'nombre_rep_legal' : 'prueba nombre rep legal',
+          'rfc' : 'FSE920910CC6',
+          'calle_y_numero' : 'prueba calle y numero',
+          'colonia' : 'prueba colonia',
+          'ciudad' : 'prueba ciudad',
+          'estado' : 'prueba estado',
+          'codigo_postal' : 'prueba codigo postal',
+          'telefono' : 'prueba telefono',
+        },
+        sign_callback_url: "https://dev.localhost.ngrok-free.app/private/api/mifiel/documents",
       }
     });
 
     console.log("document", document);
-    return res.json({ mensaje: "ok" });
+    return res.json({ 
+      mensaje: "ok",
+      document: document 
+    });
     const documents = await Template.generateDocuments({
       templateId: '98f9ae82-1762-4372-a12c-fa1714c2c42c',
       callback_url: 'https://aaa0-2806-2f0-90c0-b9fa-b124-ecfe-4508-2967.ngrok-free.app/private/api/mifiel/documents',
