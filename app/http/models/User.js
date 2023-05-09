@@ -20,6 +20,7 @@ const userSchema = new Schema({
     idDistrito: Number,
     ipV4: String,
     brokercode: String,
+    rfc: { type: String, index: true, unique: true, required: true, uniqueCaseInsensitive: true },
     createdAt: { type: Date, default: utc }
 }, { collection: 'User' });
 

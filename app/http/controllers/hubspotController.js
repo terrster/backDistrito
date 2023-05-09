@@ -17,7 +17,7 @@ const deal = {
 
     store: async(request) => { 
         try{
-
+            let nombreCorreo = request.email.split("@")[0];
             let dealParams = {
                 "associations": {
                     "associatedVids": [
@@ -30,7 +30,7 @@ const deal = {
                         "name": "numeroderegistro"
                     },
                     {
-                        "value": request.name + " " + request.lastname,
+                        "value": nombreCorreo,
                         "name": "nombre_comercial"
                     },
                     {
@@ -42,7 +42,7 @@ const deal = {
                         "name": "celular"
                     },
                     {
-                        "value": request.prefix ? request.prefix + request.idDistrito + " " + request.name + " " + request.lastname : request.idDistrito + " " + request.name + " " + request.lastname,
+                        "value": request.prefix ? request.prefix + request.idDistrito + " " + request.rfc : request.idDistrito + " " + request.rfc,
                         "name": "dealname"
                     },
                     {
@@ -1000,6 +1000,7 @@ const deal = {
 const contact = {
 
     store: async(request) => {
+        let nombreCorreo = request.email.split("@")[0];
         try{
             let contactParams = {
                 "properties": [
@@ -1012,11 +1013,11 @@ const contact = {
                         "property": "phone"
                     },
                     {
-                        "value": request.name,
+                        "value": request.rfc,
                         "property": "firstname"
                     },
                     {
-                        "value": request.lastname,
+                        "value": "",
                         "property": "lastname"
                     },
                     {

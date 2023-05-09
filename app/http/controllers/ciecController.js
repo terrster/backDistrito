@@ -489,6 +489,10 @@ const ciecController = {
         type: type,
       });
 
+      await getUpdate(User, id, {
+        rfc: params.rfcPerson ? params.rfcPerson : params.rfcMoral,
+      });
+
       let userUpdated = await getPro(User, id);
 
       return userUpdated;

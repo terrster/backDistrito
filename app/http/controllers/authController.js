@@ -22,11 +22,12 @@ const authController = {
   sigin: async (request, response) => {
     try {
       let data = request.body;
-
       let userExist = await User.findOne({ email: data.email.trim() });
+      let userExistRFC = await User.findOne({ rfc: data.rfc.trim() });
       let contactExist = await hubspotController.contact.getByEmail(
         data.email.trim()
       );
+
 
       let userExistMin = await User.findOne({
         email: data.email.toLowerCase().trim(),
@@ -37,10 +38,10 @@ const authController = {
 
       data.email = data.email.toLowerCase().trim();
 
-      if (userExist || contactExist || userExistMin || contactExistMin) {
+      if (userExist || contactExist || userExistMin || contactExistMin || userExistRFC) {
         return response.json({
           code: 500,
-          msg: "El correo electrónico ya existe",
+          msg: "El correo electrónico o RFC ya existe",
         });
       }
 
@@ -134,9 +135,10 @@ const authController = {
     }
   },
   login: async (request, response) => {
+    
     let { email, password } = request.body;
 
-    let user = await User.findOne({ email: email.trim() });
+    let user = await User.findOne({ email: email.trim() }) || await User.findOne({ email: email.toLowerCase().trim() }) || await User.findOne({ rfc: email });
     if (!user) {
       return response.status(200).json({
         code: 500,
