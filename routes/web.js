@@ -44,7 +44,7 @@ route.post("/reset_password/:hash", authController.reset_password);
 route.post("/buro_ext", [limit] ,buroHelper.buroExt);
 
 //ciec
-// route.post("/ciec", ciecController.create);
+route.post("/ciec", ciecController.get);
 //prueba
 route.get("/control/buro", dataController.getControl);
 route.post("/control/unykoo", dataController.setBuro);

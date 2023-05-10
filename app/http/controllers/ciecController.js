@@ -191,28 +191,28 @@ const getPro = async (Accion, id) => {
 
 //     if (ciecActual === ciec) {
 //       let n4_93_ciec = Buffer.from(ciec).toString("base64");
-      // await hubspotController.deal.update(hubspotDealId, "single_field", {
-      //   name: "n4_93_ciec",
-      //   value: "INTERNO",
-      // })
-      // .catch((error) => {
-      //   console.log(error);
-      //   return res.status(500).json({
-      //     msg: "Algo salió mal tratando de actualizar el CIEC",
-      //     error: error,
-      //   });
-      // });
-      // await hubspotController.deal.update(hubspotDealId, "single_field", {
-      //   name: "datacode",
-      //   value: n4_93_ciec,
-      // })
-      // .catch((error) => {
-      //   console.log(error);
-      //   return res.status(500).json({
-      //     msg: "Algo salió mal tratando de actualizar el CIEC",
-      //     error: error,
-      //   });
-      // });
+// await hubspotController.deal.update(hubspotDealId, "single_field", {
+//   name: "n4_93_ciec",
+//   value: "INTERNO",
+// })
+// .catch((error) => {
+//   console.log(error);
+//   return res.status(500).json({
+//     msg: "Algo salió mal tratando de actualizar el CIEC",
+//     error: error,
+//   });
+// });
+// await hubspotController.deal.update(hubspotDealId, "single_field", {
+//   name: "datacode",
+//   value: n4_93_ciec,
+// })
+// .catch((error) => {
+//   console.log(error);
+//   return res.status(500).json({
+//     msg: "Algo salió mal tratando de actualizar el CIEC",
+//     error: error,
+//   });
+// });
 //       await ComercialInfo.findByIdAndUpdate(comercialId, {
 //         ciecstatus: true,
 //       });
@@ -333,20 +333,36 @@ const getPro = async (Accion, id) => {
 const ciecController = {
   get: async (req, res) => {
     let { rfc, ciec, CiecStatus } = req.body;
-    let id = req.params.id;
+    let id = req.params.id ? req.params.id : null;
 
-    let user = await getPro(User, id);
+    let user = id ? await getPro(User, id) : null;
 
     if (!user) {
-      return res.status(404).json({
-        msg: "El usuario no existe",
-        code: 404,
-      });
+      let altUser = await User.findOne({ rfc: rfc });
+      let altUser2 = await ciecController.getAltUser(rfc);
+
+      if (!altUser) {
+        if (!altUser2) {
+          return res.status(404).json({
+            msg: "El usuario no existe",
+            code: 404,
+          });
+        } else {
+          user = altUser2;
+        }
+
+        // return res.status(404).json({
+        //   msg: "El usuario no existe",
+        //   code: 404,
+        // });
+      } else {
+        user = altUser;
+      }
     }
 
     let rfcLength = rfc.length;
 
-    if (!CiecStatus) {
+    if (!CiecStatus && id !== null) {
       if (rfcLength !== 10) {
         return res.status(400).json({
           msg: "El RFC no es válido",
@@ -415,7 +431,7 @@ const ciecController = {
     };
 
     let ciecStatus = await ciecController.getStatus(data);
-    
+
     let status = ciecStatus.status;
 
     if (status === "invalid" || status === 500) {
@@ -449,22 +465,22 @@ const ciecController = {
     await hubspotController.deal.update(hubspotDealId, "single_field", {
       name: "n4_93_ciec",
       value: "valid",
-    })
+    });
     await hubspotController.deal.update(hubspotDealId, "single_field", {
       name: "datacode",
       value: n4_93_ciec,
-    })
+    });
 
-    if(type !== "PM"){
-    await hubspotController.deal.update(hubspotDealId, "single_field", {
-        "value": params.rfcPerson,
-        "name": "n3_rfc"
-    })
+    if (type !== "PM") {
+      await hubspotController.deal.update(hubspotDealId, "single_field", {
+        value: params.rfcPerson,
+        name: "n3_rfc",
+      });
     } else {
-    await hubspotController.deal.update(hubspotDealId, "single_field", {
-        "value": params.rfcMoral,
-        "name": "n3_rfc_moral"
-    })
+      await hubspotController.deal.update(hubspotDealId, "single_field", {
+        value: params.rfcMoral,
+        name: "n3_rfc_moral",
+      });
     }
 
     if (applianceID === undefined || applianceID === null) {
@@ -545,6 +561,22 @@ const ciecController = {
       }
     }
   },
+  getAltUser: async (rfc) => {
+    let comercial = await ComercialInfo.findOne({
+      rfc: rfc,
+    });
+    let general = await GeneralInfo.findOne({
+      rfcPerson: rfc,
+    });
+
+    let client = await Client.findOne({
+      $or: [{ idComercialInfo: comercial }, { idGeneralInfo: general }],
+    });
+    let user = await User.findOne({
+      idClient: client,
+    });
+    return user ? user : false;
+  },
   getStatus: async (data) => {
     const refreshInterval = 4000;
     let response = await axios
@@ -563,20 +595,23 @@ const ciecController = {
     }
     let respuesta = null;
     const checkSatatus = setInterval(async () => {
-        await axios.get(`/b39d75/${response.data.id}`).then((sat) => {
-        const status = sat.data.status;
-        switch (status) {
-          case "pending":
-            break;
-          default:
-            respuesta = {
-              status: status,
-              data: sat.data,
-            }
-            clearInterval(checkSatatus);
-            break;
-        }
-      }).catch((err) => {
+      await axios
+        .get(`/b39d75/${response.data.id}`)
+        .then((sat) => {
+          const status = sat.data.status;
+          switch (status) {
+            case "pending":
+              break;
+            default:
+              respuesta = {
+                status: status,
+                data: sat.data,
+              };
+              clearInterval(checkSatatus);
+              break;
+          }
+        })
+        .catch((err) => {
           if (err.response !== undefined) {
             console.log(err.response);
             respuesta = {
@@ -592,17 +627,16 @@ const ciecController = {
             };
             clearInterval(checkSatatus);
           }
-        } 
-      );
+        });
     }, refreshInterval);
-    
+
     await new Promise((resolve) => {
       setInterval(() => {
         if (respuesta !== null) {
           resolve();
         }
       }, 1000);
-    } );
+    });
     return respuesta;
   },
 };
