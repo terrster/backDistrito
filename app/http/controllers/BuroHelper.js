@@ -183,6 +183,8 @@ const buroHelper = {
       rfc = comercial.rfc;
     }
 
+    console.log("RFC: " + rfc);
+
     if (user.idClient.appliance[0].idBuro) {
       let data = await Buro.findById(user.idClient.appliance[0].idBuro._id);
       if (data) {
@@ -348,7 +350,7 @@ const buroHelper = {
     if (type === "moral") {
       console.log("consulta buro moral :", comercial.businessName);
     } else {
-      console.log("consulta buro :", user.name);
+      console.log("consulta buro :", general.name);
     }
 
     // if(process.env.NODE_ENV !== "production"){
