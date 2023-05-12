@@ -5,9 +5,12 @@ const path = require("path");
 const fs = require("fs");
 const axios = require("axios");
 const User = require("../models/User");
+const ComercialInfo = require("../models/ComercialInfo");
+const GeneralInfo = require("../models/GeneralInfo");
 
 const APP_ID = process.env.MIFIEL_APP_ID;
 const APP_SECRET = process.env.MIFIEL_TOKEN;
+const TemplateId = process.env.MIFIEL_TEMPLATE_ID;
 const ENV = process.env.MIFIEL_ENV;
 
 const miFielController = {
@@ -16,160 +19,195 @@ const miFielController = {
     const userId = req.params.id;
 
     try {
+      const user = await User.findById(userId);
 
-    const user = await User.findById(userId);
-    const { email } = user;
+      if (!user) {
+        return res.status(404).json({ mensaje: "No se encontro el usuario" });
+      }
 
-    console.log("email", email);
+      const { idClient, email, phone } = user;
+      const { idComercialInfo, idGeneralInfo } = idClient;
+      const comercialInfo = await ComercialInfo.findById(idComercialInfo);
+      const generalInfo = await GeneralInfo.findById(idGeneralInfo);
 
-    const fiscal = await FiscalInfo.findOne({ rfcMoral: rfc });
+      let fiscal = await FiscalInfo.findOne({ rfcMoral: rfc });
 
-    if (!fiscal) {
-      return res.json({ mensaje: "No se encontro el RFC" });
+      if (!fiscal) {
+        if (idClient.type !== "PM") {
+          return res.status(200).json({
+            mensaje: "No es persona moral",
+            code: 1,
+          });
+        }
+
+        const comercialRFC = comercialInfo.rfc;
+
+        fiscal = await FiscalInfo.create({
+          rfcMoral: comercialRFC,
+        });
+      }
+
+      const { buroMoral } = fiscal;
+
+      if (buroMoral.documentId !== null && buroMoral.documentId !== undefined) {
+        console.log("buroMoral", buroMoral);
+
+        const Configuracion = Config.setTokens({
+          appId: APP_ID,
+          appSecret: APP_SECRET,
+          env: ENV,
+        });
+
+        let document = await Document.find(buroMoral.documentId);
+        const { signers, id } = document;
+        for (const signer of signers) {
+          if (signer.email === email) {
+            return res.status(200).json({
+              mensaje: "ok",
+              documento: document,
+              widgetId: signer.widget_id,
+            });
+          }
+        }
+      }
+
+      const representante_legal =
+        generalInfo.name +
+        " " +
+        generalInfo.lastname +
+        " " +
+        generalInfo.secondLastname;
+
+      const data = {
+        razon_social: comercialInfo.businessName,
+        address: comercialInfo.address,
+        email,
+        phone,
+        representante_legal,
+        rfc: fiscal.rfcMoral,
+      };
+
+      console.log("data", data);
+
+      const { document, success, error } = await miFielController.index(data);
+
+      if (!success) {
+        return res.status(200).json({
+          mensaje: "error",
+          code: 2,
+          error,
+        });
+      }
+
+      const { signers, id } = document;
+      let dataSigners = {};
+
+      for (const signer of signers) {
+        const { id, widget_id } = signer;
+        if (signer.email === email) {
+          console.log("signer", signer);
+          dataSigners = {
+            id: document.id,
+            widgetid: signer.widget_id,
+          };
+          break;
+        }
+      }
+
+      console.log("dataSigners", dataSigners);
+
+      await FiscalInfo.findOneAndUpdate(
+        { rfcMoral: rfc },
+        {
+          buroMoral: {
+            ...fiscal.buroMoral,
+            documentId: document.id,
+            widgetId: dataSigners.widgetid,
+          },
+        }
+      );
+
+      return res.status(200).json({
+        mensaje: "ok",
+        documento: document,
+        dataSigners,
+        widgetId: dataSigners.widgetid,
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).json({ mensaje: "error" });
     }
-
-    const { buroMoral } = fiscal;
-
+  },
+  async index({
+    razon_social,
+    address,
+    email,
+    phone,
+    representante_legal,
+    rfc,
+  }) {
     const Configuracion = Config.setTokens({
       appId: APP_ID,
       appSecret: APP_SECRET,
-      env: "sandbox",
-    })
-
-    if(buroMoral.documentId !== null && buroMoral.documentId !== undefined) {
-      let document = await Document.find(buroMoral.documentId);
-      const { signers, id } = document;
-      for (const signer of signers) {
-        if (signer.email === email) {
-          return res.status(200).json({
-            mensaje: "ok",
-            documento: document,
-            widgetId: signer.widget_id,
-          });
-        }
-      }
-  }
-
-      const file = path.join(__dirname, "../../../public/tmpFiles/Factura4.pdf");
-
-      const data = {
-        file: file,
-        signatories: [
-            {
-                tax_id: rfc,
-                email: email,
-                name: "Juan Perez",
-                external_id: "1234",
-            },
-        ],
-        callback_url: "https://aaa0-2806-2f0-90c0-b9fa-b124-ecfe-4508-2967.ngrok-free.app/private/api/mifiel/documents",
-    };
-
-        const document = await Document.create(data);
-
-        const { signers, id } = document;
-        let dataSigners = {};
-
-        for(const signer of signers) {
-            const { id, widget_id } = signer;
-            if(signer.email === email) {
-                console.log("signer", signer);
-                dataSigners = {
-                    id : document.id,
-                    widgetid: signer.widget_id
-                }
-                break;
-            }
-        }
-
-        console.log("dataSigners", dataSigners);
-
-        await FiscalInfo.findOneAndUpdate({ rfcMoral: rfc }, 
-          {
-            buroMoral: {
-                ...fiscal.buroMoral,
-                documentId: document.id,
-                widgetId: dataSigners.widgetid
-            }
-          }
-          );
-
-        return res.status(200).json({
-          mensaje: "ok",
-          documento: document,
-          dataSigners, 
-          widgetId: dataSigners.widgetid,
-        });
-
-    } catch (error) {
-        console.log("error", error);
-        return res.status(500).json({ mensaje: "error" });
-    }
-
-    
-  },
-  async index(req, res) {
-    
-    const Configuracion = Config.setTokens({
-      appId: "17417d350087fdb8270428202d5750358c993ba2",
-      appSecret: "eCDRePVo97Gt3MDUmmaxZ1B8LwC4HaEv3EjO2C3Fv/sYNBEOFXDGv2/BBzu1tuBcS87AuMvKZwfEqkKUna9v6w==",
       env: ENV,
     });
 
+    const nameDocument = "Aut_BC_PM_" + razon_social.split(" ").join("_");
+
     try {
-
-    const document = await Template.generateDocument({
-      templateId: '2b4170c4-b52f-47c4-aac7-3ae9aad36054',
-      document: {
-        name: 'prueba documento',
-        send_mail: true,
-        signatories: [{
-          name: 'Juan Perez',
-          email: 'terrorkmr@gmail.com',
-          tax_id: 'FSE920910CC6'
-        }],
-        fields: {
-          'razon_social': 'prueba razon social',
-          'nombre_rep_legal' : 'prueba nombre rep legal',
-          'rfc' : 'FSE920910CC6',
-          'calle_y_numero' : 'prueba calle y numero',
-          'colonia' : 'prueba colonia',
-          'ciudad' : 'prueba ciudad',
-          'estado' : 'prueba estado',
-          'codigo_postal' : 'prueba codigo postal',
-          'telefono' : 'prueba telefono',
+      const document = await Template.generateDocument({
+        templateId: TemplateId,
+        document: {
+          name: nameDocument,
+          send_mail: true,
+          signatories: [
+            {
+              name: razon_social,
+              email: email,
+              tax_id: rfc,
+            },
+          ],
+          fields: {
+            razon_social: razon_social,
+            nombre_rep_legal: representante_legal,
+            rfc: rfc,
+            calle_y_numero: address.street + " " + address.extNumber,
+            colonia: address.town,
+            ciudad: address.municipality,
+            estado: address.state,
+            codigo_postal: address.zipCode,
+            telefono: phone,
+          },
+          viewers: [
+            {
+              name: "Distrito Pyme",
+              email: "documentos@distritopyme.com",
+            },
+          ],
+          // sign_callback_url:
+          //   "https://dev.localhost.ngrok-free.app/private/api/mifiel/documents",
         },
-        sign_callback_url: "https://dev.localhost.ngrok-free.app/private/api/mifiel/documents",
-      }
-    });
+      });
 
-    console.log("document", document);
-    return res.json({ 
-      mensaje: "ok",
-      document: document 
-    });
-    const documents = await Template.generateDocuments({
-      templateId: '98f9ae82-1762-4372-a12c-fa1714c2c42c',
-      callback_url: 'https://aaa0-2806-2f0-90c0-b9fa-b124-ecfe-4508-2967.ngrok-free.app/private/api/mifiel/documents',
-      documents: [{
-        name: 'Mi primer documento',
-        // ...
-      }]
-    });
-    console.log("document", document);
-    return res.json({ mensaje: "ok" });
+      return {
+        success: true,
+        document: document,
+      };
     } catch (error) {
       console.log("error", error);
-      return res.json({ mensaje: "error" });
+      return {
+        success: false,
+        error: error,
+      };
     }
 
     //rfc distritopyme
-    // buro de fisica es viable === razon social === mandar mensaje necesitamos la autorizacion de buro Moral // button saber más // botton firmar Ahora // botton no cuento e.firma a la mano, firmar despues === 
-    // puedes regresar en cualquier momento para firmar tu documento mismo que tambien sera enviado via correo electronico, continuamos con tus documentos, imagen para regresar a la pagina 
+    // buro de fisica es viable === razon social === mandar mensaje necesitamos la autorizacion de buro Moral // button saber más // botton firmar Ahora // botton no cuento e.firma a la mano, firmar despues ===
+    // puedes regresar en cualquier momento para firmar tu documento mismo que tambien sera enviado via correo electronico, continuamos con tus documentos, imagen para regresar a la pagina
 
     // !buro no viable salta a documentos
 
-    // buro fisica es viable !== razon social === documentos 
+    // buro fisica es viable !== razon social === documentos
 
     const hexHash = await Document.getHash(fileBuffer);
 
