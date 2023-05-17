@@ -27,7 +27,7 @@ class Server{
         this.app.use(fileUpload());
 
         this.app.use((request, response, next) => {
-            const allowedOrigins = ['https://distritopyme.com', 'https://www.distritopyme.com', 'https://www.dev.distritocasa.com', 'https://dev.distritocasa.com','https://distritocasa.com','https://www.distritocasa.com', 'https://www.dev.distritopyme.com', 'https://dev.distritopyme.com', 'https://impmx.com', 'https://dev.impmx.com', 'https://api-v2.finerio.mx'];
+            const allowedOrigins = ['https://dev.re-krea.mx', 'https://www.dev.re-krea.mx', 'https://www.dev.distritocasa.com', 'https://dev.distritocasa.com','https://distritocasa.com','https://www.distritocasa.com', 'https://www.dev.distritopyme.com', 'https://dev.distritopyme.com', 'https://impmx.com', 'https://dev.impmx.com', 'https://api-v2.finerio.mx'];
             const origin = request.headers.origin || '';
             const token = request.headers.token || '';
 
